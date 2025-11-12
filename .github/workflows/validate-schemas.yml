@@ -1,0 +1,53 @@
+name: Validate Schemas
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    paths:
+      - '**.json'
+      - '**.yml'
+      - '**.yaml'
+      - '.github/workflows/validate-schemas.yml'
+
+jobs:
+  validate-schemas:
+    name: Validate Configuration Schemas
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install check-jsonschema
+        run: pip install check-jsonschema
+
+      - name: Validate GitHub Workflows
+        run: |
+          echo "Validating GitHub workflow files..."
+          check-jsonschema --builtin-schema github-workflows .github/workflows/*.yml
+
+      - name: Validate ESLint config
+        run: |
+          echo "Validating ESLint configuration..."
+          check-jsonschema --schemafile https://json.schemastore.org/eslintrc.json .eslintrc.json
+
+      - name: Validate Prettier config
+        run: |
+          echo "Validating Prettier configuration..."
+          check-jsonschema --schemafile https://json.schemastore.org/prettierrc.json .prettierrc.json
+
+      - name: Validate Markdownlint config
+        run: |
+          echo "Validating Markdownlint configuration..."
+          check-jsonschema --schemafile https://json.schemastore.org/markdownlint.json .markdownlint.json
+
+      - name: Validation summary
+        if: always()
+        run: echo "Schema validation completed"
