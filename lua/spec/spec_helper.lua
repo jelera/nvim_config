@@ -262,20 +262,44 @@ function M.create_vim_mock()
 
     -- Options (vim.o, vim.opt, etc.)
     o = {},
-    opt = setmetatable({}, {
+    opt = setmetatable({
+      _values = {},  -- Store option values internally
+    }, {
       __index = function(t, k)
-        -- Return an object with prepend/append/remove methods for option arrays
+        if k == '_values' then
+          return rawget(t, k)
+        end
+        -- Return an object with the stored value and array methods
         return {
-          prepend = function(self, value) end,
-          append = function(self, value) end,
+          _value = t._values[k],
+          prepend = function(self, value)
+            t._values[k] = value
+          end,
+          append = function(self, value)
+            t._values[k] = value
+          end,
           remove = function(self, value) end,
         }
       end,
-      __newindex = function(t, k, v) end,
+      __newindex = function(t, k, v)
+        -- Store the value
+        t._values[k] = v
+      end,
     }),
-    opt_local = setmetatable({}, {
-      __index = function(t, k) return nil end,
-      __newindex = function(t, k, v) end,
+    opt_local = setmetatable({
+      _values = {},
+    }, {
+      __index = function(t, k)
+        if k == '_values' then
+          return rawget(t, k)
+        end
+        return {
+          _value = t._values[k],
+        }
+      end,
+      __newindex = function(t, k, v)
+        t._values[k] = v
+      end,
     }),
     g = {},
     b = {},
