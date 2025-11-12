@@ -1,0 +1,117 @@
+return {
+  -- Default: Run all tests (both unit and integration)
+  _all = {
+    -- Directory structure
+    ROOT = { 'lua/spec/unit', 'lua/spec/integration' },
+    pattern = '_spec%.lua$',  -- Files ending with _spec.lua
+
+    -- Execution settings
+    shuffle = true,           -- Randomize test order to catch test interdependencies
+    seed = os.time(),         -- Use timestamp as seed for reproducible shuffles
+    verbose = true,           -- Show each test name as it runs (essential for TDD)
+    defer_print = false,      -- Immediate output (critical for debugging hanging tests)
+
+    -- Output format
+    output = 'utfTerminal',   -- UTF-8 terminal output with colors
+
+    -- Coverage (when enabled via --coverage flag)
+    coverage = false,         -- Disabled by default, enable with: busted --coverage
+
+    -- Lua configuration
+    lua = 'luajit',          -- Use LuaJIT (compatible with NeoVim's Lua 5.1)
+  },
+
+  -- Unit tests only (fast, for TDD red-green-refactor)
+  unit = {
+    ROOT = { 'lua/spec/unit' },
+    pattern = '_spec%.lua$',
+    shuffle = true,
+    seed = os.time(),
+    verbose = true,
+    defer_print = false,
+    output = 'utfTerminal',
+    lua = 'luajit',
+  },
+
+  -- Integration tests only (slower, less frequent)
+  integration = {
+    ROOT = { 'lua/spec/integration' },
+    pattern = '_spec%.lua$',
+    shuffle = true,
+    seed = os.time(),
+    verbose = true,
+    defer_print = false,
+    output = 'utfTerminal',
+    lua = 'luajit',
+  },
+}
+
+--[[
+Usage Examples:
+===============
+
+Run all tests (unit + integration):
+  busted
+  ./scripts/test.sh
+
+Run only unit tests (fast, for TDD) - TWO WAYS:
+  # By directory:
+  busted lua/spec/unit
+  ./scripts/test.sh lua/spec/unit
+
+  # By tag (works across all directories):
+  busted --tags=unit
+  ./scripts/test.sh --tags=unit
+
+Run only integration tests - TWO WAYS:
+  # By directory:
+  busted lua/spec/integration
+  ./scripts/test.sh lua/spec/integration
+
+  # By tag:
+  busted --tags=integration
+  ./scripts/test.sh --tags=integration
+
+Exclude slow integration tests during rapid TDD:
+  busted --exclude-tags=integration
+  ./scripts/test.sh --exclude-tags=integration
+
+Run specific test file:
+  busted lua/spec/unit/nvim/core/module_loader_spec.lua
+  ./scripts/test.sh lua/spec/unit/nvim/core/module_loader_spec.lua
+
+Run tests matching a pattern:
+  busted --filter="module loader"
+
+Run without shuffle (for debugging):
+  busted --no-shuffle lua/spec/unit
+
+Reproduce a specific test order:
+  busted --seed=1234567890
+
+Run with coverage report:
+  busted --coverage
+
+Helpful flags for debugging:
+  --no-shuffle              Disable test randomization
+  --verbose                 Extra verbose output
+  --output=plainTerminal    Simpler output format
+  --seed=<number>           Use specific seed for reproducibility
+  --tags=<tag>              Run only tests with specific tag
+  --exclude-tags=<tag>      Exclude tests with specific tag
+
+When a test fails in shuffle mode:
+1. Note the seed value from the output
+2. Re-run with that seed: busted --seed=<noted-seed>
+3. Or disable shuffle to debug: busted --no-shuffle
+
+Test file structure:
+  Implementation: lua/nvim/core/module_loader.lua
+  Unit tests:     lua/spec/unit/nvim/core/module_loader_spec.lua (tagged #unit)
+  Integration:    lua/spec/integration/nvim/core/module_loader_integration_spec.lua (tagged #integration)
+
+Test tagging convention:
+  - All test files use tags: describe('module_name #unit', ...) or describe('module_name #integration', ...)
+  - Unit tests: Fast, isolated, no external dependencies
+  - Integration tests: Slower, test interactions between components
+--]]

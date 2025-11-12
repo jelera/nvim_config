@@ -1,0 +1,43 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Read SESSION_STATUS.md to understand the current project state, what was accomplished in the last session, and what to work on next. This file contains:\n- Completed work (72 tests passing, 2 modules complete)\n- Test structure and conventions\n- Key decisions made\n- Next steps\n- File structure\n- Test running commands\n\nAfter reading, briefly confirm you understand the current state and what to work on next."
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "clear|logout|other",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Before ending this session, please update SESSION_STATUS.md with:\n1. What was accomplished this session\n2. Current test results (pass/fail counts)\n3. Any new files created or modules completed\n4. Updated 'Next Steps' section\n5. Any important decisions or notes for next session\n\nKeep the format consistent with the existing structure."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/scripts/lint-check.sh \"$CLAUDE_TOOL_INPUT\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/scripts/type-check.sh \"$CLAUDE_TOOL_INPUT\"",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}

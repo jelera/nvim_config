@@ -1,0 +1,72 @@
+name: Lint and Type Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  lint-and-type-check:
+    name: Lint and Type Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up mise
+        uses: jdx/mise-action@v2
+        with:
+          install: true
+          cache: true
+
+      - name: Install Lua dependencies
+        run: |
+          luarocks install busted
+          luarocks install luacheck
+          luarocks install luacov
+
+      - name: Install Node.js dependencies (if needed)
+        run: |
+          if [ -f "package.json" ]; then
+            npm install
+            npm install -g eslint typescript
+          fi
+
+      - name: Install Python dependencies (if needed)
+        run: |
+          if [ -f "requirements.txt" ]; then
+            pip install -r requirements.txt
+            pip install ruff mypy
+          fi
+
+      - name: Install Ruby dependencies (if needed)
+        run: |
+          if [ -f "Gemfile" ]; then
+            bundle install
+            gem install rubocop
+          fi
+
+      - name: Run lint checks
+        run: ./scripts/lint-check.sh
+
+      - name: Run type checks
+        run: ./scripts/type-check.sh
+
+      - name: Run tests
+        run: busted
+        if: always()
+
+      - name: Generate coverage report
+        run: busted --coverage
+        if: always()
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          file: ./luacov.report.out
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false

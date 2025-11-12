@@ -1,0 +1,36 @@
+# mise configuration for NeoVim IDE project
+# https://mise.jdx.dev/
+#
+# This file defines all tool versions needed for development
+# Run: mise install
+#
+# Supported platforms:
+# - macOS + Homebrew
+# - Ubuntu 24.04 LTS + Homebrew
+# - Ubuntu 24.04 LTS + apt
+# - Ubuntu 22.04 LTS + Homebrew
+# - Ubuntu 22.04 LTS + apt
+
+[tools]
+# Core development tools (installed via mise)
+neovim = "0.10.2"           # Latest stable NeoVim
+node = "22.11.0"            # LTS - needed for LSP servers and Copilot
+python = "3.12.7"           # Latest stable - needed for Python LSP and DAP
+ruby = "3.3.6"              # Latest stable - needed for Ruby LSP
+lua = "5.1.5"               # Lua 5.1 (compatible with LuaJIT/NeoVim)
+go = "1.23.3"               # Latest - needed for Go LSP (gopls) and tools
+rust = "1.82.0"             # Latest stable - needed for Rust LSP and some NeoVim plugins
+
+[env]
+# Environment variables for the project
+_.path = ["./node_modules/.bin", "$PATH"]
+NVIM_APPNAME = "nvim"       # NeoVim config directory name
+
+# Ensure project lua paths are available for requires and tests
+# This allows: require('spec.spec_helper'), require('nvim.core.module_loader'), etc.
+LUA_PATH = "./lua/?.lua;./lua/?/init.lua;$LUA_PATH"
+LUA_CPATH = "./lua/?.so;$LUA_CPATH"
+
+[settings]
+# mise behavior settings
+experimental = true

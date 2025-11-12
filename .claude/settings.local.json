@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(mkdir:*)",
+      "WebFetch(domain:code.claude.com)",
+      "Bash(busted:*)",
+      "Bash(luarocks path:*)",
+      "Bash(./scripts/test.sh:*)",
+      "Bash(luarocks show:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
