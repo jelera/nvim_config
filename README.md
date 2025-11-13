@@ -20,25 +20,61 @@ Modern, IDE-like NeoVim configuration built with TDD and modular architecture.
 
 ## Installation
 
-### Quick Install (One-liner)
+### Quick Start (One-liner)
 
+**Fully automated (recommended):**
+
+Using curl:
 ```bash
-gh repo clone jelera/nvim_config ~/.config/nvim && cd ~/.config/nvim && ./install.sh
+curl -fsSL https://raw.githubusercontent.com/jelera/nvim_config/main/quick-start.sh | bash -s -- -y
 ```
 
-This will clone the repository and run the automated installer.
+Using wget:
+```bash
+wget -qO- https://raw.githubusercontent.com/jelera/nvim_config/main/quick-start.sh | bash -s -- -y
+```
 
-### Automated Installation (Recommended)
+**Interactive (with confirmation prompts):**
 
-The install script handles all dependencies automatically:
+Using curl:
+```bash
+curl -fsSL https://raw.githubusercontent.com/jelera/nvim_config/main/quick-start.sh | bash
+```
+
+Using wget:
+```bash
+wget -qO- https://raw.githubusercontent.com/jelera/nvim_config/main/quick-start.sh | bash
+```
+
+The quick-start script safely handles existing configurations by:
+- Checking for existing `~/.config/nvim` before cloning
+- Prompting for confirmation if config exists
+- Creating automatic timestamped backups
+- Running the full installation
+
+The `-y` flag auto-confirms all prompts for a completely hands-off installation.
+
+**Alternative: Using GitHub CLI (gh):**
+```bash
+# Clone to temporary location, then run installer
+gh repo clone jelera/nvim_config /tmp/nvim_config && cd /tmp/nvim_config && ./install.sh
+```
+
+### Manual Installation
+
+If you prefer to clone to a custom location:
 
 ```bash
-# Clone repository
-git clone https://github.com/jelera/nvim_config.git ~/nvimconfig
-cd ~/nvimconfig
+# Clone repository to custom location
+git clone https://github.com/jelera/nvim_config.git ~/my-nvim-config
+cd ~/my-nvim-config
 
 # Run installer (requires mise: https://mise.jdx.dev/)
+# This will create a symlink from ~/.config/nvim to this directory
 ./install.sh
+
+# Or skip prompts:
+./install.sh -y
 ```
 
 **What it installs:**
@@ -56,28 +92,11 @@ cd ~/nvimconfig
 **Options:**
 ```bash
 ./install.sh --help              # Show all options
+./install.sh -y                  # Auto-confirm all prompts
 ./install.sh --skip-optional     # Skip optional tools and fonts
 ./install.sh --verify-only       # Check what's installed
 ./install.sh --use-homebrew      # Force Homebrew (Linux)
 ./install.sh --use-apt           # Force apt (Ubuntu)
-```
-
-### Manual Installation
-
-If you prefer manual setup:
-
-```bash
-# Clone repository
-git clone <repo-url> ~/.config/nvim
-
-# Install dependencies (see Requirements below)
-# ...
-
-# Start NeoVim (plugins auto-install)
-nvim
-
-# Check health
-:checkhealth
 ```
 
 ## Requirements

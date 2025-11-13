@@ -732,15 +732,34 @@ install_nerd_fonts() {
 setup_nvim_config() {
     print_header "Setting up NeoVim configuration"
 
+    local auto_yes="${1:-false}"
     local nvim_config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
 
     # Backup existing config if it exists and is not a symlink
     if [[ -d "$nvim_config_dir" ]] && [[ ! -L "$nvim_config_dir" ]]; then
         local backup_dir
         backup_dir="${nvim_config_dir}.backup.$(date +%Y%m%d_%H%M%S)"
-        print_warning "Backing up existing config to: $backup_dir"
+
+        print_warning "Existing NeoVim config found at: $nvim_config_dir"
+        print_info "This will be backed up to: $backup_dir"
+        echo ""
+
+        if [[ "$auto_yes" == "true" ]]; then
+            print_info "Auto-confirming backup (--yes flag)"
+            REPLY="y"
+        else
+            read -p "Continue with backup and installation? [Y/n] " -n 1 -r
+            echo ""
+        fi
+
+        if [[ $REPLY =~ ^[Nn]$ ]]; then
+            print_info "Installation cancelled by user"
+            exit 0
+        fi
+
+        print_info "Backing up existing config..."
         mv "$nvim_config_dir" "$backup_dir"
-        print_success "Backup created"
+        print_success "Backup created at: $backup_dir"
     fi
 
     # Remove broken symlink if it exists
@@ -953,6 +972,7 @@ ${BOLD}Usage:${NC}
 
 ${BOLD}Options:${NC}
   --help              Show this help message
+  --yes, -y           Auto-confirm all prompts (non-interactive mode)
   --use-homebrew      Force use of Homebrew (Linux only)
   --use-apt           Force use of apt (Ubuntu only)
   --skip-optional     Skip installation of optional tools
@@ -1021,6 +1041,7 @@ main() {
     local skip_optional=false
     local verify_only=false
     local no_config=false
+    local auto_yes=false
 
     # Parse command-line arguments
     while [[ $# -gt 0 ]]; do
@@ -1047,6 +1068,10 @@ main() {
             ;;
         --no-config)
             no_config=true
+            shift
+            ;;
+        --yes | -y)
+            auto_yes=true
             shift
             ;;
         *)
@@ -1104,7 +1129,7 @@ main() {
 
     # Step 8: Setup NeoVim configuration
     if ! $no_config; then
-        setup_nvim_config
+        setup_nvim_config "$auto_yes"
     else
         print_info "Skipping NeoVim config setup (--no-config flag)"
     fi
