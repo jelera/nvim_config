@@ -24,9 +24,9 @@
 #   ./install.sh --use-apt          # Force apt (Ubuntu)
 #   ./install.sh --help             # Show help
 
-set -e  # Exit on error
-set -u  # Exit on undefined variable
-set -o pipefail  # Pipeline fails if any command fails
+set -e          # Exit on error
+set -u          # Exit on undefined variable
+set -o pipefail # Pipeline fails if any command fails
 
 #------------------------------------------------------------------------------
 # Configuration
@@ -42,7 +42,8 @@ readonly BOLD='\033[1m'
 readonly NC='\033[0m' # No Color
 
 # Script directory
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_DIR
 
 # Supported Ubuntu LTS versions
 readonly SUPPORTED_UBUNTU_LTS=("22.04" "24.04")
@@ -55,24 +56,28 @@ PKG_MANAGER=""
 #------------------------------------------------------------------------------
 
 # Print colored messages
+color_echo() {
+    echo -e "$*"
+}
+
 print_header() {
-    echo -e "\n${BOLD}${CYAN}>>> $*${NC}\n"
+    color_echo "\n${BOLD}${CYAN}🔧 $*${NC}\n"
 }
 
 print_info() {
-    echo -e "${BLUE}==>${NC} $*"
+    color_echo "${BLUE}ℹ️${NC}  $*"
 }
 
 print_success() {
-    echo -e "${GREEN}✓${NC} $*"
+    color_echo "${GREEN}✅${NC} $*"
 }
 
 print_warning() {
-    echo -e "${YELLOW}⚠${NC} $*"
+    color_echo "${YELLOW}⚠️${NC}  $*"
 }
 
 print_error() {
-    echo -e "${RED}✗${NC} $*" >&2
+    color_echo "${RED}❌${NC} $*" >&2
 }
 
 # Check if command exists
@@ -222,15 +227,29 @@ install_mise_tools() {
 install_homebrew_packages() {
     print_header "Installing system tools via Homebrew"
 
-    local packages=(
-        "luarocks"          # Lua package manager
-        "ripgrep"           # Fast grep (optional but recommended)
-        "fd"                # Fast find (optional but recommended)
-        "lazygit"           # Git TUI (optional)
-        "git"               # Git (if not already installed)
+    # Required packages
+    local required_packages=(
+        "git"      # Git (if not already installed)
+        "luarocks" # Lua package manager
     )
 
-    for package in "${packages[@]}"; do
+    # Optional but recommended packages
+    local optional_packages=(
+        "ripgrep" # Fast grep (for Telescope)
+        "fd"      # Fast find (for Telescope)
+        "lazygit" # Git TUI
+        "bat"     # Better cat with syntax highlighting
+        "delta"   # Better git diff viewer
+        "eza"     # Better ls (formerly exa)
+        "fzf"     # Fuzzy finder (general use)
+        "gh"      # GitHub CLI
+        "jq"      # JSON processor
+        "tree"    # Directory tree viewer
+    )
+
+    # Install required packages
+    print_info "Installing required packages..."
+    for package in "${required_packages[@]}"; do
         if brew list "$package" &>/dev/null; then
             print_success "$package is already installed"
         else
@@ -238,7 +257,23 @@ install_homebrew_packages() {
             if brew install "$package"; then
                 print_success "$package installed"
             else
-                print_warning "Failed to install $package"
+                print_error "Failed to install $package (required)"
+                return 1
+            fi
+        fi
+    done
+
+    # Install optional packages
+    print_info "Installing optional packages..."
+    for package in "${optional_packages[@]}"; do
+        if brew list "$package" &>/dev/null; then
+            print_success "$package is already installed"
+        else
+            print_info "Installing $package..."
+            if brew install "$package"; then
+                print_success "$package installed"
+            else
+                print_warning "Failed to install $package (optional)"
             fi
         fi
     done
@@ -248,9 +283,9 @@ install_homebrew_packages() {
 add_apt_repositories() {
     print_header "Adding third-party APT repositories"
 
-    local os_info
-    os_info=$(detect_os)
-    local ubuntu_version="${os_info##*:}"
+    # Note: We don't use ubuntu_version here, but keeping detect_os call
+    # in case we need version-specific logic in the future
+    detect_os >/dev/null
 
     # Neovim stable PPA (official)
     if ! grep -q "neovim-ppa/stable" /etc/apt/sources.list.d/* 2>/dev/null; then
@@ -293,28 +328,39 @@ install_apt_packages() {
 
     # Essential packages
     local essential_packages=(
-        "build-essential"   # Compilers and build tools
-        "curl"              # For downloading
-        "wget"              # For downloading
-        "git"               # Version control
-        "unzip"             # Archive extraction
-        "software-properties-common"  # For add-apt-repository
+        "build-essential"            # Compilers and build tools
+        "curl"                       # For downloading
+        "wget"                       # For downloading
+        "git"                        # Version control
+        "unzip"                      # Archive extraction
+        "zip"                        # Archive creation
+        "software-properties-common" # For add-apt-repository
     )
 
     print_info "Installing essential packages..."
     # shellcheck disable=SC2068
     sudo apt-get install -y ${essential_packages[@]}
 
-    # Main packages
-    local packages=(
-        "neovim"            # NeoVim (from PPA)
-        "luarocks"          # Lua package manager
-        "ripgrep"           # Fast grep (optional but recommended)
-        "fd-find"           # Fast find (fd is called fd-find on Ubuntu)
-        "lazygit"           # Git TUI (from PPA, optional)
+    # Required packages
+    local required_packages=(
+        "neovim"   # NeoVim (from PPA)
+        "luarocks" # Lua package manager
     )
 
-    for package in "${packages[@]}"; do
+    # Optional but recommended packages
+    local optional_packages=(
+        "ripgrep" # Fast grep (for Telescope)
+        "fd-find" # Fast find (fd is called fd-find on Ubuntu)
+        "lazygit" # Git TUI (from PPA)
+        "bat"     # Better cat with syntax highlighting
+        "fzf"     # Fuzzy finder
+        "jq"      # JSON processor
+        "tree"    # Directory tree viewer
+    )
+
+    # Install required packages
+    print_info "Installing required packages..."
+    for package in "${required_packages[@]}"; do
         if dpkg -l | grep -q "^ii  $package "; then
             print_success "$package is already installed"
         else
@@ -322,7 +368,23 @@ install_apt_packages() {
             if sudo apt-get install -y "$package"; then
                 print_success "$package installed"
             else
-                print_warning "Failed to install $package"
+                print_error "Failed to install $package (required)"
+                return 1
+            fi
+        fi
+    done
+
+    # Install optional packages
+    print_info "Installing optional packages..."
+    for package in "${optional_packages[@]}"; do
+        if dpkg -l | grep -q "^ii  $package "; then
+            print_success "$package is already installed"
+        else
+            print_info "Installing $package..."
+            if sudo apt-get install -y "$package"; then
+                print_success "$package installed"
+            else
+                print_warning "Failed to install $package (optional)"
             fi
         fi
     done
@@ -332,6 +394,23 @@ install_apt_packages() {
         print_info "Creating fd symlink..."
         sudo ln -sf "$(which fdfind)" /usr/local/bin/fd
         print_success "fd symlink created"
+    fi
+
+    # Create symlink for bat (Ubuntu calls it batcat)
+    if command_exists batcat && ! command_exists bat; then
+        print_info "Creating bat symlink..."
+        sudo ln -sf "$(which batcat)" /usr/local/bin/bat
+        print_success "bat symlink created"
+    fi
+
+    # Install delta (better git diff) - not in apt, install via cargo or download
+    if ! command_exists delta; then
+        print_info "delta not available via apt (will install via cargo later if rust is available)"
+    fi
+
+    # Install eza (better ls) - not in standard apt repos
+    if ! command_exists eza; then
+        print_info "eza not available via apt (optional, can install manually from https://github.com/eza-community/eza)"
     fi
 }
 
@@ -363,10 +442,10 @@ install_lua_packages() {
     fi
 
     local lua_packages=(
-        "busted"            # Testing framework (required)
-        "luacheck"          # Lua linter (required for development)
-        "luacov"            # Code coverage tool (optional)
-        "lanes"             # Multithreading support (for busted)
+        "busted"   # Testing framework (required)
+        "luacheck" # Lua linter (required for development)
+        "luacov"   # Code coverage tool (optional)
+        "lanes"    # Multithreading support (for busted)
     )
 
     for package in "${lua_packages[@]}"; do
@@ -408,16 +487,16 @@ install_node_packages() {
     fi
 
     local node_packages=(
-        "neovim"                        # NeoVim Node.js provider (required)
-        "tree-sitter-cli"               # TreeSitter CLI (required for parsers)
-        "eslint"                        # JavaScript/TypeScript linter (required for lint-check.sh)
-        "typescript"                    # TypeScript compiler (required for type checking)
-        "@typescript-eslint/parser"     # TypeScript parser for ESLint
-        "@typescript-eslint/eslint-plugin"  # TypeScript rules for ESLint
-        "markdownlint-cli"              # Markdown linter (required for lint-check.sh)
-        "prettier"                      # Code formatter (for auto-fixing)
-        "eslint-config-prettier"        # Disable ESLint rules that conflict with Prettier
-        "eslint-plugin-prettier"        # Run Prettier as an ESLint rule
+        "neovim"                           # NeoVim Node.js provider (required)
+        "tree-sitter-cli"                  # TreeSitter CLI (required for parsers)
+        "eslint"                           # JavaScript/TypeScript linter (required for lint-check.sh)
+        "typescript"                       # TypeScript compiler (required for type checking)
+        "@typescript-eslint/parser"        # TypeScript parser for ESLint
+        "@typescript-eslint/eslint-plugin" # TypeScript rules for ESLint
+        "markdownlint-cli"                 # Markdown linter (required for lint-check.sh)
+        "prettier"                         # Code formatter (for auto-fixing)
+        "eslint-config-prettier"           # Disable ESLint rules that conflict with Prettier
+        "eslint-plugin-prettier"           # Run Prettier as an ESLint rule
     )
 
     for package in "${node_packages[@]}"; do
@@ -451,11 +530,11 @@ install_python_packages() {
     fi
 
     local python_packages=(
-        "pynvim"            # NeoVim Python provider (required)
-        "debugpy"           # Python debugger for DAP (optional but recommended)
-        "ruff"              # Fast Python linter and formatter (required for lint-check.sh)
-        "mypy"              # Python type checker (required for type-check.sh)
-        "black"             # Python formatter (for auto-fixing, works with ruff)
+        "pynvim"  # NeoVim Python provider (required)
+        "debugpy" # Python debugger for DAP (optional but recommended)
+        "ruff"    # Fast Python linter and formatter (required for lint-check.sh)
+        "mypy"    # Python type checker (required for type-check.sh)
+        "black"   # Python formatter (for auto-fixing, works with ruff)
     )
 
     for package in "${python_packages[@]}"; do
@@ -480,9 +559,9 @@ install_ruby_gems() {
     fi
 
     local ruby_gems=(
-        "neovim"            # NeoVim Ruby provider (required)
-        "solargraph"        # Ruby LSP (optional but recommended)
-        "rubocop"           # Ruby linter (optional)
+        "neovim"     # NeoVim Ruby provider (required)
+        "solargraph" # Ruby LSP (optional but recommended)
+        "rubocop"    # Ruby linter (optional)
     )
 
     for gem_name in "${ruby_gems[@]}"; do
@@ -506,20 +585,151 @@ install_cargo_tools() {
         return 1
     fi
 
-    local cargo_tools=(
-        "stylua"            # Lua formatter (required for auto-fix.sh)
+    # Required cargo tools
+    local required_tools=(
+        "stylua" # Lua formatter (required for auto-fix.sh)
     )
 
-    for tool in "${cargo_tools[@]}"; do
-        print_info "Installing $tool..."
-        if cargo install "$tool"; then
-            print_success "$tool installed"
+    # Optional cargo tools
+    local optional_tools=(
+        "git-delta" # Better git diff viewer (installs as 'delta')
+        "eza"       # Better ls (formerly exa)
+    )
+
+    # Install required tools
+    for tool in "${required_tools[@]}"; do
+        local bin_name="$tool"
+        if [[ "$tool" == "git-delta" ]]; then
+            bin_name="delta"
+        fi
+
+        if command_exists "$bin_name"; then
+            print_success "$tool already installed"
         else
-            print_warning "Failed to install $tool"
+            print_info "Installing $tool..."
+            if cargo install "$tool"; then
+                print_success "$tool installed"
+            else
+                print_error "Failed to install $tool (required)"
+                return 1
+            fi
+        fi
+    done
+
+    # Install optional tools
+    for tool in "${optional_tools[@]}"; do
+        local bin_name="$tool"
+        if [[ "$tool" == "git-delta" ]]; then
+            bin_name="delta"
+        fi
+
+        if command_exists "$bin_name"; then
+            print_success "$tool already installed"
+        else
+            print_info "Installing $tool..."
+            if cargo install "$tool"; then
+                print_success "$tool installed"
+            else
+                print_warning "Failed to install $tool (optional)"
+            fi
         fi
     done
 
     print_info "Cargo version: $(cargo --version)"
+}
+
+#------------------------------------------------------------------------------
+# Font Installation
+#------------------------------------------------------------------------------
+
+# Install Nerd Fonts
+install_nerd_fonts() {
+    print_header "Installing Nerd Fonts"
+
+    # Check if user wants to install fonts
+    print_info "Nerd Fonts provide icons for file types and UI elements 💎"
+    print_info "They are large downloads (~100-200 MB per font) 📥"
+    echo ""
+    read -p "Install Nerd Fonts? [y/N] " -n 1 -r
+    echo ""
+
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        print_info "Skipping Nerd Fonts installation"
+        print_warning "You can install manually later from: https://www.nerdfonts.com/"
+        return 0
+    fi
+
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS: Use Homebrew Cask
+        print_info "Installing Nerd Fonts via Homebrew..."
+
+        local fonts=(
+            "font-hack-nerd-font"           # Hack (popular monospace)
+            "font-jetbrains-mono-nerd-font" # JetBrains Mono (popular for coding)
+            "font-fira-code-nerd-font"      # Fira Code (ligatures)
+        )
+
+        for font in "${fonts[@]}"; do
+            if brew list --cask "$font" &>/dev/null; then
+                print_success "$font is already installed"
+            else
+                print_info "Installing $font..."
+                if brew install --cask "$font"; then
+                    print_success "$font installed"
+                else
+                    print_warning "Failed to install $font"
+                fi
+            fi
+        done
+
+        print_success "Nerd Fonts installed!"
+        print_info "To use: Set your terminal font to 'Hack Nerd Font', 'JetBrainsMono Nerd Font', or 'FiraCode Nerd Font'"
+
+    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        # Linux: Download and install manually
+        print_info "Installing Nerd Fonts manually..."
+
+        local fonts_dir="$HOME/.local/share/fonts"
+        mkdir -p "$fonts_dir"
+
+        local temp_dir
+        temp_dir=$(mktemp -d)
+
+        # Download popular Nerd Fonts
+        local font_urls=(
+            "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/Hack.zip"
+            "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/JetBrainsMono.zip"
+            "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/FiraCode.zip"
+        )
+
+        for url in "${font_urls[@]}"; do
+            local font_name
+            font_name=$(basename "$url" .zip)
+            print_info "Downloading $font_name..."
+
+            if curl -L -o "$temp_dir/$font_name.zip" "$url"; then
+                print_info "Extracting $font_name..."
+                unzip -q "$temp_dir/$font_name.zip" -d "$fonts_dir/$font_name"
+                print_success "$font_name installed"
+            else
+                print_warning "Failed to download $font_name"
+            fi
+        done
+
+        # Update font cache
+        print_info "Updating font cache..."
+        if fc-cache -fv &>/dev/null; then
+            print_success "Font cache updated"
+        else
+            print_warning "Failed to update font cache (you may need to restart)"
+        fi
+
+        # Cleanup
+        rm -rf "$temp_dir"
+
+        print_success "Nerd Fonts installed!"
+        print_info "To use: Set your terminal font to 'Hack Nerd Font', 'JetBrainsMono Nerd Font', or 'FiraCode Nerd Font'"
+    fi
 }
 
 #------------------------------------------------------------------------------
@@ -534,7 +744,8 @@ setup_nvim_config() {
 
     # Backup existing config if it exists and is not a symlink
     if [[ -d "$nvim_config_dir" ]] && [[ ! -L "$nvim_config_dir" ]]; then
-        local backup_dir="${nvim_config_dir}.backup.$(date +%Y%m%d_%H%M%S)"
+        local backup_dir
+        backup_dir="${nvim_config_dir}.backup.$(date +%Y%m%d_%H%M%S)"
         print_warning "Backing up existing config to: $backup_dir"
         mv "$nvim_config_dir" "$backup_dir"
         print_success "Backup created"
@@ -579,7 +790,7 @@ verify_installation() {
 
     # Check core development tools (from mise)
     echo ""
-    echo "${BOLD}Core Development Tools (mise):${NC}"
+    color_echo "${BOLD}📦 Core Development Tools (mise):${NC}"
 
     local core_tools=(
         "nvim:NeoVim:nvim --version | head -1"
@@ -593,7 +804,7 @@ verify_installation() {
     )
 
     for tool_spec in "${core_tools[@]}"; do
-        IFS=':' read -r cmd name version_cmd <<< "$tool_spec"
+        IFS=':' read -r cmd name version_cmd <<<"$tool_spec"
         if command_exists "$cmd"; then
             local version
             version=$(eval "$version_cmd" 2>&1 | head -1)
@@ -606,7 +817,7 @@ verify_installation() {
 
     # Check system tools
     echo ""
-    echo "${BOLD}System Tools:${NC}"
+    color_echo "${BOLD}🔧 System Tools:${NC}"
 
     local system_tools=(
         "git:Git:git --version"
@@ -614,7 +825,7 @@ verify_installation() {
     )
 
     for tool_spec in "${system_tools[@]}"; do
-        IFS=':' read -r cmd name version_cmd <<< "$tool_spec"
+        IFS=':' read -r cmd name version_cmd <<<"$tool_spec"
         if command_exists "$cmd"; then
             local version
             version=$(eval "$version_cmd" 2>&1 | head -1)
@@ -627,16 +838,23 @@ verify_installation() {
 
     # Check optional tools
     echo ""
-    echo "${BOLD}Optional Tools:${NC}"
+    color_echo "${BOLD}🎨 Optional Tools:${NC}"
 
     local optional_tools=(
         "rg:ripgrep"
         "fd:fd-find"
         "lazygit:lazygit"
+        "bat:bat"
+        "delta:delta"
+        "eza:eza"
+        "fzf:fzf"
+        "gh:GitHub CLI"
+        "jq:jq"
+        "tree:tree"
     )
 
     for tool_spec in "${optional_tools[@]}"; do
-        IFS=':' read -r cmd name <<< "$tool_spec"
+        IFS=':' read -r cmd name <<<"$tool_spec"
         if command_exists "$cmd"; then
             printf "  ${GREEN}✓${NC} %-15s installed\n" "$name"
         else
@@ -645,9 +863,33 @@ verify_installation() {
         fi
     done
 
+    # Check for Nerd Fonts
+    echo ""
+    color_echo "${BOLD}🔤 Fonts:${NC}"
+    local nerd_fonts_installed=false
+
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # Check macOS fonts via fc-list or system_profiler
+        if fc-list 2>/dev/null | grep -i "nerd font" &>/dev/null; then
+            nerd_fonts_installed=true
+        fi
+    else
+        # Check Linux fonts via fc-list
+        if command_exists fc-list && fc-list 2>/dev/null | grep -i "nerd font" &>/dev/null; then
+            nerd_fonts_installed=true
+        fi
+    fi
+
+    if $nerd_fonts_installed; then
+        printf "  ${GREEN}✓${NC} %-15s installed\n" "Nerd Fonts"
+    else
+        printf "  ${YELLOW}○${NC} %-15s ${YELLOW}not installed (optional but recommended for icons)${NC}\n" "Nerd Fonts"
+        ((warnings++))
+    fi
+
     # Check Lua packages
     echo ""
-    echo "${BOLD}Lua Packages:${NC}"
+    color_echo "${BOLD}🌙 Lua Packages:${NC}"
 
     local lua_packages=("busted" "luacheck")
     for package in "${lua_packages[@]}"; do
@@ -663,11 +905,11 @@ verify_installation() {
 
     # Check NeoVim providers
     echo ""
-    echo "${BOLD}NeoVim Providers:${NC}"
+    color_echo "${BOLD}🔌 NeoVim Providers:${NC}"
 
     if command_exists nvim; then
-        local provider_status
-        provider_status=$(nvim --headless -c 'checkhealth provider' -c 'quit' 2>&1 || echo "")
+        # Note: We could use checkhealth output, but direct checks are more reliable
+        # provider_status=$(nvim --headless -c 'checkhealth provider' -c 'quit' 2>&1 || echo "")
 
         # Check each provider
         local providers=("python3" "node" "ruby")
@@ -710,7 +952,7 @@ verify_installation() {
 #------------------------------------------------------------------------------
 
 show_help() {
-    cat << EOF
+    cat <<EOF
 ${BOLD}NeoVim IDE Configuration - Installation Script${NC}
 ═══════════════════════════════════════════════════════════════
 
@@ -737,11 +979,12 @@ ${BOLD}Description:${NC}
 
   ${CYAN}1.${NC} Checks for mise (tool version manager)
   ${CYAN}2.${NC} Installs development tools via mise (neovim, node, python, ruby, lua, go, rust)
-  ${CYAN}3.${NC} Installs system packages (luarocks, ripgrep, fd, lazygit, git)
+  ${CYAN}3.${NC} Installs system packages (git, luarocks, ripgrep, fd, lazygit, bat, delta, etc.)
   ${CYAN}4.${NC} Installs Lua packages (busted, luacheck, luacov)
-  ${CYAN}5.${NC} Installs language-specific packages (npm, pip, gem)
-  ${CYAN}6.${NC} Sets up NeoVim configuration symlink
-  ${CYAN}7.${NC} Verifies installation
+  ${CYAN}5.${NC} Installs language-specific packages (npm, pip, gem, cargo tools)
+  ${CYAN}6.${NC} Installs Nerd Fonts (optional, with user prompt)
+  ${CYAN}7.${NC} Sets up NeoVim configuration symlink
+  ${CYAN}8.${NC} Verifies installation
 
 ${BOLD}Requirements:${NC}
   • mise (https://mise.jdx.dev/) - ${YELLOW}Required${NC}
@@ -790,43 +1033,43 @@ main() {
     # Parse command-line arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
-            --help|-h)
-                show_help
-                exit 0
-                ;;
-            --use-homebrew)
-                PKG_MANAGER="brew"
-                shift
-                ;;
-            --use-apt)
-                PKG_MANAGER="apt"
-                shift
-                ;;
-            --skip-optional)
-                skip_optional=true
-                shift
-                ;;
-            --verify-only)
-                verify_only=true
-                shift
-                ;;
-            --no-config)
-                no_config=true
-                shift
-                ;;
-            *)
-                print_error "Unknown option: $1"
-                echo "Use --help for usage information"
-                exit 1
-                ;;
+        --help | -h)
+            show_help
+            exit 0
+            ;;
+        --use-homebrew)
+            PKG_MANAGER="brew"
+            shift
+            ;;
+        --use-apt)
+            PKG_MANAGER="apt"
+            shift
+            ;;
+        --skip-optional)
+            skip_optional=true
+            shift
+            ;;
+        --verify-only)
+            verify_only=true
+            shift
+            ;;
+        --no-config)
+            no_config=true
+            shift
+            ;;
+        *)
+            print_error "Unknown option: $1"
+            echo "Use --help for usage information"
+            exit 1
+            ;;
         esac
     done
 
     # Print banner
     echo ""
-    echo "╔════════════════════════════════════════════════════════════════╗"
-    echo "║  ${BOLD}NeoVim IDE Configuration - Installation Script${NC}                ║"
-    echo "╚════════════════════════════════════════════════════════════════╝"
+    color_echo "╔════════════════════════════════════════════════════════════════╗"
+    color_echo "║  ${BOLD}NeoVim IDE Configuration - Installation Script${NC}                ║"
+    color_echo "╚════════════════════════════════════════════════════════════════╝"
     echo ""
 
     # Verify-only mode
@@ -860,53 +1103,60 @@ main() {
     install_ruby_gems
     install_cargo_tools
 
-    # Step 7: Setup NeoVim configuration
+    # Step 7: Install Nerd Fonts (optional, with prompt)
+    if ! $skip_optional; then
+        install_nerd_fonts
+    else
+        print_info "Skipping Nerd Fonts installation (--skip-optional flag)"
+    fi
+
+    # Step 8: Setup NeoVim configuration
     if ! $no_config; then
         setup_nvim_config
     else
         print_info "Skipping NeoVim config setup (--no-config flag)"
     fi
 
-    # Step 8: Verify installation
+    # Step 9: Verify installation
     echo ""
     if verify_installation; then
         echo ""
-        echo "╔════════════════════════════════════════════════════════════════╗"
-        echo "║  ${GREEN}${BOLD}Installation Complete!${NC}                                          ║"
-        echo "╚════════════════════════════════════════════════════════════════╝"
+        color_echo "╔════════════════════════════════════════════════════════════════╗"
+        color_echo "║  ${GREEN}${BOLD}Installation Complete!${NC}                                        ║"
+        color_echo "╚════════════════════════════════════════════════════════════════╝"
         echo ""
-        echo "${BOLD}Next Steps:${NC}"
-        echo "  ${CYAN}1.${NC} Restart your shell or activate mise:"
-        echo "     ${YELLOW}eval \"\$(mise activate bash)\"${NC}  # for bash"
-        echo "     ${YELLOW}eval \"\$(mise activate zsh)\"${NC}   # for zsh"
+        color_echo "${BOLD}📝 Next Steps:${NC}"
+        color_echo "  ${CYAN}1.${NC} Restart your shell or activate mise:"
+        color_echo "     ${YELLOW}eval \"\$(mise activate bash)\"${NC}  # for bash"
+        color_echo "     ${YELLOW}eval \"\$(mise activate zsh)\"${NC}   # for zsh"
         echo ""
-        echo "  ${CYAN}2.${NC} Start NeoVim:"
-        echo "     ${YELLOW}nvim${NC}"
+        color_echo "  ${CYAN}2.${NC} Start NeoVim:"
+        color_echo "     ${YELLOW}nvim${NC}"
         echo ""
-        echo "  ${CYAN}3.${NC} Wait for plugins to install automatically (lazy.nvim)"
+        color_echo "  ${CYAN}3.${NC} Wait for plugins to install automatically (lazy.nvim)"
         echo ""
-        echo "  ${CYAN}4.${NC} Run the test suite:"
-        echo "     ${YELLOW}cd $SCRIPT_DIR && busted${NC}"
+        color_echo "  ${CYAN}4.${NC} Run the test suite:"
+        color_echo "     ${YELLOW}cd $SCRIPT_DIR && busted${NC}"
         echo ""
-        echo "  ${CYAN}5.${NC} Check health:"
-        echo "     ${YELLOW}:checkhealth${NC} (inside NeoVim)"
+        color_echo "  ${CYAN}5.${NC} Check health:"
+        color_echo "     ${YELLOW}:checkhealth${NC} (inside NeoVim)"
         echo ""
-        echo "${BOLD}Documentation:${NC}"
+        color_echo "${BOLD}📚 Documentation:${NC}"
         echo "  • README.md - User guide"
         echo "  • CLAUDE.md - Development plan"
         echo "  • docs/ - Additional documentation"
         echo ""
     else
         echo ""
-        echo "╔════════════════════════════════════════════════════════════════╗"
-        echo "║  ${YELLOW}${BOLD}Installation Completed with Warnings${NC}                          ║"
-        echo "╚════════════════════════════════════════════════════════════════╝"
+        color_echo "╔════════════════════════════════════════════════════════════════╗"
+        color_echo "║  ${YELLOW}${BOLD}Installation Completed with Warnings${NC}                          ║"
+        color_echo "╚════════════════════════════════════════════════════════════════╝"
         echo ""
         print_warning "Some components are missing or not configured properly"
         print_warning "Review the verification output above"
         echo ""
-        echo "${BOLD}Troubleshooting:${NC}"
-        echo "  • Run: ${YELLOW}./install.sh --verify-only${NC} to check what's missing"
+        color_echo "${BOLD}🔍 Troubleshooting:${NC}"
+        color_echo "  • Run: ${YELLOW}./install.sh --verify-only${NC} to check what's missing"
         echo "  • See: docs/TROUBLESHOOTING.md"
         echo "  • Check: mise doctor"
         echo ""
