@@ -182,6 +182,15 @@ M.mock_fn = {
   isdirectory = function(path)
     return 0  -- Mock: not a directory
   end,
+
+  mkdir = function(path, mode)
+    -- Mock: directory creation (no-op in tests)
+    return 1  -- Success
+  end,
+
+  getcwd = function()
+    return '/mock/cwd'
+  end,
 }
 
 -- Mock vim.loop - libuv event loop
