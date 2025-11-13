@@ -134,22 +134,6 @@ local default_config = {
   },
 }
 
----Merge user configuration with defaults
----@param user_config table|nil User configuration
----@return table merged_config The merged configuration
-local function merge_config(user_config)
-  if not user_config then
-    return utils.deep_copy(default_config)
-  end
-
-  -- Start with defaults
-  local merged = utils.deep_copy(default_config)
-
-  -- Deep merge user config
-  merged = utils.deep_merge(merged, user_config)
-
-  return merged
-end
 
 ---Setup TreeSitter with configuration
 ---@param config table|nil Configuration options
@@ -172,8 +156,8 @@ function M.setup(config)
     return false
   end
 
-  -- Merge config with defaults
-  local merged_config = merge_config(config)
+  -- Merge config with defaults using shared utility
+  local merged_config = utils.merge_config(default_config, config)
 
   -- Configure TreeSitter
   local setup_ok, err = pcall(function()

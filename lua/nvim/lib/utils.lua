@@ -148,4 +148,26 @@ function M.table_size(tbl)
   return count
 end
 
+--[[
+Merge user configuration with defaults
+
+Helper function to merge user-provided configuration with default values.
+Creates a deep copy of defaults and merges user config on top, ensuring
+neither input table is mutated.
+
+This is a common pattern across modules for configuration management.
+
+@param defaults table: Default configuration
+@param user_config table|nil: User-provided configuration (optional)
+@return table: Merged configuration (new table)
+--]]
+function M.merge_config(defaults, user_config)
+  if not user_config then
+    return M.deep_copy(defaults)
+  end
+
+  local merged = M.deep_copy(defaults)
+  return M.deep_merge(merged, user_config)
+end
+
 return M

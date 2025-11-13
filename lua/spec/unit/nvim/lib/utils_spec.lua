@@ -414,4 +414,107 @@ describe('lib.utils #unit', function()
       assert.equals(1, utils.table_size({ key = 'value' }))
     end)
   end)
+
+  describe('merge_config()', function()
+    it('should exist as a function', function()
+      assert.is_function(utils.merge_config)
+    end)
+
+    it('should return deep copy of defaults when user_config is nil', function()
+      local defaults = { a = 1, b = { c = 2 } }
+      local result = utils.merge_config(defaults, nil)
+
+      assert.equals(1, result.a)
+      assert.equals(2, result.b.c)
+
+      -- Should be a copy, not the same table
+      result.a = 999
+      assert.equals(1, defaults.a)
+    end)
+
+    it('should return deep copy of defaults when user_config is not provided', function()
+      local defaults = { a = 1, b = 2 }
+      local result = utils.merge_config(defaults)
+
+      assert.equals(1, result.a)
+      assert.equals(2, result.b)
+    end)
+
+    it('should merge user config with defaults', function()
+      local defaults = { a = 1, b = 2, c = 3 }
+      local user = { b = 99, d = 4 }
+      local result = utils.merge_config(defaults, user)
+
+      assert.equals(1, result.a) -- from defaults
+      assert.equals(99, result.b) -- overridden by user
+      assert.equals(3, result.c) -- from defaults
+      assert.equals(4, result.d) -- from user
+    end)
+
+    it('should deep merge nested tables', function()
+      local defaults = {
+        ui = { theme = 'dark', font = 'mono' },
+        lsp = { enabled = true },
+      }
+      local user = {
+        ui = { theme = 'light' },
+        extra = 'value',
+      }
+      local result = utils.merge_config(defaults, user)
+
+      assert.equals('light', result.ui.theme) -- overridden
+      assert.equals('mono', result.ui.font) -- from defaults
+      assert.is_true(result.lsp.enabled) -- from defaults
+      assert.equals('value', result.extra) -- from user
+    end)
+
+    it('should not mutate defaults', function()
+      local defaults = { a = 1, b = { c = 2 } }
+      local user = { a = 999, b = { c = 888, d = 777 } }
+
+      utils.merge_config(defaults, user)
+
+      assert.equals(1, defaults.a)
+      assert.equals(2, defaults.b.c)
+      assert.is_nil(defaults.b.d)
+    end)
+
+    it('should not mutate user config', function()
+      local defaults = { a = 1 }
+      local user = { b = 2 }
+
+      utils.merge_config(defaults, user)
+
+      assert.is_nil(user.a)
+      assert.equals(2, user.b)
+    end)
+
+    it('should handle empty defaults', function()
+      local defaults = {}
+      local user = { a = 1, b = 2 }
+      local result = utils.merge_config(defaults, user)
+
+      assert.equals(1, result.a)
+      assert.equals(2, result.b)
+    end)
+
+    it('should handle empty user config', function()
+      local defaults = { a = 1, b = 2 }
+      local user = {}
+      local result = utils.merge_config(defaults, user)
+
+      assert.equals(1, result.a)
+      assert.equals(2, result.b)
+    end)
+
+    it('should replace arrays not merge them', function()
+      local defaults = { items = { 1, 2, 3 } }
+      local user = { items = { 4, 5 } }
+      local result = utils.merge_config(defaults, user)
+
+      assert.equals(2, #result.items)
+      assert.equals(4, result.items[1])
+      assert.equals(5, result.items[2])
+    end)
+  end)
 end)
