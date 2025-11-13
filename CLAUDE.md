@@ -339,15 +339,26 @@ Debug keymaps:
 
 ---
 
-### Phase 10: Testing Framework ⏸️ PENDING
+### Phase 10: Testing Framework ✅ COMPLETE
 **Goal**: Run tests from within NeoVim
 
-Tasks:
-1. Set up neotest
-2. Configure language adapters
-3. Add test keymaps
-4. Configure coverage display
-5. Test test execution (meta!)
+**30 tests passing** - Neotest with per-language adapters for 4 languages.
+
+Modular structure: init.lua (orchestrator) + neotest.lua (core setup) + adapters/javascript.lua + adapters/python.lua + adapters/ruby.lua + adapters/lua.lua + keymaps.lua (test keymaps).
+
+Features:
+- Neotest: Modern async test runner with UI, summary, and output panels
+- JavaScript/TypeScript: Jest (via neotest-jest) + Karma (via neotest-vim-test)
+- Python: Pytest (via neotest-python)
+- Ruby: RSpec (via neotest-rspec)
+- Lua: Busted (via neotest-busted) - meta testing!
+- Per-language adapters: Clean separation, easy to extend
+
+Test keymaps:
+- Run: `<leader>tt` (nearest), `<leader>tf` (file), `<leader>ts` (suite), `<leader>tl` (last)
+- Debug: `<leader>td` (debug nearest test)
+- Output: `<leader>to` (output), `<leader>tO` (output panel), `<leader>tc` (summary)
+- Control: `<leader>tS` (stop), `<leader>ta` (attach)
 
 ---
 
@@ -758,14 +769,14 @@ busted
 - [x] Phase 7: Navigation & Search (57 tests)
 - [x] Phase 8: Git Integration (21 tests)
 - [x] Phase 9: Debugging (DAP) (30 tests)
+- [x] Phase 10: Testing Framework (30 tests)
 
-**Total: 716 tests passing (100% success rate)**
+**Total: 746 tests passing (100% success rate)**
 
 ### In Progress ⏳
 - None currently
 
 ### Pending ⏸️
-- [ ] Phase 10: Testing Framework
 - [ ] Phase 11: AI Integration
 - [ ] Phase 12: Editor Enhancements
 - [ ] Phase 13: Documentation & Polish
