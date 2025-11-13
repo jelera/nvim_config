@@ -18,8 +18,8 @@
 
 set -euo pipefail
 
-# Activate mise environment
-eval "$(mise activate bash)"
+# Activate mise environment (if not already activated)
+eval "$(mise activate bash)" 2>/dev/null || true
 
 # Configure luarocks path
 eval "$(luarocks path)"

@@ -15,20 +15,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Lua and LuaRocks
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y lua5.1 luarocks
+      - name: Setup mise
+        uses: jdx/mise-action@v2
+        with:
+          version: latest
+          install: true
+          cache: true
+          experimental: true
 
       - name: Install busted
         run: |
-          sudo luarocks install busted
+          eval "$(luarocks path)"
+          luarocks install --local busted
 
       - name: Run tests
-        run: |
-          ./scripts/test.sh
+        run: ./scripts/test.sh
 
       - name: Test summary
         if: always()
-        run: |
-          echo "Tests completed"
+        run: echo "Tests completed"
