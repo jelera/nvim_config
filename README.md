@@ -1,22 +1,22 @@
 # NeoVim IDE Configuration
 
-A modern, test-driven NeoVim configuration built from scratch with modular architecture.
+Modern, IDE-like NeoVim configuration built with TDD and modular architecture.
 
-## Status
+## Features
 
-**665 tests passing** | **7 phases complete** | **Phase 8 next**
+✅ **12 Complete Modules** | **786 Tests Passing** | **100% Success Rate**
 
-### Completed Features
-- ✅ Core Framework (module loader, event bus, plugin system)
-- ✅ Vim Configuration (options, keymaps, autocmds, commands)
-- ✅ UI & Theming (gruvbox, lualine, icons, indent guides)
-- ✅ TreeSitter (syntax highlighting, code folding, text objects)
-- ✅ LSP Support (9 language servers via Mason)
-- ✅ Completion (nvim-cmp with LSP, snippets, buffer, path, cmdline)
-- ✅ Navigation (Telescope fuzzy finder, nvim-tree explorer, keymaps)
-
-### Next
-- ⏳ Git Integration (gitsigns + fugitive + diffview)
+- **Core**: Vim options, keymaps, autocmds, commands
+- **UI**: Colorscheme, statusline, icons, indent guides, notifications
+- **TreeSitter**: Syntax highlighting, folding, text objects
+- **LSP**: 9 language servers with Mason
+- **Completion**: nvim-cmp with LSP, snippets, buffer, path, cmdline
+- **Navigation**: Telescope fuzzy finder + nvim-tree explorer
+- **Git**: Gitsigns, fugitive, diffview
+- **Debug**: DAP with 4 language adapters (JS/TS, Python, Ruby, Lua)
+- **Testing**: Neotest with Jest, Karma, pytest, RSpec
+- **AI**: Sidekick.nvim (Copilot NES + AI terminal)
+- **Editor**: Auto-pairs, surround, comment, project, session management
 
 ## Quick Start
 
@@ -24,48 +24,52 @@ A modern, test-driven NeoVim configuration built from scratch with modular archi
 # Clone repository
 git clone <repo-url> ~/.config/nvim
 
-# Install dependencies
-./install.sh
-
 # Start NeoVim (plugins auto-install)
 nvim
+
+# Check health
+:checkhealth
 ```
 
-## Architecture
+## Requirements
 
-```
-lua/
-├── nvim/                    # Core Framework
-│   ├── core/               # Module loader, event bus, plugin system
-│   └── lib/                # Shared utilities and validators
-│
-├── modules/                 # Feature Modules
-│   ├── core/               # Vim configuration
-│   ├── ui/                 # UI & theming
-│   ├── treesitter/         # Syntax highlighting
-│   ├── lsp/                # Language servers
-│   ├── completion/         # Auto-completion & snippets
-│   └── navigation/         # Fuzzy finder & file explorer
-│
-└── spec/                    # Test Suite (busted)
-    ├── unit/               # Unit tests
-    └── integration/        # Integration tests
-```
+- NeoVim 0.10.2+
+- Git 2.30+
+- Node.js 18+ (for LSP servers)
 
-## Language Server Support
+**Optional:**
+- ripgrep (faster search)
+- fd (faster file finding)
+- Nerd Font (icons)
 
-Pre-configured LSP servers for:
-- **Lua** (lua_ls) - NeoVim-specific settings
-- **TypeScript/JavaScript** (ts_ls) - With inlay hints
-- **Python** (pyright)
-- **Ruby** (solargraph)
-- **Go** (gopls)
-- **Rust** (rust_analyzer)
-- **Bash** (bashls)
-- **SQL** (sqlls)
-- **Markdown** (marksman)
+## Key Bindings
 
-Add more servers via `lua/modules/lsp/servers/<language>/`
+Leader key: `,`
+
+**Quick Reference:**
+- `<C-p>g` - Find files
+- `<leader>rg` - Live grep
+- `<C-t>` - Toggle file tree
+- `gd` - Go to definition
+- `<leader>ca` - Code actions
+- `gcc` - Toggle comment
+- `<leader>gs` - Git status
+- See [docs/KEYMAPS.md](docs/KEYMAPS.md) for complete reference
+
+## Language Support
+
+Pre-configured LSP servers:
+- Lua (lua_ls)
+- TypeScript/JavaScript (ts_ls)
+- Python (pyright)
+- Ruby (solargraph)
+- Go (gopls)
+- Rust (rust_analyzer)
+- Bash (bashls)
+- SQL (sqlls)
+- Markdown (marksman)
+
+**Auto-install:** Servers install automatically on first file open.
 
 ## Testing
 
@@ -73,39 +77,61 @@ Add more servers via `lua/modules/lsp/servers/<language>/`
 # Run all tests
 ./scripts/test.sh
 
-# Run unit tests only
-./scripts/test.sh --tags=unit
+# Run by tag
+./scripts/test.sh --tags=integration
 
-# Run specific test file
+# Run specific module
 ./scripts/test.sh lua/spec/integration/modules/lsp_spec.lua
 ```
 
-## Key Features
-
-- **Test-Driven**: Every feature has comprehensive test coverage
-- **Modular**: Small, focused modules (~130 lines max)
-- **Extensible**: Easy to add new language servers and features
-- **Graceful Degradation**: Works even if plugins are missing
-- **Fast**: Lazy loading and optimized startup time
-
-## Requirements
-
-- NeoVim 0.10.2+
-- Lua 5.1 (LuaJIT)
-- Git 2.30+
-- Node.js 18+ (for LSP servers)
-- Luarocks (for testing)
-
-### Optional
-- ripgrep (faster search)
-- fd (faster file finding)
-- Nerd Font (icons)
+See [TESTING.md](TESTING.md) for detailed testing guide.
 
 ## Documentation
 
-- `CLAUDE.md` - Complete development plan and context
-- `SESSION_STATUS.md` - Current progress tracking
-- `TESTING.md` - Testing guide and conventions
+- [KEYMAPS.md](docs/KEYMAPS.md) - Complete keymap reference
+- [ARCHITECTURE.md](docs/ARCHITECTURE.md) - Design and module system
+- [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) - Common issues
+- [TESTING.md](TESTING.md) - Testing guide
+- [CLAUDE.md](CLAUDE.md) - Development plan (for future sessions)
+
+## Architecture
+
+Modular design with each feature as a self-contained module:
+
+```
+modules/<name>/
+├── init.lua          # Orchestrator
+├── <feature>.lua     # Implementation
+├── keymaps.lua       # Key mappings
+└── plugins.lua       # Plugin specs
+```
+
+**Key principles:**
+- Test-Driven Development (TDD)
+- Simple orchestrators (no state management)
+- Use plugin defaults
+- Lazy loading for performance
+- Integration tests only
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for details.
+
+## Performance
+
+- Startup: <100ms target
+- 786 tests run in <1 second
+- Lazy loading for all non-critical plugins
+- Profile with `:Lazy profile`
+
+## Project Status
+
+### Phase 12 (Current)
+✅ Editor Enhancements - Complete
+
+### Next
+📋 Phase 13: Documentation & Polish (in progress)
+📋 Phase 14: CI/CD & Distribution
+
+See [CLAUDE.md](CLAUDE.md) for complete development plan.
 
 ## License
 
