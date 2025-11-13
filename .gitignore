@@ -227,7 +227,13 @@ $RECYCLE.BIN/
 /.env.local
 /.env.*.local
 /local.lua
-/settings.local.json
+
+# AI Assistant local configs (keep user-specific, don't commit)
+/.claude/settings.local.json
+/.cursor/
+/.aider.chat.history.md
+/.aider.input.history
+/.aider.tags.cache.v3/
 
 # Authentication & Secrets
 /.secrets
@@ -268,3 +274,5 @@ $RECYCLE.BIN/
 # /scratch/
 # /playground/
 # /test-local/
+
+.claude/settings.local.json

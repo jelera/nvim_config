@@ -534,11 +534,12 @@ install_python_packages() {
     fi
 
     local python_packages=(
-        "pynvim"  # NeoVim Python provider (required)
-        "debugpy" # Python debugger for DAP (optional but recommended)
-        "ruff"    # Fast Python linter and formatter (required for lint-check.sh)
-        "mypy"    # Python type checker (required for type-check.sh)
-        "black"   # Python formatter (for auto-fixing, works with ruff)
+        "pynvim"      # NeoVim Python provider (required)
+        "debugpy"     # Python debugger for DAP (optional but recommended)
+        "ruff"        # Fast Python linter and formatter (required for lint-check.sh)
+        "mypy"        # Python type checker (required for type-check.sh)
+        "black"       # Python formatter (for auto-fixing, works with ruff)
+        "aider-chat"  # AI pair programming tool (optional but recommended)
     )
 
     for package in "${python_packages[@]}"; do

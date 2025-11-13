@@ -1,20 +1,16 @@
-# Claude Code Hooks Configuration
+# Claude Code Configuration
 
-This directory contains Claude Code hooks configuration that automatically runs code quality checks when files are edited or written through Claude Code.
+> **Project Context:** See [`AGENTS.md`](../AGENTS.md) at repository root for complete architecture, patterns, and development guidelines.
 
-## Configured Hooks
+## Hooks Configuration
+
+This directory contains Claude Code hooks that automatically run code quality checks on file edits/writes.
 
 ### PostToolUse: Edit|Write
 
-When Claude Code edits or writes files, the following checks run automatically:
-
-1. **Lint Check** (`scripts/lint-check.sh`)
-   - Validates code style and quality
-   - Exit code 2 blocks the operation if linting fails
-
-2. **Type Check** (`scripts/type-check.sh`)
-   - Validates static types for typed languages
-   - Exit code 2 blocks the operation if type errors found
+Configured checks:
+1. **Lint Check** (`scripts/lint-check.sh`) - Blocks on linting errors
+2. **Type Check** (`scripts/type-check.sh`) - Blocks on type errors
 
 ## Supported Languages
 
@@ -24,27 +20,9 @@ When Claude Code edits or writes files, the following checks run automatically:
 | **TypeScript/JS** | ESLint | tsc | Prettier |
 | **Python** | ruff | mypy | ruff/black |
 | **Ruby** | rubocop | - | rubocop |
-| **Go** | golangci-lint | go build | gofmt |
-| **Rust** | cargo clippy | cargo check | cargo fmt |
-| **Markdown** | markdownlint | - | markdownlint |
-
-## ESLint + Prettier Integration
-
-The project is configured to use ESLint and Prettier together without conflicts:
-
-- **`.eslintrc.json`**: Extends `plugin:prettier/recommended`
-- **`.prettierrc`**: Defines formatting rules (100 char line length, 2 spaces, etc.)
-- ESLint handles code quality, Prettier handles formatting
-- Both tools respect each other's domain
-
-## GitHub-Friendly Configuration
-
-All configurations follow GitHub conventions and best practices:
-
-- **Line endings**: LF (Unix-style)
-- **Indentation**: 2 spaces
-- **Line length**: 100-120 characters
-- **Markdown**: Supports GitHub-flavored Markdown (details, summary, etc.)
+| **Markdown** | markdownlint | - | prettier |
+| **JSON** | prettier | - | prettier |
+| **Shell** | shellcheck | - | shfmt |
 
 ## Auto-Fixing
 

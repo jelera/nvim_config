@@ -1,0 +1,40 @@
+# Aider AI Configuration
+# https://aider.chat/docs/config/aider_conf.html
+
+# Read AGENTS.md for project context
+read:
+  - AGENTS.md
+  - README.md
+
+# Auto-commit changes
+auto-commits: true
+
+# Commit message style
+commit-prompt: |
+  Write a concise git commit message following this project's style:
+  - Start with imperative verb (Add, Fix, Update, etc.)
+  - Keep under 72 characters
+  - No period at the end
+  - Add newline then detailed description if needed
+
+  🤖 Generated with Aider
+
+  Co-Authored-By: AI <noreply@aider.chat>
+
+# Linting
+lint-cmd: "./scripts/lint-check.sh"
+
+# Testing
+test-cmd: "./scripts/test.sh"
+
+# File patterns to watch
+watch-files:
+  - "lua/**/*.lua"
+  - "scripts/**/*.sh"
+  - "*.md"
+
+# Dark mode (if terminal supports it)
+dark-mode: true
+
+# Use map tokens for better context
+map-tokens: 2048

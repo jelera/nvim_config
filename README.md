@@ -88,6 +88,7 @@ cd ~/my-nvim-config
   - Markdown: markdownlint-cli, prettier
   - JSON: prettier
   - Shell: shellcheck, shfmt
+- **AI Tools**: aider-chat (AI pair programming)
 - **Nerd Fonts**: Hack, JetBrains Mono, Fira Code (installed by default)
 - **NeoVim config**: Creates symlink to `~/.config/nvim`
 
@@ -226,13 +227,37 @@ Automated checks run on every PR (only when relevant files change):
 - Ubuntu-based CI environment
 - Runs on all PRs and pushes to main
 
+## AI Assistant Support
+
+This project supports multiple AI coding assistants through the **[agents.md](https://agents.md) standard**:
+
+**Supported Tools:**
+- ✅ **Claude Code** - Auto-reads `AGENTS.md`, configured hooks in `.claude/`
+- ✅ **GitHub Copilot** - Reads `.github/copilot-instructions.md` (references `AGENTS.md`)
+- ✅ **Cursor** - Auto-reads `AGENTS.md`
+- ✅ **Aider** - Pre-installed! Configured via `.aider.conf.yml` to read `AGENTS.md`
+- ✅ **OpenAI Codex, Gemini CLI, Zed** - All support `AGENTS.md`
+
+**Using Aider:**
+```bash
+aider               # Start Aider (auto-reads AGENTS.md for context)
+aider --help        # See all options
+```
+
+**Context Files:**
+- `AGENTS.md` - Universal AI context (architecture, patterns, workflows)
+- `docs/DEVELOPMENT_HISTORY.md` - Historical development context (former `CLAUDE.md`)
+
+See [`AGENTS.md`](AGENTS.md) for complete project context and development guidelines.
+
 ## Documentation
 
+- [AGENTS.md](AGENTS.md) - AI assistant context and development guidelines
 - [KEYMAPS.md](docs/KEYMAPS.md) - Complete keymap reference
 - [ARCHITECTURE.md](docs/ARCHITECTURE.md) - Design and module system
 - [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) - Common issues
 - [TESTING.md](TESTING.md) - Testing guide
-- [CLAUDE.md](CLAUDE.md) - Development plan (for future sessions)
+- [DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md) - Development history
 
 ## Architecture
 
