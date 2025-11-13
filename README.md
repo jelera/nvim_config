@@ -4,7 +4,7 @@ A modern, test-driven NeoVim configuration built from scratch with modular archi
 
 ## Status
 
-**575 tests passing** | **5 phases complete** | **Phase 6 in progress**
+**608 tests passing** | **6 phases complete** | **Phase 7 next**
 
 ### Completed Features
 - ✅ Core Framework (module loader, event bus, plugin system)
@@ -12,9 +12,10 @@ A modern, test-driven NeoVim configuration built from scratch with modular archi
 - ✅ UI & Theming (gruvbox, lualine, icons, indent guides)
 - ✅ TreeSitter (syntax highlighting, code folding, text objects)
 - ✅ LSP Support (9 language servers via Mason)
+- ✅ Completion (nvim-cmp with LSP, snippets, buffer, path, cmdline)
 
-### In Progress
-- ⏳ Completion System (nvim-cmp + LuaSnip)
+### Next
+- ⏳ Navigation & Search (Telescope + File Explorer)
 
 ## Quick Start
 
@@ -41,7 +42,8 @@ lua/
 │   ├── core/               # Vim configuration
 │   ├── ui/                 # UI & theming
 │   ├── treesitter/         # Syntax highlighting
-│   └── lsp/                # Language servers
+│   ├── lsp/                # Language servers
+│   └── completion/         # Auto-completion & snippets
 │
 └── spec/                    # Test Suite (busted)
     ├── unit/               # Unit tests
