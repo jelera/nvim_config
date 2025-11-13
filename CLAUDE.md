@@ -362,14 +362,23 @@ Test keymaps:
 
 ---
 
-### Phase 11: AI Integration ⏸️ PENDING
+### Phase 11: AI Integration ✅ COMPLETE
 **Goal**: AI-assisted coding
 
-Tasks:
-1. Set up copilot.lua
-2. Configure CopilotChat.nvim
-3. Add AI keymaps
-4. Test AI suggestions
+**18 tests passing** - Sidekick.nvim with Copilot NES and AI CLI terminal.
+
+Modular structure: init.lua (orchestrator) + sidekick.lua (sidekick.nvim config) + keymaps.lua (AI keymaps).
+
+Features:
+- Copilot NES: Multi-line refactorings and edit suggestions (better than inline completion)
+- AI Terminal: Built-in terminal for Claude, Gemini, Grok, Amazon Q, Aider, Cursor, and more
+- Unified interface: One plugin instead of multiple AI providers
+- Uses sidekick.nvim's excellent defaults (by folke, creator of lazy.nvim)
+
+AI keymaps:
+- NES: `<leader>aa` (accept), `<leader>an` (next hunk), `<leader>ap` (prev hunk), `<leader>ar` (reject)
+- Terminal: `<leader>at` (open), `<leader>ac` (chat), `<leader>as` (send selection), `<leader>aq` (close)
+- Control: `<leader>ai` (toggle sidekick)
 
 ---
 
@@ -770,14 +779,14 @@ busted
 - [x] Phase 8: Git Integration (21 tests)
 - [x] Phase 9: Debugging (DAP) (30 tests)
 - [x] Phase 10: Testing Framework (30 tests)
+- [x] Phase 11: AI Integration (18 tests)
 
-**Total: 746 tests passing (100% success rate)**
+**Total: 764 tests passing (100% success rate)**
 
 ### In Progress ⏳
 - None currently
 
 ### Pending ⏸️
-- [ ] Phase 11: AI Integration
 - [ ] Phase 12: Editor Enhancements
 - [ ] Phase 13: Documentation & Polish
 - [ ] Phase 14: CI/CD & Distribution
