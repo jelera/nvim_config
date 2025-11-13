@@ -243,6 +243,21 @@ M.mock_cmd = function(command)
   table.insert(M._commands, command)
 end
 
+-- Mock vim.diagnostic - Diagnostic API
+M.mock_diagnostic = {
+  severity = {
+    ERROR = 1,
+    WARN = 2,
+    INFO = 3,
+    HINT = 4,
+  },
+  config = function(opts) end,
+  show = function() end,
+  hide = function() end,
+  get = function() return {} end,
+  set = function() end,
+}
+
 -- Create complete mock vim object
 function M.create_vim_mock()
   return {
@@ -254,6 +269,7 @@ function M.create_vim_mock()
     schedule = M.mock_schedule,
     schedule_wrap = M.mock_schedule_wrap,
     cmd = M.mock_cmd,
+    diagnostic = M.mock_diagnostic,
 
     -- Log levels
     log = {
