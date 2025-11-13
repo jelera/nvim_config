@@ -23,7 +23,7 @@ Modern, IDE-like NeoVim configuration built with TDD and modular architecture.
 ### Quick Install (One-liner)
 
 ```bash
-gh repo clone jelera/nvimconfig ~/.config/nvim && cd ~/.config/nvim && ./install.sh
+gh repo clone jelera/nvim_config ~/.config/nvim && cd ~/.config/nvim && ./install.sh
 ```
 
 This will clone the repository and run the automated installer.
@@ -34,7 +34,7 @@ The install script handles all dependencies automatically:
 
 ```bash
 # Clone repository
-git clone https://github.com/jelera/nvimconfig.git ~/nvimconfig
+git clone https://github.com/jelera/nvim_config.git ~/nvimconfig
 cd ~/nvimconfig
 
 # Run installer (requires mise: https://mise.jdx.dev/)
