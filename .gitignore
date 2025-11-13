@@ -1,0 +1,270 @@
+# NeoVim IDE Configuration - .gitignore
+# ======================================
+
+# -----------------------------------------------------------------------------
+# NeoVim-specific
+# -----------------------------------------------------------------------------
+
+# Plugin data directories (managed by lazy.nvim)
+/lazy-lock.json.bak
+/plugin/
+
+# NeoVim cache and state
+/.nvim/
+/nvim.log
+/nvim.log.*
+
+# Swap files, backups, undo history
+*.sw[a-p]
+*.un~
+*.backup
+*~
+
+# Session files
+/Session.vim
+/session/
+/.session/
+
+# Shada/viminfo files (if generated)
+/.shada
+/.nviminfo
+
+# LSP server logs
+/lsp.log
+/lsp-*.log
+
+# Tree-sitter compiled parsers (usually in cache)
+/parser/
+
+# -----------------------------------------------------------------------------
+# Development Tools & Build Artifacts
+# -----------------------------------------------------------------------------
+
+# Node.js
+/node_modules/
+/npm-debug.log*
+/yarn-debug.log*
+/yarn-error.log*
+/package-lock.json
+/yarn.lock
+/.pnpm-debug.log
+/pnpm-lock.yaml
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+/build/
+/develop-eggs/
+/dist/
+/downloads/
+/eggs/
+/.eggs/
+/lib/
+/lib64/
+/parts/
+/sdist/
+/var/
+/wheels/
+/pip-wheel-metadata/
+/share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+/.pytest_cache/
+/.ruff_cache/
+/.mypy_cache/
+/.pytype/
+
+# Ruby
+/.bundle/
+/vendor/bundle/
+/lib/bundler/man/
+/pkg/
+/spec/reports/
+/spec/examples.txt
+/test/tmp/
+/test/version_tmp/
+/tmp/
+*.gem
+*.rbc
+/.config
+/coverage/
+/InstalledFiles
+/rdoc/
+/.yardoc/
+/_yardoc/
+/doc/
+/.yard/
+
+# Go
+/bin/
+/pkg/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+/go.work
+
+# Rust
+/target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
+
+# Lua
+/luac.out
+/luarocks/
+
+# -----------------------------------------------------------------------------
+# Testing & Coverage
+# -----------------------------------------------------------------------------
+
+# Test outputs
+/.busted_history
+/test-results/
+/test-output/
+/*.tap
+/*.xml
+
+# Coverage reports
+/coverage/
+/coverage.xml
+/.coverage
+/.coverage.*
+/htmlcov/
+/.nyc_output/
+/lcov.info
+/lcov-report/
+/.luacov
+/luacov.*.out
+/luacov.report.out
+
+# -----------------------------------------------------------------------------
+# Operating System
+# -----------------------------------------------------------------------------
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# -----------------------------------------------------------------------------
+# IDEs & Editors (when editing this config in other editors)
+# -----------------------------------------------------------------------------
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+/out/
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim (when not using this NeoVim config)
+.vim/
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# -----------------------------------------------------------------------------
+# Environment & Local Configuration
+# -----------------------------------------------------------------------------
+
+# Local configuration overrides (keep user-specific, don't commit)
+/.env
+/.env.local
+/.env.*.local
+/local.lua
+/settings.local.json
+
+# Authentication & Secrets
+/.secrets
+/*.key
+/*.pem
+/*.p12
+/.aws/
+/.ssh/
+/credentials
+
+# Logs
+*.log
+/logs/
+/log/
+
+# Temporary files
+/tmp/
+/.tmp/
+/temp/
+/.temp/
+
+# -----------------------------------------------------------------------------
+# Git-specific
+# -----------------------------------------------------------------------------
+
+# Backup files created by git merge
+*.orig
+
+# -----------------------------------------------------------------------------
+# Project-specific (uncomment if needed)
+# -----------------------------------------------------------------------------
+
+# Backups of config before updates (uncomment if you create these)
+# *.backup.*
+# /nvim.backup.*/
+
+# Local testing/development files (uncomment if you create these)
+# /scratch/
+# /playground/
+# /test-local/

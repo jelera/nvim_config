@@ -235,16 +235,18 @@ install_homebrew_packages() {
 
     # Optional but recommended packages
     local optional_packages=(
-        "ripgrep" # Fast grep (for Telescope)
-        "fd"      # Fast find (for Telescope)
-        "lazygit" # Git TUI
-        "bat"     # Better cat with syntax highlighting
-        "delta"   # Better git diff viewer
-        "eza"     # Better ls (formerly exa)
-        "fzf"     # Fuzzy finder (general use)
-        "gh"      # GitHub CLI
-        "jq"      # JSON processor
-        "tree"    # Directory tree viewer
+        "ripgrep"   # Fast grep (for Telescope)
+        "fd"        # Fast find (for Telescope)
+        "lazygit"   # Git TUI
+        "bat"       # Better cat with syntax highlighting
+        "delta"     # Better git diff viewer
+        "eza"       # Better ls (formerly exa)
+        "fzf"       # Fuzzy finder (general use)
+        "gh"        # GitHub CLI
+        "jq"        # JSON processor
+        "tree"      # Directory tree viewer
+        "shellcheck" # Shell script linter
+        "shfmt"     # Shell script formatter
     )
 
     # Install required packages
@@ -349,13 +351,15 @@ install_apt_packages() {
 
     # Optional but recommended packages
     local optional_packages=(
-        "ripgrep" # Fast grep (for Telescope)
-        "fd-find" # Fast find (fd is called fd-find on Ubuntu)
-        "lazygit" # Git TUI (from PPA)
-        "bat"     # Better cat with syntax highlighting
-        "fzf"     # Fuzzy finder
-        "jq"      # JSON processor
-        "tree"    # Directory tree viewer
+        "ripgrep"    # Fast grep (for Telescope)
+        "fd-find"    # Fast find (fd is called fd-find on Ubuntu)
+        "lazygit"    # Git TUI (from PPA)
+        "bat"        # Better cat with syntax highlighting
+        "fzf"        # Fuzzy finder
+        "jq"         # JSON processor
+        "tree"       # Directory tree viewer
+        "shellcheck" # Shell script linter
+        "shfmt"      # Shell script formatter
     )
 
     # Install required packages
@@ -489,12 +493,12 @@ install_node_packages() {
     local node_packages=(
         "neovim"                           # NeoVim Node.js provider (required)
         "tree-sitter-cli"                  # TreeSitter CLI (required for parsers)
-        "eslint"                           # JavaScript/TypeScript linter (required for lint-check.sh)
-        "typescript"                       # TypeScript compiler (required for type checking)
+        "eslint"                           # JavaScript/TypeScript linter
+        "typescript"                       # TypeScript compiler
         "@typescript-eslint/parser"        # TypeScript parser for ESLint
         "@typescript-eslint/eslint-plugin" # TypeScript rules for ESLint
-        "markdownlint-cli"                 # Markdown linter (required for lint-check.sh)
-        "prettier"                         # Code formatter (for auto-fixing)
+        "markdownlint-cli"                 # Markdown linter
+        "prettier"                         # Code formatter (JS/TS/JSON/Markdown/YAML)
         "eslint-config-prettier"           # Disable ESLint rules that conflict with Prettier
         "eslint-plugin-prettier"           # Run Prettier as an ESLint rule
     )
@@ -559,9 +563,11 @@ install_ruby_gems() {
     fi
 
     local ruby_gems=(
-        "neovim"     # NeoVim Ruby provider (required)
-        "solargraph" # Ruby LSP (optional but recommended)
-        "rubocop"    # Ruby linter (optional)
+        "neovim"              # NeoVim Ruby provider (required)
+        "solargraph"          # Ruby LSP
+        "rubocop"             # Ruby linter and formatter
+        "rubocop-performance" # Performance cops for RuboCop
+        "rubocop-rspec"       # RSpec cops for RuboCop
     )
 
     for gem_name in "${ruby_gems[@]}"; do

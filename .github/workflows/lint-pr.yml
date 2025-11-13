@@ -1,0 +1,167 @@
+name: Lint & Format PR Changes
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '**.md'
+      - '**.sh'
+      - '**.ts'
+      - '**.tsx'
+      - '**.js'
+      - '**.jsx'
+      - '**.json'
+      - '**.lua'
+      - '.luacheckrc'
+      - '.stylua.toml'
+      - '.eslintrc*'
+      - '.prettierrc*'
+      - 'tsconfig.json'
+      - '.github/workflows/lint-pr.yml'
+
+jobs:
+  lint-changed-files:
+    name: Lint & Format Check (Changed Files Only)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for proper diff
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Node.js linters/formatters
+        run: |
+          npm install -g \
+            eslint \
+            prettier \
+            markdownlint-cli \
+            typescript \
+            @typescript-eslint/parser \
+            @typescript-eslint/eslint-plugin
+
+      - name: Install shellcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck shfmt
+
+      - name: Install Lua tools
+        run: |
+          sudo apt-get install -y lua5.1 luarocks
+          sudo luarocks install luacheck
+
+      - name: Install stylua
+        run: |
+          cargo install stylua || echo "stylua install failed, skipping"
+
+      - name: Get changed files
+        id: changed-files
+        run: |
+          # Get list of changed files (compared to base branch)
+          git fetch origin ${{ github.base_ref }}
+          CHANGED_FILES=$(git diff --name-only --diff-filter=ACM origin/${{ github.base_ref }}...HEAD | tr '\n' ' ')
+          echo "Changed files: $CHANGED_FILES"
+          echo "files=$CHANGED_FILES" >> $GITHUB_OUTPUT
+
+      - name: Lint changed Markdown files
+        if: steps.changed-files.outputs.files != ''
+        run: |
+          for file in ${{ steps.changed-files.outputs.files }}; do
+            if [[ "$file" == *.md ]] && [[ -f "$file" ]]; then
+              echo "Linting Markdown: $file"
+              markdownlint "$file" || echo "::warning file=$file::Markdown lint issues found"
+            fi
+          done
+
+      - name: Lint changed Shell scripts
+        if: steps.changed-files.outputs.files != ''
+        run: |
+          for file in ${{ steps.changed-files.outputs.files }}; do
+            if [[ "$file" == *.sh ]] && [[ -f "$file" ]]; then
+              echo "Linting Shell script: $file"
+              shellcheck "$file" || exit 1
+            fi
+          done
+
+      - name: Lint changed TypeScript/JavaScript files
+        if: steps.changed-files.outputs.files != ''
+        run: |
+          for file in ${{ steps.changed-files.outputs.files }}; do
+            if [[ "$file" == *.ts ]] || [[ "$file" == *.tsx ]] || [[ "$file" == *.js ]] || [[ "$file" == *.jsx ]]; then
+              if [[ -f "$file" ]]; then
+                echo "Linting TS/JS: $file"
+                eslint "$file" || exit 1
+              fi
+            fi
+          done
+
+      - name: Lint changed Lua files
+        if: steps.changed-files.outputs.files != ''
+        run: |
+          for file in ${{ steps.changed-files.outputs.files }}; do
+            if [[ "$file" == *.lua ]] && [[ -f "$file" ]]; then
+              echo "Linting Lua: $file"
+              luacheck "$file" || exit 1
+            fi
+          done
+
+      - name: Check format of changed files
+        if: steps.changed-files.outputs.files != ''
+        run: |
+          FORMAT_FAILED=0
+
+          for file in ${{ steps.changed-files.outputs.files }}; do
+            if [[ ! -f "$file" ]]; then
+              continue
+            fi
+
+            case "$file" in
+              *.ts|*.tsx|*.js|*.jsx|*.json)
+                echo "Checking format: $file"
+                if ! prettier --check "$file" 2>&1; then
+                  echo "::error file=$file::File is not properly formatted (run: prettier --write $file)"
+                  FORMAT_FAILED=1
+                fi
+                ;;
+              *.md)
+                echo "Checking format: $file"
+                if ! prettier --check "$file" 2>&1; then
+                  echo "::warning file=$file::Markdown file is not properly formatted"
+                fi
+                ;;
+              *.sh)
+                echo "Checking format: $file"
+                if shfmt -d "$file" 2>&1 | grep -q .; then
+                  echo "::error file=$file::Shell script is not properly formatted (run: shfmt -w $file)"
+                  FORMAT_FAILED=1
+                fi
+                ;;
+              *.lua)
+                if command -v stylua &> /dev/null; then
+                  echo "Checking format: $file"
+                  if ! stylua --check "$file" 2>&1; then
+                    echo "::error file=$file::Lua file is not properly formatted (run: stylua $file)"
+                    FORMAT_FAILED=1
+                  fi
+                fi
+                ;;
+            esac
+          done
+
+          if [ $FORMAT_FAILED -eq 1 ]; then
+            echo "❌ Format check failed. Please run formatters on the files above."
+            exit 1
+          fi
+
+          echo "✅ All changed files are properly formatted"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "Lint and format checks completed for PR"
+          echo "Changed files checked: ${{ steps.changed-files.outputs.files }}"

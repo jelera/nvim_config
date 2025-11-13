@@ -1,14 +1,24 @@
-name: Lint
+name: Lint & Type Check
 
 on:
   push:
     branches: [ main ]
+    paths:
+      - '**.lua'
+      - '.luacheckrc'
+      - '.stylua.toml'
+      - '.github/workflows/lint-and-type-check.yml'
   pull_request:
     branches: [ main ]
+    paths:
+      - '**.lua'
+      - '.luacheckrc'
+      - '.stylua.toml'
+      - '.github/workflows/lint-and-type-check.yml'
 
 jobs:
-  lint:
-    name: Lua Lint
+  lint-lua:
+    name: Lua Lint & Format Check
     runs-on: ubuntu-latest
 
     steps:
@@ -28,7 +38,23 @@ jobs:
         run: |
           luacheck lua/ --config .luacheckrc || true
 
+      - name: Install stylua
+        run: |
+          cargo install stylua || echo "stylua install failed, will skip format check"
+
+      - name: Check Lua formatting
+        run: |
+          if command -v stylua &> /dev/null; then
+            echo "Checking Lua file formatting..."
+            stylua --check lua/ || {
+              echo "::error::Lua files are not properly formatted. Run 'stylua lua/' to fix."
+              exit 1
+            }
+          else
+            echo "stylua not available, skipping format check"
+          fi
+
       - name: Lint summary
         if: always()
         run: |
-          echo "Linting completed"
+          echo "Lua linting and format checking completed"

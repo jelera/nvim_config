@@ -60,7 +60,7 @@ if [ "$FIX_ALL" = true ]; then
   echo -e "${BLUE}🔍 Finding all source files...${NC}"
   while IFS= read -r -d '' file; do
     FILE_PATHS+=("$file")
-  done < <(find . -type f \( -name "*.lua" -o -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" -o -name "*.py" -o -name "*.rb" -o -name "*.go" -o -name "*.rs" -o -name "*.md" \) -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "*/dist/*" -not -path "*/build/*" -print0)
+  done < <(find . -type f \( -name "*.lua" -o -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" -o -name "*.py" -o -name "*.rb" -o -name "*.go" -o -name "*.rs" -o -name "*.md" -o -name "*.sh" -o -name "*.json" \) -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "*/dist/*" -not -path "*/build/*" -print0)
 elif [ $# -eq 0 ]; then
   # No arguments: fix all staged git files
   if command -v git &> /dev/null && git rev-parse --git-dir > /dev/null 2>&1; then
@@ -324,6 +324,68 @@ fix_markdown() {
   fi
 }
 
+# Function to fix Shell script files
+fix_shell() {
+  local file="$1"
+
+  if ! command -v shfmt &> /dev/null; then
+    echo -e "${YELLOW}⚠️  shfmt not found. Install with: brew install shfmt (macOS) or apt install shfmt (Ubuntu)${NC}"
+    return 0
+  fi
+
+  echo -e "${BLUE}🔧 Formatting $file with shfmt...${NC}"
+
+  if [ "$CHECK_ONLY" = true ]; then
+    if shfmt -d "$file" 2>&1 | grep -q .; then
+      echo -e "${YELLOW}⚠️  Would format: $file${NC}"
+      return 0
+    else
+      echo -e "${GREEN}✅ Already formatted: $file${NC}"
+      return 0
+    fi
+  else
+    if shfmt -w "$file" 2>&1; then
+      echo -e "${GREEN}✅ Formatted: $file${NC}"
+      FILES_FIXED=$((FILES_FIXED + 1))
+      return 0
+    else
+      echo -e "${RED}❌ Failed to format: $file${NC}"
+      return 1
+    fi
+  fi
+}
+
+# Function to fix JSON files
+fix_json() {
+  local file="$1"
+
+  if ! command -v prettier &> /dev/null; then
+    echo -e "${YELLOW}⚠️  prettier not found. Install with: npm install -g prettier${NC}"
+    return 0
+  fi
+
+  echo -e "${BLUE}🔧 Formatting $file with prettier...${NC}"
+
+  if [ "$CHECK_ONLY" = true ]; then
+    if prettier --check "$file" 2>&1; then
+      echo -e "${GREEN}✅ Already formatted: $file${NC}"
+      return 0
+    else
+      echo -e "${YELLOW}⚠️  Would format: $file${NC}"
+      return 0
+    fi
+  else
+    if prettier --write "$file" 2>&1; then
+      echo -e "${GREEN}✅ Formatted: $file${NC}"
+      FILES_FIXED=$((FILES_FIXED + 1))
+      return 0
+    else
+      echo -e "${RED}❌ Failed to format: $file${NC}"
+      return 1
+    fi
+  fi
+}
+
 # Track Rust files separately (need to run cargo fmt once for all)
 RUST_FILES=()
 
@@ -361,6 +423,16 @@ for file in "${FILE_PATHS[@]}"; do
       ;;
     *.md)
       if ! fix_markdown "$file"; then
+        FIX_FAILED=1
+      fi
+      ;;
+    *.sh)
+      if ! fix_shell "$file"; then
+        FIX_FAILED=1
+      fi
+      ;;
+    *.json)
+      if ! fix_json "$file"; then
         FIX_FAILED=1
       fi
       ;;

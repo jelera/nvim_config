@@ -79,8 +79,15 @@ cd ~/my-nvim-config
 
 **What it installs:**
 - **Development tools** (via mise): NeoVim, Node.js, Python, Ruby, Lua, Go, Rust
-- **System packages**: Git, luarocks, ripgrep, fd, lazygit, bat, delta, eza, fzf, gh, jq, tree
-- **Language packages**: npm packages, pip packages, Ruby gems, Cargo tools (stylua, delta, eza)
+- **System packages**: Git, luarocks, ripgrep, fd, lazygit, bat, delta, eza, fzf, gh, jq, tree, shellcheck, shfmt
+- **Linters & Formatters**:
+  - TypeScript/JavaScript: eslint, prettier
+  - Python: ruff, mypy, black
+  - Ruby: rubocop (+ performance, rspec extensions)
+  - Lua: stylua
+  - Markdown: markdownlint-cli, prettier
+  - JSON: prettier
+  - Shell: shellcheck, shfmt
 - **Nerd Fonts**: Hack, JetBrains Mono, Fira Code (installed by default)
 - **NeoVim config**: Creates symlink to `~/.config/nvim`
 
@@ -149,7 +156,41 @@ Pre-configured LSP servers:
 
 **Auto-install:** Servers install automatically on first file open.
 
-## Testing
+## Development Workflow
+
+### Pre-commit Hooks
+
+Automatically check code quality before commits:
+
+```bash
+# Install git hooks
+./scripts/install-hooks.sh
+```
+
+The pre-commit hook runs:
+1. **Lint checks** - luacheck, eslint, ruff, rubocop, markdownlint, shellcheck
+2. **Type checks** - TypeScript, Python
+3. **Format checks** - stylua, prettier, shfmt
+
+**Auto-fix formatting issues:**
+```bash
+./scripts/auto-fix.sh          # Fix staged files
+./scripts/auto-fix.sh --all    # Fix all files
+./scripts/auto-fix.sh --check  # Dry run (check only)
+```
+
+**Manual linting:**
+```bash
+./scripts/lint-check.sh        # Lint staged files
+./scripts/type-check.sh        # Type check staged files
+```
+
+**Bypass hook (not recommended):**
+```bash
+git commit --no-verify
+```
+
+### Testing
 
 ```bash
 # Run all tests
@@ -163,6 +204,27 @@ Pre-configured LSP servers:
 ```
 
 See [TESTING.md](TESTING.md) for detailed testing guide.
+
+### CI/CD
+
+Automated checks run on every PR (only when relevant files change):
+
+**PR Checks** (`.github/workflows/lint-pr.yml`):
+- Triggers only when code files change (`.md`, `.sh`, `.ts`, `.js`, `.json`, `.lua`)
+- Lints only changed files (Markdown, Shell, TS/JS, Lua)
+- Checks formatting on changed files (JSON, TS/JS, Shell, Lua)
+- Fast feedback on incremental changes
+
+**Full Lua Checks** (`.github/workflows/lint-and-type-check.yml`):
+- Triggers only when Lua files or config change (`.lua`, `.luacheckrc`, `.stylua.toml`)
+- Full Lua linting with luacheck
+- Full Lua format checking with stylua
+- Runs on push to main and PRs
+
+**Tests** (`.github/workflows/test.yml`):
+- Runs full test suite (786 tests)
+- Ubuntu-based CI environment
+- Runs on all PRs and pushes to main
 
 ## Documentation
 

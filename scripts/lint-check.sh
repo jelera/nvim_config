@@ -209,6 +209,46 @@ check_markdown() {
   fi
 }
 
+# Function to check Shell script files
+check_shell() {
+  local file="$1"
+
+  if ! command -v shellcheck &> /dev/null; then
+    echo -e "${YELLOW}⚠️  shellcheck not found. Install with: brew install shellcheck (macOS) or apt install shellcheck (Ubuntu)${NC}"
+    return 0
+  fi
+
+  echo -e "${BLUE}🔍 Running shellcheck on $file...${NC}"
+
+  if shellcheck "$file" 2>&1; then
+    echo -e "${GREEN}✅ Shell script lint check passed: $file${NC}"
+    return 0
+  else
+    echo -e "${RED}❌ Shell script lint check failed: $file${NC}"
+    return 2
+  fi
+}
+
+# Function to check JSON files (format check with prettier)
+check_json() {
+  local file="$1"
+
+  if ! command -v prettier &> /dev/null; then
+    echo -e "${YELLOW}⚠️  prettier not found. Install with: npm install -g prettier${NC}"
+    return 0
+  fi
+
+  echo -e "${BLUE}🔍 Checking JSON format with prettier on $file...${NC}"
+
+  if prettier --check "$file" 2>&1; then
+    echo -e "${GREEN}✅ JSON format check passed: $file${NC}"
+    return 0
+  else
+    echo -e "${RED}❌ JSON format check failed: $file (run prettier --write to fix)${NC}"
+    return 2
+  fi
+}
+
 # Process each file
 for file in $STAGED_FILES; do
   # Skip if file doesn't exist (could be deleted)
@@ -250,6 +290,16 @@ for file in $STAGED_FILES; do
       ;;
     *.md)
       if ! check_markdown "$file"; then
+        LINT_FAILED=2
+      fi
+      ;;
+    *.sh)
+      if ! check_shell "$file"; then
+        LINT_FAILED=2
+      fi
+      ;;
+    *.json)
+      if ! check_json "$file"; then
         LINT_FAILED=2
       fi
       ;;
