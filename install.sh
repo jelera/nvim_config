@@ -646,18 +646,10 @@ install_cargo_tools() {
 install_nerd_fonts() {
     print_header "Installing Nerd Fonts"
 
-    # Check if user wants to install fonts
     print_info "Nerd Fonts provide icons for file types and UI elements 💎"
     print_info "They are large downloads (~100-200 MB per font) 📥"
+    print_info "Installing fonts automatically... (use --skip-optional to skip)"
     echo ""
-    read -p "Install Nerd Fonts? [y/N] " -n 1 -r
-    echo ""
-
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        print_info "Skipping Nerd Fonts installation"
-        print_warning "You can install manually later from: https://www.nerdfonts.com/"
-        return 0
-    fi
 
     if [[ "$OSTYPE" == "darwin"* ]]; then
         # macOS: Use Homebrew Cask

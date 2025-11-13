@@ -20,13 +20,21 @@ Modern, IDE-like NeoVim configuration built with TDD and modular architecture.
 
 ## Installation
 
+### Quick Install (One-liner)
+
+```bash
+gh repo clone jelera/nvimconfig ~/.config/nvim && cd ~/.config/nvim && ./install.sh
+```
+
+This will clone the repository and run the automated installer.
+
 ### Automated Installation (Recommended)
 
 The install script handles all dependencies automatically:
 
 ```bash
 # Clone repository
-git clone <repo-url> ~/nvimconfig
+git clone https://github.com/jelera/nvimconfig.git ~/nvimconfig
 cd ~/nvimconfig
 
 # Run installer (requires mise: https://mise.jdx.dev/)
@@ -37,7 +45,7 @@ cd ~/nvimconfig
 - **Development tools** (via mise): NeoVim, Node.js, Python, Ruby, Lua, Go, Rust
 - **System packages**: Git, luarocks, ripgrep, fd, lazygit, bat, delta, eza, fzf, gh, jq, tree
 - **Language packages**: npm packages, pip packages, Ruby gems, Cargo tools (stylua, delta, eza)
-- **Nerd Fonts** (optional): Hack, JetBrains Mono, Fira Code (prompts before installing)
+- **Nerd Fonts**: Hack, JetBrains Mono, Fira Code (installed by default)
 - **NeoVim config**: Creates symlink to `~/.config/nvim`
 
 **Supported platforms:**
