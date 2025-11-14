@@ -262,19 +262,23 @@ install_homebrew_packages() {
 
     # Optional but recommended packages
     local optional_packages=(
-        "ripgrep"   # Fast grep (for Telescope)
-        "fd"        # Fast find (for Telescope)
-        "lazygit"   # Git TUI
-        "bat"       # Better cat with syntax highlighting
-        "delta"     # Better git diff viewer
-        "eza"       # Better ls (formerly exa)
-        "fzf"       # Fuzzy finder (general use)
-        "gh"        # GitHub CLI
-        "jq"        # JSON processor (for rest.nvim HTTP client)
+        "ripgrep"    # Fast grep (for Telescope)
+        "fd"         # Fast find (for Telescope)
+        "lazygit"    # Git TUI
+        "bat"        # Better cat with syntax highlighting
+        "delta"      # Better git diff viewer
+        "eza"        # Better ls (formerly exa)
+        "fzf"        # Fuzzy finder (general use)
+        "gh"         # GitHub CLI
+        "jq"         # JSON processor (for rest.nvim HTTP client)
         "tidy-html5" # HTML formatter (for rest.nvim)
-        "tree"      # Directory tree viewer
+        "tree"       # Directory tree viewer
         "shellcheck" # Shell script linter
-        "shfmt"     # Shell script formatter
+        "shfmt"      # Shell script formatter
+        "actionlint" # GitHub Actions workflow linter (for nvim-lint)
+        "codespell"  # Spell checker (for nvim-lint)
+        "gitlint"    # Git commit message linter (for nvim-lint)
+        "checkmake"  # Makefile linter (for nvim-lint)
     )
 
     # Install required packages
@@ -389,6 +393,7 @@ install_apt_packages() {
         "tree"       # Directory tree viewer
         "shellcheck" # Shell script linter
         "shfmt"      # Shell script formatter
+        "codespell"  # Spell checker (for nvim-lint)
     )
 
     # Install required packages
@@ -444,6 +449,20 @@ install_apt_packages() {
     # Install eza (better ls) - not in standard apt repos
     if ! command_exists eza; then
         print_info "eza not available via apt (optional, can install manually from https://github.com/eza-community/eza)"
+    fi
+
+    # Linters for nvim-lint (not in apt, can install via pip or Homebrew)
+    if ! command_exists actionlint; then
+        print_info "actionlint not available via apt (optional linter for nvim-lint)"
+        print_info "Install via: go install github.com/rhysd/actionlint/cmd/actionlint@latest"
+    fi
+    if ! command_exists gitlint; then
+        print_info "gitlint not available via apt (optional linter for nvim-lint)"
+        print_info "Install via: pip install --user gitlint"
+    fi
+    if ! command_exists checkmake; then
+        print_info "checkmake not available via apt (optional linter for nvim-lint)"
+        print_info "Install via: go install github.com/mrtazz/checkmake/cmd/checkmake@latest"
     fi
 }
 
@@ -571,6 +590,7 @@ install_python_packages() {
         "ruff"        # Fast Python linter and formatter (required for lint-check.sh)
         "mypy"        # Python type checker (required for type-check.sh)
         "black"       # Python formatter (for auto-fixing, works with ruff)
+        "gitlint"     # Git commit message linter (for nvim-lint)
         "aider-chat"  # AI pair programming tool (optional but recommended)
     )
 
@@ -904,6 +924,10 @@ verify_installation() {
         "gh:GitHub CLI"
         "jq:jq"
         "tree:tree"
+        "actionlint:actionlint"
+        "codespell:codespell"
+        "gitlint:gitlint"
+        "checkmake:checkmake"
     )
 
     for tool_spec in "${optional_tools[@]}"; do
@@ -1036,9 +1060,10 @@ ${BOLD}Description:${NC}
   ${CYAN}3.${NC} Installs system packages (git, luarocks, ripgrep, fd, lazygit, bat, delta, etc.)
   ${CYAN}4.${NC} Installs Lua packages (busted, luacheck, luacov)
   ${CYAN}5.${NC} Installs language-specific packages (npm, pip, gem, cargo tools)
-  ${CYAN}6.${NC} Installs Nerd Fonts (optional, with user prompt)
-  ${CYAN}7.${NC} Sets up NeoVim configuration symlink
-  ${CYAN}8.${NC} Verifies installation
+  ${CYAN}6.${NC} Installs linters for nvim-lint (actionlint, codespell, gitlint, checkmake)
+  ${CYAN}7.${NC} Installs Nerd Fonts (optional, with user prompt)
+  ${CYAN}8.${NC} Sets up NeoVim configuration symlink
+  ${CYAN}9.${NC} Verifies installation
 
 ${BOLD}Requirements:${NC}
   • mise (https://mise.jdx.dev/) - ${YELLOW}Required${NC}

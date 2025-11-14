@@ -27,24 +27,24 @@ Example config:
 local M = {}
 
 local default_config = {
-  rspec_cmd = "bundle exec rspec",
-  root_files = { ".git", "Gemfile" },
-  filter_dirs = { "node_modules", ".git", "vendor" },
+	rspec_cmd = "bundle exec rspec",
+	root_files = { ".git", "Gemfile" },
+	filter_dirs = { "node_modules", ".git", "vendor" },
 }
 
 ---Get RSpec adapter with custom configuration
 ---@param config? table Custom configuration options
 ---@return table|nil adapter The neotest adapter or nil
 function M.get_adapter(config)
-  local ok, neotest_rspec = pcall(require, 'neotest-rspec')
-  if not ok then
-    return nil
-  end
+	local ok, neotest_rspec = pcall(require, "neotest-rspec")
+	if not ok then
+		return nil
+	end
 
-  -- Merge with defaults
-  local merged_config = vim.tbl_deep_extend('force', default_config, config or {})
+	-- Merge with defaults
+	local merged_config = vim.tbl_deep_extend("force", default_config, config or {})
 
-  return neotest_rspec(merged_config)
+	return neotest_rspec(merged_config)
 end
 
 return M

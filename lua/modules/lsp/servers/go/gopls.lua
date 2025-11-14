@@ -8,6 +8,6 @@ Returns a table that gets merged with default LSP settings.
 --]]
 
 return {
-  -- Use defaults - gopls has excellent defaults
-  settings = {},
+	-- Use defaults - gopls has excellent defaults
+	settings = {},
 }

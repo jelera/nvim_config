@@ -31,25 +31,25 @@ local M = {}
 ---@param config? table Optional configuration
 ---@return boolean success Whether setup succeeded
 function M.setup(config)
-  config = config or {}
+	config = config or {}
 
-  -- Setup snippets first (required for completion)
-  local snippets = require('modules.completion.snippets')
-  local snippets_ok = snippets.setup(config)
-  if not snippets_ok then
-    vim.notify('Failed to setup snippets. Completion may not work properly.', vim.log.levels.ERROR)
-    return false
-  end
+	-- Setup snippets first (required for completion)
+	local snippets = require("modules.completion.snippets")
+	local snippets_ok = snippets.setup(config)
+	if not snippets_ok then
+		vim.notify("Failed to setup snippets. Completion may not work properly.", vim.log.levels.ERROR)
+		return false
+	end
 
-  -- Setup completion
-  local completion = require('modules.completion.completion')
-  local completion_ok = completion.setup(config)
-  if not completion_ok then
-    vim.notify('Failed to setup completion.', vim.log.levels.ERROR)
-    return false
-  end
+	-- Setup completion
+	local completion = require("modules.completion.completion")
+	local completion_ok = completion.setup(config)
+	if not completion_ok then
+		vim.notify("Failed to setup completion.", vim.log.levels.ERROR)
+		return false
+	end
 
-  return true
+	return true
 end
 
 return M

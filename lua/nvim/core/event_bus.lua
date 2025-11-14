@@ -36,8 +36,8 @@ Usage:
 local M = {}
 
 -- Internal state
-M._subscriptions = {}      -- { event_name = { [id] = subscription } }
-M._next_id = 1            -- Auto-incrementing subscription ID
+M._subscriptions = {} -- { event_name = { [id] = subscription } }
+M._next_id = 1 -- Auto-incrementing subscription ID
 
 --[[
 Subscribe to an event
@@ -51,36 +51,36 @@ Subscribe to an event
 @raises error: If event_name is not a string or callback is not a function
 --]]
 function M.on(event_name, callback, opts)
-  opts = opts or {}
+	opts = opts or {}
 
-  -- Validate parameters
-  if not event_name or type(event_name) ~= 'string' or event_name == '' then
-    error('Event name must be a non-empty string', 2)
-  end
+	-- Validate parameters
+	if not event_name or type(event_name) ~= "string" or event_name == "" then
+		error("Event name must be a non-empty string", 2)
+	end
 
-  if not callback or type(callback) ~= 'function' then
-    error('Callback must be a function', 2)
-  end
+	if not callback or type(callback) ~= "function" then
+		error("Callback must be a function", 2)
+	end
 
-  -- Initialize subscriptions for this event if needed
-  if not M._subscriptions[event_name] then
-    M._subscriptions[event_name] = {}
-  end
+	-- Initialize subscriptions for this event if needed
+	if not M._subscriptions[event_name] then
+		M._subscriptions[event_name] = {}
+	end
 
-  -- Create subscription
-  local subscription_id = M._next_id
-  M._next_id = M._next_id + 1
+	-- Create subscription
+	local subscription_id = M._next_id
+	M._next_id = M._next_id + 1
 
-  local subscription = {
-    id = subscription_id,
-    callback = callback,
-    once = opts.once or false,
-    priority = opts.priority or 0,
-  }
+	local subscription = {
+		id = subscription_id,
+		callback = callback,
+		once = opts.once or false,
+		priority = opts.priority or 0,
+	}
 
-  M._subscriptions[event_name][subscription_id] = subscription
+	M._subscriptions[event_name][subscription_id] = subscription
 
-  return subscription_id
+	return subscription_id
 end
 
 --[[
@@ -94,46 +94,43 @@ execution continues with remaining callbacks.
 @param data any: Data to pass to callbacks (optional)
 --]]
 function M.emit(event_name, data)
-  -- Get subscriptions for this event
-  local subscriptions = M._subscriptions[event_name]
-  if not subscriptions then
-    return  -- No subscribers, nothing to do
-  end
+	-- Get subscriptions for this event
+	local subscriptions = M._subscriptions[event_name]
+	if not subscriptions then
+		return -- No subscribers, nothing to do
+	end
 
-  -- Convert to array and sort by priority (highest first)
-  local callbacks = {}
-  for _, subscription in pairs(subscriptions) do
-    table.insert(callbacks, subscription)
-  end
+	-- Convert to array and sort by priority (highest first)
+	local callbacks = {}
+	for _, subscription in pairs(subscriptions) do
+		table.insert(callbacks, subscription)
+	end
 
-  table.sort(callbacks, function(a, b)
-    return a.priority > b.priority
-  end)
+	table.sort(callbacks, function(a, b)
+		return a.priority > b.priority
+	end)
 
-  -- Execute callbacks in priority order
-  local to_remove = {}
-  for _, subscription in ipairs(callbacks) do
-    -- Execute callback with error handling
-    local success, err = pcall(subscription.callback, data)
+	-- Execute callbacks in priority order
+	local to_remove = {}
+	for _, subscription in ipairs(callbacks) do
+		-- Execute callback with error handling
+		local success, err = pcall(subscription.callback, data)
 
-    if not success then
-      -- Log error but continue with other callbacks
-      vim.notify(
-        string.format('Error in event callback for "%s": %s', event_name, err),
-        vim.log.levels.ERROR
-      )
-    end
+		if not success then
+			-- Log error but continue with other callbacks
+			vim.notify(string.format('Error in event callback for "%s": %s', event_name, err), vim.log.levels.ERROR)
+		end
 
-    -- Mark for removal if it's a one-time subscription
-    if subscription.once then
-      table.insert(to_remove, subscription.id)
-    end
-  end
+		-- Mark for removal if it's a one-time subscription
+		if subscription.once then
+			table.insert(to_remove, subscription.id)
+		end
+	end
 
-  -- Remove one-time subscriptions
-  for _, id in ipairs(to_remove) do
-    M._subscriptions[event_name][id] = nil
-  end
+	-- Remove one-time subscriptions
+	for _, id in ipairs(to_remove) do
+		M._subscriptions[event_name][id] = nil
+	end
 end
 
 --[[
@@ -146,18 +143,18 @@ Can be called with either:
 @param identifier number|string: Subscription ID or event name
 --]]
 function M.off(identifier)
-  if type(identifier) == 'number' then
-    -- Unsubscribe by ID
-    for event_name, subscriptions in pairs(M._subscriptions) do
-      if subscriptions[identifier] then
-        subscriptions[identifier] = nil
-        return
-      end
-    end
-  elseif type(identifier) == 'string' then
-    -- Unsubscribe all for event
-    M._subscriptions[identifier] = nil
-  end
+	if type(identifier) == "number" then
+		-- Unsubscribe by ID
+		for _event_name, subscriptions in pairs(M._subscriptions) do
+			if subscriptions[identifier] then
+				subscriptions[identifier] = nil
+				return
+			end
+		end
+	elseif type(identifier) == "string" then
+		-- Unsubscribe all for event
+		M._subscriptions[identifier] = nil
+	end
 end
 
 --[[
@@ -170,13 +167,13 @@ Can be called with either:
 @param event_name string|nil: Optional event name to clear
 --]]
 function M.clear(event_name)
-  if event_name then
-    -- Clear specific event
-    M._subscriptions[event_name] = nil
-  else
-    -- Clear all events
-    M._subscriptions = {}
-  end
+	if event_name then
+		-- Clear specific event
+		M._subscriptions[event_name] = nil
+	else
+		-- Clear all events
+		M._subscriptions = {}
+	end
 end
 
 --[[
@@ -188,18 +185,18 @@ Get subscribers for introspection
   - If no event_name: returns table of { event_name = subscriptions }
 --]]
 function M.get_subscribers(event_name)
-  if event_name then
-    -- Return list of subscriptions for specific event
-    local subscriptions = M._subscriptions[event_name] or {}
-    local result = {}
-    for _, subscription in pairs(subscriptions) do
-      table.insert(result, subscription)
-    end
-    return result
-  else
-    -- Return all subscriptions grouped by event
-    return M._subscriptions
-  end
+	if event_name then
+		-- Return list of subscriptions for specific event
+		local subscriptions = M._subscriptions[event_name] or {}
+		local result = {}
+		for _, subscription in pairs(subscriptions) do
+			table.insert(result, subscription)
+		end
+		return result
+	else
+		-- Return all subscriptions grouped by event
+		return M._subscriptions
+	end
 end
 
 return M

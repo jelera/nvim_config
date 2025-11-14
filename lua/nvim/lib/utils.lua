@@ -35,15 +35,15 @@ Non-table values (primitives, functions) are returned as-is.
 @return any: Deep copy of the value
 --]]
 function M.deep_copy(orig)
-  if type(orig) ~= 'table' then
-    return orig
-  end
+	if type(orig) ~= "table" then
+		return orig
+	end
 
-  local copy = {}
-  for k, v in pairs(orig) do
-    copy[k] = M.deep_copy(v)
-  end
-  return copy
+	local copy = {}
+	for k, v in pairs(orig) do
+		copy[k] = M.deep_copy(v)
+	end
+	return copy
 end
 
 --[[
@@ -58,19 +58,19 @@ modifying inputs.
 @return table: Merged table (new table, doesn't modify inputs)
 --]]
 function M.deep_merge(source, target)
-  local result = M.deep_copy(source)
+	local result = M.deep_copy(source)
 
-  for k, v in pairs(target) do
-    if type(v) == 'table' and type(result[k]) == 'table' and not M.is_array(v) and not M.is_array(result[k]) then
-      -- Recursively merge nested tables (but not arrays)
-      result[k] = M.deep_merge(result[k], v)
-    else
-      -- Override with target value (for primitives, arrays, and mismatched types)
-      result[k] = M.deep_copy(v)
-    end
-  end
+	for k, v in pairs(target) do
+		if type(v) == "table" and type(result[k]) == "table" and not M.is_array(v) and not M.is_array(result[k]) then
+			-- Recursively merge nested tables (but not arrays)
+			result[k] = M.deep_merge(result[k], v)
+		else
+			-- Override with target value (for primitives, arrays, and mismatched types)
+			result[k] = M.deep_copy(v)
+		end
+	end
 
-  return result
+	return result
 end
 
 --[[
@@ -85,19 +85,19 @@ Arrays must have:
 @return boolean: true if value is an array
 --]]
 function M.is_array(value)
-  if type(value) ~= 'table' then
-    return false
-  end
+	if type(value) ~= "table" then
+		return false
+	end
 
-  local count = 0
-  for k, _ in pairs(value) do
-    count = count + 1
-    if type(k) ~= 'number' or k ~= count then
-      return false
-    end
-  end
+	local count = 0
+	for k, _ in pairs(value) do
+		count = count + 1
+		if type(k) ~= "number" or k ~= count then
+			return false
+		end
+	end
 
-  return true
+	return true
 end
 
 --[[
@@ -109,10 +109,10 @@ Non-table values are considered "empty" and return true.
 @return boolean: true if table is empty or value is not a table
 --]]
 function M.is_empty(tbl)
-  if type(tbl) ~= 'table' then
-    return true
-  end
-  return next(tbl) == nil
+	if type(tbl) ~= "table" then
+		return true
+	end
+	return next(tbl) == nil
 end
 
 --[[
@@ -125,11 +125,11 @@ Order is not guaranteed.
 @return table: Array of keys
 --]]
 function M.table_keys(tbl)
-  local keys = {}
-  for k, _ in pairs(tbl) do
-    table.insert(keys, k)
-  end
-  return keys
+	local keys = {}
+	for k, _ in pairs(tbl) do
+		table.insert(keys, k)
+	end
+	return keys
 end
 
 --[[
@@ -141,11 +141,11 @@ Counts all top-level entries in the table.
 @return number: Number of entries in table
 --]]
 function M.table_size(tbl)
-  local count = 0
-  for _, _ in pairs(tbl) do
-    count = count + 1
-  end
-  return count
+	local count = 0
+	for _, _ in pairs(tbl) do
+		count = count + 1
+	end
+	return count
 end
 
 --[[
@@ -162,12 +162,12 @@ This is a common pattern across modules for configuration management.
 @return table: Merged configuration (new table)
 --]]
 function M.merge_config(defaults, user_config)
-  if not user_config then
-    return M.deep_copy(defaults)
-  end
+	if not user_config then
+		return M.deep_copy(defaults)
+	end
 
-  local merged = M.deep_copy(defaults)
-  return M.deep_merge(merged, user_config)
+	local merged = M.deep_copy(defaults)
+	return M.deep_merge(merged, user_config)
 end
 
 return M

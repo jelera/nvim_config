@@ -20,31 +20,31 @@ require('lazy').setup(vim.list_extend(lsp_plugins, {
 --]]
 
 return {
-  -- LSP configuration
-  {
-    'neovim/nvim-lspconfig',
-    config = false, -- We'll configure it in modules.lsp
-  },
+	-- LSP configuration
+	{
+		"neovim/nvim-lspconfig",
+		config = false, -- We'll configure it in modules.lsp
+	},
 
-  -- Mason - LSP server installer with UI
-  {
-    'williamboman/mason.nvim',
-    config = false,
-  },
+	-- Mason - LSP server installer with UI
+	{
+		"williamboman/mason.nvim",
+		config = false,
+	},
 
-  -- Bridge between Mason and nvim-lspconfig
-  {
-    'williamboman/mason-lspconfig.nvim',
-    dependencies = {
-      'williamboman/mason.nvim',
-      'neovim/nvim-lspconfig',
-    },
-    config = false,
-  },
+	-- Bridge between Mason and nvim-lspconfig
+	{
+		"williamboman/mason-lspconfig.nvim",
+		dependencies = {
+			"williamboman/mason.nvim",
+			"neovim/nvim-lspconfig",
+		},
+		config = false,
+	},
 
-  -- LSP capabilities for nvim-cmp (completion)
-  {
-    'hrsh7th/cmp-nvim-lsp',
-    config = false,
-  },
+	-- LSP capabilities for nvim-cmp (completion)
+	{
+		"hrsh7th/cmp-nvim-lsp",
+		config = false,
+	},
 }

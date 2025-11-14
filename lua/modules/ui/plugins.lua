@@ -20,36 +20,36 @@ require('lazy').setup(vim.list_extend(ui_plugins, {
 --]]
 
 return {
-  -- Colorscheme (Treesitter-compatible gruvbox)
-  {
-    'ellisonleao/gruvbox.nvim',
-    priority = 1000, -- Load colorscheme first
-    config = false, -- We'll configure it in modules.ui.colorscheme
-  },
+	-- Colorscheme (Treesitter-compatible gruvbox)
+	{
+		"ellisonleao/gruvbox.nvim",
+		priority = 1000, -- Load colorscheme first
+		config = false, -- We'll configure it in modules.ui.colorscheme
+	},
 
-  -- Icons
-  {
-    'nvim-tree/nvim-web-devicons',
-    config = false, -- We'll configure it in modules.ui.icons
-  },
+	-- Icons
+	{
+		"nvim-tree/nvim-web-devicons",
+		config = false, -- We'll configure it in modules.ui.icons
+	},
 
-  -- Statusline
-  {
-    'nvim-lualine/lualine.nvim',
-    dependencies = { 'nvim-tree/nvim-web-devicons' },
-    config = false, -- We'll configure it in modules.ui.statusline
-  },
+	-- Statusline
+	{
+		"nvim-lualine/lualine.nvim",
+		dependencies = { "nvim-tree/nvim-web-devicons" },
+		config = false, -- We'll configure it in modules.ui.statusline
+	},
 
-  -- Indent guides
-  {
-    'lukas-reineke/indent-blankline.nvim',
-    main = 'ibl',
-    config = false, -- We'll configure it in modules.ui.indent
-  },
+	-- Indent guides
+	{
+		"lukas-reineke/indent-blankline.nvim",
+		main = "ibl",
+		config = false, -- We'll configure it in modules.ui.indent
+	},
 
-  -- Notifications
-  {
-    'rcarriga/nvim-notify',
-    config = false, -- We'll configure it in modules.ui.notifications
-  },
+	-- Notifications
+	{
+		"rcarriga/nvim-notify",
+		config = false, -- We'll configure it in modules.ui.notifications
+	},
 }

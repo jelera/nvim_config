@@ -23,7 +23,7 @@ Usage:
 local M = {}
 
 -- Dependencies
-local utils = require('nvim.lib.utils')
+local utils = require("nvim.lib.utils")
 
 --[[
 Validate a value against a type
@@ -39,26 +39,26 @@ Supported types:
 @return string|nil: Error message if invalid, nil otherwise
 --]]
 function M.validate_type(value, expected_type)
-  -- Handle 'any' type (always valid)
-  if expected_type == 'any' then
-    return true, nil
-  end
+	-- Handle 'any' type (always valid)
+	if expected_type == "any" then
+		return true, nil
+	end
 
-  -- Handle 'array' type
-  if expected_type == 'array' then
-    if utils.is_array(value) then
-      return true, nil
-    else
-      return false, 'Expected array, got ' .. type(value)
-    end
-  end
+	-- Handle 'array' type
+	if expected_type == "array" then
+		if utils.is_array(value) then
+			return true, nil
+		else
+			return false, "Expected array, got " .. type(value)
+		end
+	end
 
-  -- Basic type validation
-  if type(value) == expected_type then
-    return true, nil
-  else
-    return false, 'Expected ' .. expected_type .. ', got ' .. type(value)
-  end
+	-- Basic type validation
+	if type(value) == expected_type then
+		return true, nil
+	else
+		return false, "Expected " .. expected_type .. ", got " .. type(value)
+	end
 end
 
 --[[
@@ -79,82 +79,83 @@ Errors are accumulated in the errors table with field paths as keys.
 @param errors table: Table to accumulate errors (modified in place)
 @return boolean: true if valid
 --]]
+-- luacheck: ignore 561
 function M.validate_field(value, field_schema, field_path, errors)
-  local field_type = field_schema.type
+	local field_type = field_schema.type
 
-  -- Handle 'any' type (always valid)
-  if field_type == 'any' then
-    return true
-  end
+	-- Handle 'any' type (always valid)
+	if field_type == "any" then
+		return true
+	end
 
-  -- Handle 'array' type
-  if field_type == 'array' then
-    if not utils.is_array(value) then
-      errors[field_path] = 'Expected array, got ' .. type(value)
-      return false
-    end
+	-- Handle 'array' type
+	if field_type == "array" then
+		if not utils.is_array(value) then
+			errors[field_path] = "Expected array, got " .. type(value)
+			return false
+		end
 
-    -- Validate array items if items schema provided
-    if field_schema.items then
-      local all_valid = true
-      for i, item in ipairs(value) do
-        local item_path = field_path .. '[' .. i .. ']'
-        if not M.validate_field(item, field_schema.items, item_path, errors) then
-          all_valid = false
-        end
-      end
-      if not all_valid then
-        return false
-      end
-    end
+		-- Validate array items if items schema provided
+		if field_schema.items then
+			local all_valid = true
+			for i, item in ipairs(value) do
+				local item_path = field_path .. "[" .. i .. "]"
+				if not M.validate_field(item, field_schema.items, item_path, errors) then
+					all_valid = false
+				end
+			end
+			if not all_valid then
+				return false
+			end
+		end
 
-    return true
-  end
+		return true
+	end
 
-  -- Basic type validation
-  local type_valid, type_err = M.validate_type(value, field_type)
-  if not type_valid then
-    errors[field_path] = type_err
-    return false
-  end
+	-- Basic type validation
+	local type_valid, type_err = M.validate_type(value, field_type)
+	if not type_valid then
+		errors[field_path] = type_err
+		return false
+	end
 
-  -- Handle nested table validation
-  if field_type == 'table' and field_schema.fields then
-    local all_valid = true
+	-- Handle nested table validation
+	if field_type == "table" and field_schema.fields then
+		local all_valid = true
 
-    for nested_field_name, nested_field_schema in pairs(field_schema.fields) do
-      local nested_path = field_path .. '.' .. nested_field_name
-      local nested_value = value[nested_field_name]
+		for nested_field_name, nested_field_schema in pairs(field_schema.fields) do
+			local nested_path = field_path .. "." .. nested_field_name
+			local nested_value = value[nested_field_name]
 
-      -- Check if nested field is required
-      if nested_field_schema.required and nested_value == nil then
-        errors[nested_path] = 'Required field is missing'
-        all_valid = false
-      end
+			-- Check if nested field is required
+			if nested_field_schema.required and nested_value == nil then
+				errors[nested_path] = "Required field is missing"
+				all_valid = false
+			end
 
-      -- Validate nested field if present
-      if nested_value ~= nil then
-        if not M.validate_field(nested_value, nested_field_schema, nested_path, errors) then
-          all_valid = false
-        end
-      end
-    end
+			-- Validate nested field if present
+			if nested_value ~= nil then
+				if not M.validate_field(nested_value, nested_field_schema, nested_path, errors) then
+					all_valid = false
+				end
+			end
+		end
 
-    if not all_valid then
-      return false
-    end
-  end
+		if not all_valid then
+			return false
+		end
+	end
 
-  -- Custom validator
-  if field_schema.validator then
-    local valid, err_msg = field_schema.validator(value)
-    if not valid then
-      errors[field_path] = err_msg or 'Custom validation failed'
-      return false
-    end
-  end
+	-- Custom validator
+	if field_schema.validator then
+		local valid, err_msg = field_schema.validator(value)
+		if not valid then
+			errors[field_path] = err_msg or "Custom validation failed"
+			return false
+		end
+	end
 
-  return true
+	return true
 end
 
 return M

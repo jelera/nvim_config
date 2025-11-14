@@ -44,24 +44,24 @@ local M = {}
 ---@param config.neotest table|nil Neotest configuration overrides
 ---@return boolean success Whether setup succeeded
 function M.setup(config)
-  config = config or {}
+	config = config or {}
 
-  -- Setup neotest core
-  local neotest = require('modules.test.neotest')
-  local neotest_ok = neotest.setup(config.neotest or {})
-  if not neotest_ok then
-    vim.notify('Failed to setup neotest. Testing disabled.', vim.log.levels.WARN)
-  end
+	-- Setup neotest core
+	local neotest = require("modules.test.neotest")
+	local neotest_ok = neotest.setup(config.neotest or {})
+	if not neotest_ok then
+		vim.notify("Failed to setup neotest. Testing disabled.", vim.log.levels.WARN)
+	end
 
-  -- Setup keymaps (after neotest is initialized)
-  local keymaps = require('modules.test.keymaps')
-  local keymaps_ok = keymaps.setup()
-  if not keymaps_ok then
-    vim.notify('Failed to setup test keymaps.', vim.log.levels.ERROR)
-    return false
-  end
+	-- Setup keymaps (after neotest is initialized)
+	local keymaps = require("modules.test.keymaps")
+	local keymaps_ok = keymaps.setup()
+	if not keymaps_ok then
+		vim.notify("Failed to setup test keymaps.", vim.log.levels.ERROR)
+		return false
+	end
 
-  return true
+	return true
 end
 
 return M

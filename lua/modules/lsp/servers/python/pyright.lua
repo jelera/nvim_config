@@ -10,14 +10,14 @@ Returns a table that gets merged with default LSP settings.
 --]]
 
 return {
-  settings = {
-    python = {
-      analysis = {
-        typeCheckingMode = 'basic', -- off, basic, strict
-        autoSearchPaths = true,
-        useLibraryCodeForTypes = true,
-        diagnosticMode = 'workspace',
-      },
-    },
-  },
+	settings = {
+		python = {
+			analysis = {
+				typeCheckingMode = "basic", -- off, basic, strict
+				autoSearchPaths = true,
+				useLibraryCodeForTypes = true,
+				diagnosticMode = "workspace",
+			},
+		},
+	},
 }

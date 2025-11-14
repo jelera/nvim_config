@@ -16,50 +16,50 @@ is enabled in the main configuration.
 --]]
 
 return {
-  -- Telescope: Fuzzy finder and picker
-  {
-    'nvim-telescope/telescope.nvim',
-    branch = '0.1.x',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      {
-        'nvim-telescope/telescope-fzf-native.nvim',
-        build = 'make',
-      },
-    },
-    cmd = 'Telescope',
-    keys = {
-      '<C-p>g',
-      '<C-p>p',
-      '<C-p>h',
-      '<C-p>b',
-      '<C-p>c',
-      '<C-p>a',
-      '<leader>rg',
-      '<leader>ag',
-      '\\',
-    },
-    config = false,
-  },
+	-- Telescope: Fuzzy finder and picker
+	{
+		"nvim-telescope/telescope.nvim",
+		branch = "0.1.x",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			{
+				"nvim-telescope/telescope-fzf-native.nvim",
+				build = "make",
+			},
+		},
+		cmd = "Telescope",
+		keys = {
+			"<C-p>g",
+			"<C-p>p",
+			"<C-p>h",
+			"<C-p>b",
+			"<C-p>c",
+			"<C-p>a",
+			"<leader>rg",
+			"<leader>ag",
+			"\\",
+		},
+		config = false,
+	},
 
-  -- Nvim-tree: File explorer
-  {
-    'nvim-tree/nvim-tree.lua',
-    dependencies = {
-      'nvim-tree/nvim-web-devicons',
-    },
-    cmd = {
-      'NvimTreeToggle',
-      'NvimTreeFindFile',
-      'NvimTreeFocus',
-      'NvimTreeCollapse',
-      'NvimTreeRefresh',
-    },
-    keys = {
-      '<C-t>',
-      '<C-B>t',
-      '<leader>e',
-    },
-    config = false,
-  },
+	-- Nvim-tree: File explorer
+	{
+		"nvim-tree/nvim-tree.lua",
+		dependencies = {
+			"nvim-tree/nvim-web-devicons",
+		},
+		cmd = {
+			"NvimTreeToggle",
+			"NvimTreeFindFile",
+			"NvimTreeFocus",
+			"NvimTreeCollapse",
+			"NvimTreeRefresh",
+		},
+		keys = {
+			"<C-t>",
+			"<C-B>t",
+			"<leader>e",
+		},
+		config = false,
+	},
 }

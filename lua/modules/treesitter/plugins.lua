@@ -20,16 +20,16 @@ require('lazy').setup(vim.list_extend(ts_plugins, {
 --]]
 
 return {
-  -- TreeSitter core
-  {
-    'nvim-treesitter/nvim-treesitter',
-    build = ':TSUpdate',
-    config = false, -- We'll configure it in modules.treesitter
-  },
+	-- TreeSitter core
+	{
+		"nvim-treesitter/nvim-treesitter",
+		build = ":TSUpdate",
+		config = false, -- We'll configure it in modules.treesitter
+	},
 
-  -- TreeSitter text objects (advanced motions and selections)
-  {
-    'nvim-treesitter/nvim-treesitter-textobjects',
-    dependencies = { 'nvim-treesitter/nvim-treesitter' },
-  },
+	-- TreeSitter text objects (advanced motions and selections)
+	{
+		"nvim-treesitter/nvim-treesitter-textobjects",
+		dependencies = { "nvim-treesitter/nvim-treesitter" },
+	},
 }

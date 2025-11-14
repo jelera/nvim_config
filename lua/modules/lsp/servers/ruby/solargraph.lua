@@ -8,6 +8,6 @@ Returns a table that gets merged with default LSP settings.
 --]]
 
 return {
-  -- Use defaults - solargraph works well out of the box
-  settings = {},
+	-- Use defaults - solargraph works well out of the box
+	settings = {},
 }

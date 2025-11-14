@@ -8,6 +8,6 @@ Returns a table that gets merged with default LSP settings.
 --]]
 
 return {
-  -- Use defaults
-  settings = {},
+	-- Use defaults
+	settings = {},
 }

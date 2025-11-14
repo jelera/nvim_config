@@ -59,10 +59,10 @@ API:
 local M = {}
 
 -- Load all core modules
-M.options = require('modules.core.options')
-M.keymaps = require('modules.core.keymaps')
-M.autocmds = require('modules.core.autocmds')
-M.commands = require('modules.core.commands')
+M.options = require("modules.core.options")
+M.keymaps = require("modules.core.keymaps")
+M.autocmds = require("modules.core.autocmds")
+M.commands = require("modules.core.commands")
 
 ---Setup all core modules with optional configuration
 ---Initializes modules in order: options, keymaps, autocmds, commands
@@ -73,37 +73,37 @@ M.commands = require('modules.core.commands')
 ---@param config.commands? table Configuration for commands module
 ---@return boolean success Whether all modules were initialized successfully
 function M.setup(config)
-  config = config or {}
+	config = config or {}
 
-  -- Setup options first (vim settings)
-  local options_success = M.options.setup(config.options)
-  if not options_success then
-    vim.notify('Core module setup failed: options', vim.log.levels.ERROR)
-    return false
-  end
+	-- Setup options first (vim settings)
+	local options_success = M.options.setup(config.options)
+	if not options_success then
+		vim.notify("Core module setup failed: options", vim.log.levels.ERROR)
+		return false
+	end
 
-  -- Setup keymaps (key bindings)
-  local keymaps_success = M.keymaps.setup(config.keymaps)
-  if not keymaps_success then
-    vim.notify('Core module setup failed: keymaps', vim.log.levels.ERROR)
-    return false
-  end
+	-- Setup keymaps (key bindings)
+	local keymaps_success = M.keymaps.setup(config.keymaps)
+	if not keymaps_success then
+		vim.notify("Core module setup failed: keymaps", vim.log.levels.ERROR)
+		return false
+	end
 
-  -- Setup autocommands (event handlers)
-  local autocmds_success = M.autocmds.setup(config.autocmds)
-  if not autocmds_success then
-    vim.notify('Core module setup failed: autocmds', vim.log.levels.ERROR)
-    return false
-  end
+	-- Setup autocommands (event handlers)
+	local autocmds_success = M.autocmds.setup(config.autocmds)
+	if not autocmds_success then
+		vim.notify("Core module setup failed: autocmds", vim.log.levels.ERROR)
+		return false
+	end
 
-  -- Setup commands (user commands)
-  local commands_success = M.commands.setup(config.commands)
-  if not commands_success then
-    vim.notify('Core module setup failed: commands', vim.log.levels.ERROR)
-    return false
-  end
+	-- Setup commands (user commands)
+	local commands_success = M.commands.setup(config.commands)
+	if not commands_success then
+		vim.notify("Core module setup failed: commands", vim.log.levels.ERROR)
+		return false
+	end
 
-  return true
+	return true
 end
 
 return M

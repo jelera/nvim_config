@@ -11,308 +11,317 @@ Test Categories:
 4. Graceful degradation
 --]]
 
-describe('modules.lsp #unit', function()
-  local spec_helper = require('spec.spec_helper')
-  local lsp
+describe("modules.lsp #unit", function()
+	local spec_helper = require("spec.spec_helper")
+	local lsp
 
-  before_each(function()
-    spec_helper.setup()
+	before_each(function()
+		spec_helper.setup()
 
-    -- Reset module cache
-    package.loaded['modules.lsp'] = nil
-    package.loaded['modules.lsp.init'] = nil
-    package.loaded['modules.lsp.config'] = nil
-    package.loaded['modules.lsp.event_handlers'] = nil
-    package.loaded['modules.lsp.keymaps'] = nil
-    package.loaded['modules.lsp.diagnostics'] = nil
-    package.loaded['mason'] = nil
-    package.loaded['mason-lspconfig'] = nil
-    package.loaded['lspconfig'] = nil
+		-- Reset module cache
+		package.loaded["modules.lsp"] = nil
+		package.loaded["modules.lsp.init"] = nil
+		package.loaded["modules.lsp.config"] = nil
+		package.loaded["modules.lsp.event_handlers"] = nil
+		package.loaded["modules.lsp.keymaps"] = nil
+		package.loaded["modules.lsp.diagnostics"] = nil
+		package.loaded["mason"] = nil
+		package.loaded["mason-lspconfig"] = nil
+		package.loaded["lspconfig"] = nil
 
-    -- Track configuration
-    _G._test_mason_config = nil
-    _G._test_mason_lspconfig_config = nil
-    _G._test_lsp_servers_setup = {}
-    _G._test_diagnostic_config = nil
-    _G._test_installed_servers = {}
+		-- Track configuration
+		_G._test_mason_config = nil
+		_G._test_mason_lspconfig_config = nil
+		_G._test_lsp_servers_setup = {}
+		_G._test_diagnostic_config = nil
+		_G._test_installed_servers = {}
 
-    -- Mock vim.diagnostic
-    vim.diagnostic = {
-      severity = {
-        ERROR = 1,
-        WARN = 2,
-        HINT = 3,
-        INFO = 4,
-      },
-      config = function(config)
-        _G._test_diagnostic_config = config
-      end,
-    }
+		-- Mock vim.diagnostic
+		vim.diagnostic = {
+			severity = {
+				ERROR = 1,
+				WARN = 2,
+				HINT = 3,
+				INFO = 4,
+			},
+			config = function(config)
+				_G._test_diagnostic_config = config
+			end,
+		}
 
-    -- Mock vim.fn.sign_define
-    vim.fn = vim.fn or {}
-    vim.fn.sign_define = function(name, opts)
-      -- Just track it was called
-    end
+		-- Mock vim.fn.sign_define
+		vim.fn = vim.fn or {}
+		vim.fn.sign_define = function(name, opts)
+			-- Just track it was called
+		end
 
-    -- Mock vim.keymap
-    vim.keymap = {
-      set = function() end,
-    }
+		-- Mock vim.keymap
+		vim.keymap = {
+			set = function() end,
+		}
 
-    -- Mock vim.api for autocommands
-    vim.api = vim.api or {}
-    vim.api.nvim_create_autocmd = function() end
+		-- Mock vim.api for autocommands
+		vim.api = vim.api or {}
+		vim.api.nvim_create_autocmd = function() end
 
-    -- Mock Mason
-    package.preload['mason'] = function()
-      return {
-        setup = function(config)
-          _G._test_mason_config = config
-        end,
-      }
-    end
+		-- Mock Mason
+		package.preload["mason"] = function()
+			return {
+				setup = function(config)
+					_G._test_mason_config = config
+				end,
+			}
+		end
 
-    -- Mock mason-lspconfig
-    package.preload['mason-lspconfig'] = function()
-      return {
-        setup = function(config)
-          _G._test_mason_lspconfig_config = config
-        end,
-        setup_handlers = function(handlers)
-          _G._test_mason_lspconfig_handlers = handlers
-        end,
-        get_installed_servers = function()
-          -- Return empty list by default, tests can override this
-          return _G._test_installed_servers or {}
-        end,
-      }
-    end
+		-- Mock mason-lspconfig
+		package.preload["mason-lspconfig"] = function()
+			return {
+				setup = function(config)
+					_G._test_mason_lspconfig_config = config
 
-    -- Mock lspconfig (needed for config loading)
-    package.preload['lspconfig'] = function()
-      return {}
-    end
+					-- If handlers are provided, call them for each installed server
+					if config.handlers and config.handlers[1] then
+						local installed = _G._test_installed_servers or {}
+						for _, server_name in ipairs(installed) do
+							config.handlers[1](server_name)
+						end
+					end
+				end,
+				setup_handlers = function(handlers)
+					_G._test_mason_lspconfig_handlers = handlers
+				end,
+				get_installed_servers = function()
+					-- Return empty list by default, tests can override this
+					return _G._test_installed_servers or {}
+				end,
+			}
+		end
 
-    -- Initialize vim.lsp if it doesn't exist
-    vim.lsp = vim.lsp or {}
+		-- Mock lspconfig (needed for config loading)
+		package.preload["lspconfig"] = function()
+			return {}
+		end
 
-    -- Mock vim.lsp.config and vim.lsp.enable for Neovim 0.11
-    vim.lsp.config = function(server_name, config)
-      _G._test_lsp_servers_setup[server_name] = config
-    end
+		-- Initialize vim.lsp if it doesn't exist
+		vim.lsp = vim.lsp or {}
 
-    vim.lsp.enable = function(server_name)
-      -- Track that enable was called
-    end
+		-- Mock vim.lsp.config and vim.lsp.enable for Neovim 0.11
+		vim.lsp.config = function(server_name, config)
+			_G._test_lsp_servers_setup[server_name] = config
+		end
 
-    -- Mock cmp_nvim_lsp
-    package.preload['cmp_nvim_lsp'] = function()
-      return {
-        default_capabilities = function()
-          return { textDocument = { completion = { completionItem = {} } } }
-        end,
-      }
-    end
+		vim.lsp.enable = function(server_name)
+			-- Track that enable was called
+		end
 
-    lsp = require('modules.lsp')
-  end)
+		-- Mock cmp_nvim_lsp
+		package.preload["cmp_nvim_lsp"] = function()
+			return {
+				default_capabilities = function()
+					return { textDocument = { completion = { completionItem = {} } } }
+				end,
+			}
+		end
 
-  after_each(function()
-    spec_helper.teardown()
-    _G._test_mason_config = nil
-    _G._test_mason_lspconfig_config = nil
-    _G._test_lsp_servers_setup = nil
-    _G._test_mason_lspconfig_handlers = nil
-    _G._test_diagnostic_config = nil
-  end)
+		lsp = require("modules.lsp")
+	end)
 
-  describe('Module structure', function()
-    it('should load without errors', function()
-      assert.is_not_nil(lsp)
-      assert.is_table(lsp)
-    end)
+	after_each(function()
+		spec_helper.teardown()
+		_G._test_mason_config = nil
+		_G._test_mason_lspconfig_config = nil
+		_G._test_lsp_servers_setup = nil
+		_G._test_mason_lspconfig_handlers = nil
+		_G._test_diagnostic_config = nil
+	end)
 
-    it('should have setup function', function()
-      assert.is_function(lsp.setup)
-    end)
-  end)
+	describe("Module structure", function()
+		it("should load without errors", function()
+			assert.is_not_nil(lsp)
+			assert.is_table(lsp)
+		end)
 
-  describe('setup() with defaults', function()
-    it('should return true on success', function()
-      local result = lsp.setup()
-      assert.is_true(result)
-    end)
+		it("should have setup function", function()
+			assert.is_function(lsp.setup)
+		end)
+	end)
 
-    it('should configure Mason', function()
-      lsp.setup()
-      assert.is_not_nil(_G._test_mason_config)
-    end)
+	describe("setup() with defaults", function()
+		it("should return true on success", function()
+			local result = lsp.setup()
+			assert.is_true(result)
+		end)
 
-    it('should configure mason-lspconfig', function()
-      lsp.setup()
-      assert.is_not_nil(_G._test_mason_lspconfig_config)
-    end)
+		it("should configure Mason", function()
+			lsp.setup()
+			assert.is_not_nil(_G._test_mason_config)
+		end)
 
-    it('should auto-install core servers', function()
-      lsp.setup()
+		it("should configure mason-lspconfig", function()
+			lsp.setup()
+			assert.is_not_nil(_G._test_mason_lspconfig_config)
+		end)
 
-      local ensure_installed = _G._test_mason_lspconfig_config.ensure_installed
-      assert.is_table(ensure_installed)
+		it("should auto-install core servers", function()
+			lsp.setup()
 
-      -- Check for core servers
-      local has_lua_ls = false
-      local has_ts_ls = false
-      local has_pyright = false
+			local ensure_installed = _G._test_mason_lspconfig_config.ensure_installed
+			assert.is_table(ensure_installed)
 
-      for _, server in ipairs(ensure_installed) do
-        if server == 'lua_ls' then
-          has_lua_ls = true
-        end
-        if server == 'ts_ls' then
-          has_ts_ls = true
-        end
-        if server == 'pyright' then
-          has_pyright = true
-        end
-      end
+			-- Check for core servers
+			local has_lua_ls = false
+			local has_ts_ls = false
+			local has_pyright = false
 
-      assert.is_true(has_lua_ls)
-      assert.is_true(has_ts_ls)
-      assert.is_true(has_pyright)
-    end)
+			for _, server in ipairs(ensure_installed) do
+				if server == "lua_ls" then
+					has_lua_ls = true
+				end
+				if server == "ts_ls" then
+					has_ts_ls = true
+				end
+				if server == "pyright" then
+					has_pyright = true
+				end
+			end
 
-    it('should enable automatic installation', function()
-      lsp.setup()
-      assert.is_true(_G._test_mason_lspconfig_config.automatic_enable)
-    end)
-  end)
+			assert.is_true(has_lua_ls)
+			assert.is_true(has_ts_ls)
+			assert.is_true(has_pyright)
+		end)
 
-  describe('setup() with custom config', function()
-    it('should accept empty config', function()
-      local result = lsp.setup({})
-      assert.is_true(result)
-    end)
+		it("should configure handlers for server setup", function()
+			lsp.setup()
+			assert.is_not_nil(_G._test_mason_lspconfig_config.handlers)
+			assert.is_equal("table", type(_G._test_mason_lspconfig_config.handlers))
+		end)
+	end)
 
-    it('should allow custom ensure_installed list', function()
-      lsp.setup({
-        ensure_installed = { 'lua_ls', 'pyright' },
-      })
+	describe("setup() with custom config", function()
+		it("should accept empty config", function()
+			local result = lsp.setup({})
+			assert.is_true(result)
+		end)
 
-      local ensure_installed = _G._test_mason_lspconfig_config.ensure_installed
-      assert.equal(2, #ensure_installed)
-    end)
+		it("should allow custom ensure_installed list", function()
+			lsp.setup({
+				ensure_installed = { "lua_ls", "pyright" },
+			})
 
-    it('should allow disabling automatic_installation', function()
-      lsp.setup({
-        automatic_enable = false,
-      })
+			local ensure_installed = _G._test_mason_lspconfig_config.ensure_installed
+			assert.equal(2, #ensure_installed)
+		end)
 
-      assert.is_false(_G._test_mason_lspconfig_config.automatic_enable)
-    end)
+		it("should disable automatic_installation by default", function()
+			lsp.setup()
 
-    it('should merge custom config with defaults', function()
-      lsp.setup({
-        ensure_installed = { 'custom_server' },
-      })
+			-- We now use handlers instead of automatic_installation
+			-- automatic_installation should be false (we control which servers to enable)
+			assert.is_false(_G._test_mason_lspconfig_config.automatic_installation)
+		end)
 
-      -- Should still configure Mason
-      assert.is_not_nil(_G._test_mason_config)
-      assert.is_not_nil(_G._test_mason_lspconfig_config)
-    end)
-  end)
+		it("should merge custom config with defaults", function()
+			lsp.setup({
+				ensure_installed = { "custom_server" },
+			})
 
-  describe('Graceful degradation', function()
-    it('should return false when Mason not available', function()
-      package.loaded['mason'] = nil
-      package.preload['mason'] = function()
-        error('not found')
-      end
+			-- Should still configure Mason
+			assert.is_not_nil(_G._test_mason_config)
+			assert.is_not_nil(_G._test_mason_lspconfig_config)
+		end)
+	end)
 
-      local result = lsp.setup()
-      assert.is_false(result)
-    end)
+	describe("Graceful degradation", function()
+		it("should return false when Mason not available", function()
+			package.loaded["mason"] = nil
+			package.preload["mason"] = function()
+				error("not found")
+			end
 
-    it('should return false when mason-lspconfig not available', function()
-      package.loaded['mason-lspconfig'] = nil
-      package.preload['mason-lspconfig'] = function()
-        error('not found')
-      end
+			local result = lsp.setup()
+			assert.is_false(result)
+		end)
 
-      local result = lsp.setup()
-      assert.is_false(result)
-    end)
+		it("should return false when mason-lspconfig not available", function()
+			package.loaded["mason-lspconfig"] = nil
+			package.preload["mason-lspconfig"] = function()
+				error("not found")
+			end
 
-    it('should return false when lspconfig not available', function()
-      package.loaded['lspconfig'] = nil
-      package.preload['lspconfig'] = function()
-        error('not found')
-      end
+			local result = lsp.setup()
+			assert.is_false(result)
+		end)
 
-      local result = lsp.setup()
-      assert.is_false(result)
-    end)
+		it("should return false when lspconfig not available", function()
+			package.loaded["lspconfig"] = nil
+			package.preload["lspconfig"] = function()
+				error("not found")
+			end
 
-    it('should handle configuration errors', function()
-      package.loaded['mason'] = nil
-      package.preload['mason'] = function()
-        return {
-          setup = function()
-            error('Configuration error')
-          end,
-        }
-      end
+			local result = lsp.setup()
+			assert.is_false(result)
+		end)
 
-      local result = lsp.setup()
-      assert.is_false(result)
-    end)
-  end)
+		it("should handle configuration errors", function()
+			package.loaded["mason"] = nil
+			package.preload["mason"] = function()
+				return {
+					setup = function()
+						error("Configuration error")
+					end,
+				}
+			end
 
-  describe('Default configuration', function()
-    it('should include all core servers', function()
-      lsp.setup()
+			local result = lsp.setup()
+			assert.is_false(result)
+		end)
+	end)
 
-      local servers = _G._test_mason_lspconfig_config.ensure_installed
+	describe("Default configuration", function()
+		it("should include all core servers", function()
+			lsp.setup()
 
-      -- Core servers that should be auto-installed
-      local expected_servers = {
-        'lua_ls',
-        'ts_ls',
-        'pyright',
-        'solargraph',
-        'bashls',
-        'sqlls',
-        'marksman',
-      }
+			local servers = _G._test_mason_lspconfig_config.ensure_installed
 
-      for _, expected in ipairs(expected_servers) do
-        local found = false
-        for _, server in ipairs(servers) do
-          if server == expected then
-            found = true
-            break
-          end
-        end
-        assert.is_true(found, 'Expected server ' .. expected .. ' to be in ensure_installed')
-      end
-    end)
+			-- Core servers that should be auto-installed
+			local expected_servers = {
+				"lua_ls",
+				"ts_ls",
+				"pyright",
+				"solargraph",
+				"bashls",
+				"postgres_lsp",
+				"marksman",
+			}
 
-    it('should configure Mason UI settings', function()
-      lsp.setup()
+			for _, expected in ipairs(expected_servers) do
+				local found = false
+				for _, server in ipairs(servers) do
+					if server == expected then
+						found = true
+						break
+					end
+				end
+				assert.is_true(found, "Expected server " .. expected .. " to be in ensure_installed")
+			end
+		end)
 
-      assert.is_not_nil(_G._test_mason_config.ui)
-    end)
-  end)
+		it("should configure Mason UI settings", function()
+			lsp.setup()
 
-  describe('LSP capabilities', function()
-    it('should configure completion capabilities', function()
-      -- Set up some test servers
-      _G._test_installed_servers = { 'lua_ls', 'ts_ls' }
-      lsp.setup()
+			assert.is_not_nil(_G._test_mason_config.ui)
+		end)
+	end)
 
-      -- Servers should be configured
-      assert.is_not_nil(_G._test_lsp_servers_setup['lua_ls'])
-      assert.is_not_nil(_G._test_lsp_servers_setup['ts_ls'])
-    end)
-  end)
+	describe("LSP capabilities", function()
+		it("should configure completion capabilities", function()
+			-- Set up some test servers
+			_G._test_installed_servers = { "lua_ls", "ts_ls" }
+			lsp.setup()
+
+			-- Servers should be configured
+			assert.is_not_nil(_G._test_lsp_servers_setup["lua_ls"])
+			assert.is_not_nil(_G._test_lsp_servers_setup["ts_ls"])
+		end)
+	end)
 end)

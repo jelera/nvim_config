@@ -29,35 +29,35 @@ local luasnip = nil
 ---Get LuaSnip instance
 ---@return table|nil luasnip LuaSnip module or nil if not loaded
 function M.get_luasnip()
-  return luasnip
+	return luasnip
 end
 
 ---Setup LuaSnip and load snippets
 ---@param config? table Optional configuration (currently unused, for future extensibility)
 ---@return boolean success Whether setup succeeded
-function M.setup(config)
-  config = config or {}
+function M.setup(_config)
+	_config = _config or {}
 
-  -- Load LuaSnip
-  local ok, ls = pcall(require, 'luasnip')
-  if not ok then
-    vim.notify('LuaSnip not found. Snippets disabled.', vim.log.levels.WARN)
-    return false
-  end
+	-- Load LuaSnip
+	local ok, ls = pcall(require, "luasnip")
+	if not ok then
+		vim.notify("LuaSnip not found. Snippets disabled.", vim.log.levels.WARN)
+		return false
+	end
 
-  luasnip = ls
+	luasnip = ls
 
-  -- Load friendly-snippets (VS Code-style snippets)
-  local loader_ok, loader = pcall(require, 'luasnip.loaders.from_vscode')
-  if not loader_ok then
-    vim.notify('friendly-snippets loader not found.', vim.log.levels.WARN)
-    return false
-  end
+	-- Load friendly-snippets (VS Code-style snippets)
+	local loader_ok, loader = pcall(require, "luasnip.loaders.from_vscode")
+	if not loader_ok then
+		vim.notify("friendly-snippets loader not found.", vim.log.levels.WARN)
+		return false
+	end
 
-  -- Lazy load VS Code-style snippets
-  loader.lazy_load()
+	-- Lazy load VS Code-style snippets
+	loader.lazy_load()
 
-  return true
+	return true
 end
 
 return M

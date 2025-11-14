@@ -25,42 +25,48 @@ local adapters = {}
 ---Setup JavaScript test adapters
 ---@param config? table Configuration options (unused, uses defaults)
 ---@return boolean success Whether setup succeeded
-function M.setup(config)
-  config = config or {}
+function M.setup(_config)
+	_config = _config or {}
 
-  -- Try to load neotest-jest adapter
-  local jest_ok, neotest_jest = pcall(require, 'neotest-jest')
-  if jest_ok then
-    table.insert(adapters, neotest_jest({
-      jestCommand = 'npm test --',
-      jestConfigFile = 'custom.jest.config.ts',
-      env = { CI = true },
-      cwd = function()
-        return vim.fn.getcwd()
-      end,
-    }))
-  end
+	-- Try to load neotest-jest adapter
+	local jest_ok, neotest_jest = pcall(require, "neotest-jest")
+	if jest_ok then
+		table.insert(
+			adapters,
+			neotest_jest({
+				jestCommand = "npm test --",
+				jestConfigFile = "custom.jest.config.ts",
+				env = { CI = true },
+				cwd = function()
+					return vim.fn.getcwd()
+				end,
+			})
+		)
+	end
 
-  -- Try to load neotest-vim-test adapter (for Karma)
-  local vim_test_ok, neotest_vim_test = pcall(require, 'neotest-vim-test')
-  if vim_test_ok then
-    table.insert(adapters, neotest_vim_test({
-      ignore_file_types = { 'python', 'vim', 'lua', 'ruby' },
-    }))
-  end
+	-- Try to load neotest-vim-test adapter (for Karma)
+	local vim_test_ok, neotest_vim_test = pcall(require, "neotest-vim-test")
+	if vim_test_ok then
+		table.insert(
+			adapters,
+			neotest_vim_test({
+				ignore_file_types = { "python", "vim", "lua", "ruby" },
+			})
+		)
+	end
 
-  -- If neither loaded, return true (lazy-loaded)
-  if not jest_ok and not vim_test_ok then
-    return true
-  end
+	-- If neither loaded, return true (lazy-loaded)
+	if not jest_ok and not vim_test_ok then
+		return true
+	end
 
-  return true
+	return true
 end
 
 ---Get the neotest adapter instances
 ---@return table adapters List of neotest adapters
 function M.get_adapter()
-  return adapters
+	return adapters
 end
 
 return M

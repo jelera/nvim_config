@@ -12,11 +12,11 @@ Dependencies:
 local M = {}
 
 function M.get_adapter()
-  local ok, adapter = pcall(require, 'neotest-minitest')
-  if not ok then
-    return nil
-  end
-  return adapter
+	local ok, adapter = pcall(require, "neotest-minitest")
+	if not ok then
+		return nil
+	end
+	return adapter
 end
 
 return M

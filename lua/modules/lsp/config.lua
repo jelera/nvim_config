@@ -21,81 +21,76 @@ local M = {}
 ---Default LSP configuration
 ---@type table
 M.default_config = {
-  -- Core servers to auto-install upfront
-  ensure_installed = {
-    -- Lua
-    'lua_ls',
+	-- Core servers to auto-install upfront
+	-- NOTE: Only include valid LSP servers available through mason-lspconfig
+	-- Tools like actionlint, gitleaks, etc. are not LSP servers and should be
+	-- installed separately through Mason or your package manager
+	ensure_installed = {
+		-- Lua
+		"lua_ls",
 
-    -- JavaScript/TypeScript/Node/Angular
-    'ts_ls', -- TypeScript/JavaScript LSP
-    'eslint', -- JavaScript/TypeScript linter (can be configured for Standard style)
-    'angularls', -- Angular Language Service
+		-- JavaScript/TypeScript/Node/Angular
+		"ts_ls", -- TypeScript/JavaScript LSP
+		"eslint", -- JavaScript/TypeScript linter (can be configured for Standard style)
+		"angularls", -- Angular Language Service
 
-    -- Python
-    'pyright',
+		-- Python
+		"pyright",
 
-    -- Ruby/Rails
-    'solargraph', -- Ruby LSP for Rails (intellisense, goto def)
-    'ruby_lsp', -- Official Ruby LSP (faster, for non-Rails)
-    'rubocop', -- Ruby linter/formatter
-    'standardrb', -- Ruby Standard Style (alternative)
+		-- Ruby/Rails
+		"solargraph", -- Ruby LSP for Rails (intellisense, goto def)
+		"ruby_lsp", -- Official Ruby LSP (faster, for non-Rails)
+		"rubocop", -- Ruby linter/formatter
+		"standardrb", -- Ruby Standard Style (alternative)
 
-    -- Elixir
-    'elixirls',
+		-- Elixir
+		"elixirls",
 
-    -- Shell
-    'bashls',
+		-- Shell
+		"bashls",
 
-    -- Vim Script
-    'vimls',
+		-- Vim Script
+		"vimls",
 
-    -- Database
-    'postgres_lsp',
+		-- Database
+		"postgres_lsp",
 
-    -- Markdown
-    'marksman',
+		-- Markdown
+		"marksman",
 
-    -- Docker
-    'dockerls',
-    'docker_compose_language_service', -- Docker Compose
+		-- Docker
+		"dockerls",
+		"docker_compose_language_service", -- Docker Compose
 
-    -- Web
-    'html',
-    'cssls', -- CSS/SCSS
-    'emmet_language_server', -- Emmet abbreviations
+		-- Web
+		"html",
+		"cssls", -- CSS/SCSS
+		"emmet_ls", -- Emmet abbreviations
 
-    -- YAML
-    'yamlls',
+		-- YAML
+		"yamlls",
 
-    -- Infrastructure/Cloud
-    'terraformls',
+		-- Infrastructure/Cloud
+		"terraformls",
 
-    -- Linters/Security/Quality
-    'actionlint', -- GitHub Actions linter
-    'codeqlls', -- CodeQL security analysis
-    'codespell', -- Spell checker
-    'commitlint', -- Git commit message linter
-    'gitleaks', -- Git secrets scanner
+		-- Go
+		"gopls",
 
-    -- GitHub Actions
-    'gh_actions_ls',
-  },
+		-- Rust
+		"rust_analyzer",
+	},
 
-  -- Automatically enable installed LSP servers
-  -- This uses vim.lsp.enable() which requires Neovim 0.11+
-  automatic_enable = true,
+	-- Format on save (can be toggled per-buffer)
+	format_on_save = true,
 
-  -- Format on save (can be toggled per-buffer)
-  format_on_save = true,
-
-  -- Mason UI settings
-  mason_ui = {
-    icons = {
-      package_installed = '✓',
-      package_pending = '➜',
-      package_uninstalled = '✗',
-    },
-  },
+	-- Mason UI settings
+	mason_ui = {
+		icons = {
+			package_installed = "✓",
+			package_pending = "➜",
+			package_uninstalled = "✗",
+		},
+	},
 }
 
 ---Load per-language server configuration
@@ -116,95 +111,86 @@ M.default_config = {
 ---@param server_name string Server name (e.g., 'lua_ls', 'ts_ls', 'eslint')
 ---@return table|nil server_config Per-language config or nil if not found
 function M.load_server_config(server_name)
-  -- Map server names to language folders
-  -- NOTE: Multiple servers can map to the same language folder
-  -- This allows multiple LSP servers per language (e.g., ts_ls + eslint for JavaScript)
-  local server_to_language = {
-    -- Lua
-    lua_ls = 'lua',
+	-- Map server names to language folders
+	-- NOTE: Multiple servers can map to the same language folder
+	-- This allows multiple LSP servers per language (e.g., ts_ls + eslint for JavaScript)
+	local server_to_language = {
+		-- Lua
+		lua_ls = "lua",
 
-    -- JavaScript/TypeScript
-    -- (Can add multiple: ts_ls, eslint, angularls, etc.)
-    ts_ls = 'javascript',
-    eslint = 'javascript',
-    angularls = 'angular',
+		-- JavaScript/TypeScript
+		-- (Can add multiple: ts_ls, eslint, angularls, etc.)
+		ts_ls = "javascript",
+		eslint = "javascript",
+		angularls = "angular",
 
-    -- Python
-    -- (Can add multiple: pyright, ruff_lsp, etc.)
-    pyright = 'python',
+		-- Python
+		-- (Can add multiple: pyright, ruff_lsp, etc.)
+		pyright = "python",
 
-    -- Ruby
-    solargraph = 'ruby',
-    ruby_lsp = 'ruby',
-    rubocop = 'ruby',
-    standardrb = 'ruby',
+		-- Ruby
+		solargraph = "ruby",
+		ruby_lsp = "ruby",
+		rubocop = "ruby",
+		standardrb = "ruby",
 
-    -- Bash
-    bashls = 'bash',
+		-- Bash
+		bashls = "bash",
 
-    -- PostgreSQL
-    postgres_lsp = 'postgresql',
+		-- PostgreSQL
+		postgres_lsp = "postgresql",
 
-    -- Markdown
-    marksman = 'markdown',
+		-- Markdown
+		marksman = "markdown",
 
-    -- Docker
-    dockerls = 'docker',
+		-- Docker
+		dockerls = "docker",
 
-    -- HTML
-    html = 'html',
+		-- HTML
+		html = "html",
 
-    -- CSS/SCSS
-    cssls = 'css',
+		-- CSS/SCSS
+		cssls = "css",
 
-    -- Terraform
-    terraformls = 'terraform',
+		-- Terraform
+		terraformls = "terraform",
 
-    -- GitHub Actions
-    gh_actions_ls = 'github',
-    actionlint = 'github',
+		-- Elixir
+		elixirls = "elixir",
 
-    -- Elixir
-    elixirls = 'elixir',
+		-- Vim Script
+		vimls = "vim",
 
-    -- Vim Script
-    vimls = 'vim',
+		-- YAML
+		yamlls = "yaml",
 
-    -- YAML
-    yamlls = 'yaml',
+		-- Docker Compose
+		docker_compose_language_service = "docker",
 
-    -- Docker Compose
-    docker_compose_language_service = 'docker',
+		-- Go
+		gopls = "go",
 
-    -- CodeQL
-    codeqlls = 'codeql',
+		-- Rust
+		rust_analyzer = "rust",
 
-    -- Linters (language-agnostic)
-    codespell = 'text',
-    commitlint = 'git',
-    gitleaks = 'git',
+		-- Emmet
+		emmet_ls = "emmet",
+	}
 
-    -- Go
-    gopls = 'go',
+	local language = server_to_language[server_name]
+	if not language then
+		return nil
+	end
 
-    -- Rust
-    rust_analyzer = 'rust',
-  }
+	-- Build config path: modules.lsp.servers.<language>.<server_name>
+	local config_path = "modules.lsp.servers." .. language .. "." .. server_name
+	local ok, server_config = pcall(require, config_path)
 
-  local language = server_to_language[server_name]
-  if not language then
-    return nil
-  end
+	if ok then
+		return server_config
+	end
 
-  -- Build config path: modules.lsp.servers.<language>.<server_name>
-  local config_path = 'modules.lsp.servers.' .. language .. '.' .. server_name
-  local ok, server_config = pcall(require, config_path)
-
-  if ok then
-    return server_config
-  end
-
-  return nil
+	return nil
 end
 
 return M

@@ -36,7 +36,7 @@ Usage:
 local M = {}
 
 -- Version information (semantic versioning)
-M.version = '0.1.0'
+M.version = "0.1.0"
 
 --[[
 Initialize the framework
@@ -54,22 +54,22 @@ This is the main entry point that:
 @return boolean: true if initialization succeeded, false otherwise
 --]]
 function M.setup(config)
-  config = config or {}
+	config = config or {}
 
-  -- Load setup module
-  local setup = require('nvim.setup')
+	-- Load setup module
+	local setup = require("nvim.setup")
 
-  -- Initialize framework
-  local success, err = pcall(function()
-    return setup.init(config)
-  end)
+	-- Initialize framework
+	local success, err = pcall(function()
+		return setup.init(config)
+	end)
 
-  if not success then
-    vim.notify('Framework initialization failed: ' .. tostring(err), vim.log.levels.ERROR)
-    return false
-  end
+	if not success then
+		vim.notify("Framework initialization failed: " .. tostring(err), vim.log.levels.ERROR)
+		return false
+	end
 
-  return err
+	return err
 end
 
 --[[
@@ -82,10 +82,10 @@ Provides direct access to core framework modules:
 - config_schema: Configuration validation
 --]]
 M.core = {
-  module_loader = require('nvim.core.module_loader'),
-  event_bus = require('nvim.core.event_bus'),
-  plugin_system = require('nvim.core.plugin_system'),
-  config_schema = require('nvim.core.config_schema'),
+	module_loader = require("nvim.core.module_loader"),
+	event_bus = require("nvim.core.event_bus"),
+	plugin_system = require("nvim.core.plugin_system"),
+	config_schema = require("nvim.core.config_schema"),
 }
 
 --[[
@@ -96,8 +96,8 @@ Provides direct access to shared utility libraries:
 - validator: Type and schema validation
 --]]
 M.lib = {
-  utils = require('nvim.lib.utils'),
-  validator = require('nvim.lib.validator'),
+	utils = require("nvim.lib.utils"),
+	validator = require("nvim.lib.validator"),
 }
 
 return M

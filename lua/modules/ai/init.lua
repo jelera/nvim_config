@@ -38,24 +38,24 @@ local M = {}
 ---@param config.sidekick table|nil Sidekick configuration overrides
 ---@return boolean success Whether setup succeeded
 function M.setup(config)
-  config = config or {}
+	config = config or {}
 
-  -- Setup sidekick
-  local sidekick = require('modules.ai.sidekick')
-  local sidekick_ok = sidekick.setup(config.sidekick or {})
-  if not sidekick_ok then
-    vim.notify('Failed to setup sidekick. AI features disabled.', vim.log.levels.WARN)
-  end
+	-- Setup sidekick
+	local sidekick = require("modules.ai.sidekick")
+	local sidekick_ok = sidekick.setup(config.sidekick or {})
+	if not sidekick_ok then
+		vim.notify("Failed to setup sidekick. AI features disabled.", vim.log.levels.WARN)
+	end
 
-  -- Setup keymaps (after sidekick is initialized)
-  local keymaps = require('modules.ai.keymaps')
-  local keymaps_ok = keymaps.setup()
-  if not keymaps_ok then
-    vim.notify('Failed to setup AI keymaps.', vim.log.levels.ERROR)
-    return false
-  end
+	-- Setup keymaps (after sidekick is initialized)
+	local keymaps = require("modules.ai.keymaps")
+	local keymaps_ok = keymaps.setup()
+	if not keymaps_ok then
+		vim.notify("Failed to setup AI keymaps.", vim.log.levels.ERROR)
+		return false
+	end
 
-  return true
+	return true
 end
 
 return M

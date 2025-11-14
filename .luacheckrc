@@ -16,6 +16,10 @@ max_cyclomatic_complexity = 15  -- Default for modules and config
 -- Ignore certain warning codes globally
 ignore = {
   '212',  -- Unused argument (common in callbacks)
+  '211/_.*',  -- Unused local variable starting with underscore
+  '311/_.*',  -- Value assigned to variable starting with underscore is unused
+  '213/_.*',  -- Unused loop variable starting with underscore
+  '321/_.*',  -- Variable starting with underscore is never accessed
 }
 
 -- Global variables accessible in all files

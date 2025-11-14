@@ -22,26 +22,26 @@ local adapter = nil
 ---Setup Lua test adapter
 ---@param config? table Configuration options (unused, uses neotest-busted defaults)
 ---@return boolean success Whether setup succeeded
-function M.setup(config)
-  config = config or {}
+function M.setup(_config)
+	_config = _config or {}
 
-  -- Try to load neotest-busted adapter
-  local ok, neotest_busted = pcall(require, 'neotest-busted')
-  if not ok then
-    -- Plugin not loaded yet (will be lazy-loaded), return true
-    return true
-  end
+	-- Try to load neotest-busted adapter
+	local ok, neotest_busted = pcall(require, "neotest-busted")
+	if not ok then
+		-- Plugin not loaded yet (will be lazy-loaded), return true
+		return true
+	end
 
-  -- Store adapter instance (neotest-busted works out of the box with defaults)
-  adapter = neotest_busted
+	-- Store adapter instance (neotest-busted works out of the box with defaults)
+	adapter = neotest_busted
 
-  return true
+	return true
 end
 
 ---Get the neotest adapter instance
 ---@return table|nil adapter The neotest adapter or nil
 function M.get_adapter()
-  return adapter
+	return adapter
 end
 
 return M

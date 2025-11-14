@@ -11,10 +11,10 @@ Returns a table that gets merged with default LSP settings.
 --]]
 
 return {
-  cmd = { 'standardrb', '--lsp' },
+	cmd = { "standardrb", "--lsp" },
 
-  settings = {
-    -- StandardRB is zero-config by design
-    -- It automatically uses .standard.yml if present
-  },
+	settings = {
+		-- StandardRB is zero-config by design
+		-- It automatically uses .standard.yml if present
+	},
 }

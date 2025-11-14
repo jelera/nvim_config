@@ -12,18 +12,18 @@ Dependencies:
 local M = {}
 
 function M.get_adapter()
-  local ok, adapter = pcall(require, 'neotest-jest')
-  if not ok then
-    return nil
-  end
+	local ok, adapter = pcall(require, "neotest-jest")
+	if not ok then
+		return nil
+	end
 
-  return adapter({
-    jestCommand = 'npm test --',
-    env = { CI = true },
-    cwd = function()
-      return vim.fn.getcwd()
-    end,
-  })
+	return adapter({
+		jestCommand = "npm test --",
+		env = { CI = true },
+		cwd = function()
+			return vim.fn.getcwd()
+		end,
+	})
 end
 
 return M

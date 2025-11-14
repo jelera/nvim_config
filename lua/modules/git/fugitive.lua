@@ -25,12 +25,12 @@ local M = {}
 ---Setup fugitive
 ---@param config? table Configuration options (currently unused)
 ---@return boolean success Whether setup succeeded
-function M.setup(config)
-  config = config or {}
+function M.setup(_config)
+	_config = _config or {}
 
-  -- Fugitive is a VimL plugin that works automatically once loaded
-  -- No additional configuration needed, it works out of the box
-  return true
+	-- Fugitive is a VimL plugin that works automatically once loaded
+	-- No additional configuration needed, it works out of the box
+	return true
 end
 
 return M

@@ -56,31 +56,31 @@ local M = {}
 ---@param config.tree table|nil Tree configuration overrides
 ---@return boolean success Whether setup succeeded
 function M.setup(config)
-  config = config or {}
+	config = config or {}
 
-  -- Setup Telescope
-  local telescope = require('modules.navigation.telescope')
-  local telescope_ok = telescope.setup(config.telescope or {})
-  if not telescope_ok then
-    vim.notify('Failed to setup Telescope. Some navigation features disabled.', vim.log.levels.WARN)
-  end
+	-- Setup Telescope
+	local telescope = require("modules.navigation.telescope")
+	local telescope_ok = telescope.setup(config.telescope or {})
+	if not telescope_ok then
+		vim.notify("Failed to setup Telescope. Some navigation features disabled.", vim.log.levels.WARN)
+	end
 
-  -- Setup nvim-tree
-  local tree = require('modules.navigation.tree')
-  local tree_ok = tree.setup(config.tree or {})
-  if not tree_ok then
-    vim.notify('Failed to setup nvim-tree. File explorer disabled.', vim.log.levels.WARN)
-  end
+	-- Setup nvim-tree
+	local tree = require("modules.navigation.tree")
+	local tree_ok = tree.setup(config.tree or {})
+	if not tree_ok then
+		vim.notify("Failed to setup nvim-tree. File explorer disabled.", vim.log.levels.WARN)
+	end
 
-  -- Setup keymaps (after telescope and tree are initialized)
-  local keymaps = require('modules.navigation.keymaps')
-  local keymaps_ok = keymaps.setup()
-  if not keymaps_ok then
-    vim.notify('Failed to setup navigation keymaps.', vim.log.levels.ERROR)
-    return false
-  end
+	-- Setup keymaps (after telescope and tree are initialized)
+	local keymaps = require("modules.navigation.keymaps")
+	local keymaps_ok = keymaps.setup()
+	if not keymaps_ok then
+		vim.notify("Failed to setup navigation keymaps.", vim.log.levels.ERROR)
+		return false
+	end
 
-  return true
+	return true
 end
 
 return M

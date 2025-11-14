@@ -13,20 +13,20 @@ is enabled in the main configuration.
 --]]
 
 return {
-  -- Sidekick: Copilot NES + AI Terminal
-  {
-    'folke/sidekick.nvim',
-    keys = {
-      '<leader>aa',
-      '<leader>an',
-      '<leader>ap',
-      '<leader>ar',
-      '<leader>at',
-      '<leader>ac',
-      '<leader>as',
-      '<leader>aq',
-      '<leader>ai',
-    },
-    config = false,
-  },
+	-- Sidekick: Copilot NES + AI Terminal
+	{
+		"folke/sidekick.nvim",
+		keys = {
+			"<leader>aa",
+			"<leader>an",
+			"<leader>ap",
+			"<leader>ar",
+			"<leader>at",
+			"<leader>ac",
+			"<leader>as",
+			"<leader>aq",
+			"<leader>ai",
+		},
+		config = false,
+	},
 }

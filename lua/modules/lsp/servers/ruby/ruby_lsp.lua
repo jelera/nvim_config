@@ -16,8 +16,8 @@ Returns a table that gets merged with default LSP settings.
 --]]
 
 return {
-  settings = {
-    -- Ruby LSP automatically detects project configuration
-    -- No special settings needed for most cases
-  },
+	settings = {
+		-- Ruby LSP automatically detects project configuration
+		-- No special settings needed for most cases
+	},
 }

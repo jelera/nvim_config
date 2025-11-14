@@ -48,45 +48,45 @@ local M = {}
 ---@param config.session table|nil Session configuration overrides
 ---@return boolean success Whether setup succeeded
 function M.setup(config)
-  config = config or {}
+	config = config or {}
 
-  -- Setup autopairs
-  local autopairs = require('modules.editor.autopairs')
-  local autopairs_ok = autopairs.setup(config.autopairs or {})
-  if not autopairs_ok then
-    vim.notify('Failed to setup autopairs.', vim.log.levels.WARN)
-  end
+	-- Setup autopairs
+	local autopairs = require("modules.editor.autopairs")
+	local autopairs_ok = autopairs.setup(config.autopairs or {})
+	if not autopairs_ok then
+		vim.notify("Failed to setup autopairs.", vim.log.levels.WARN)
+	end
 
-  -- Setup surround
-  local surround = require('modules.editor.surround')
-  local surround_ok = surround.setup(config.surround or {})
-  if not surround_ok then
-    vim.notify('Failed to setup surround.', vim.log.levels.WARN)
-  end
+	-- Setup surround
+	local surround = require("modules.editor.surround")
+	local surround_ok = surround.setup(config.surround or {})
+	if not surround_ok then
+		vim.notify("Failed to setup surround.", vim.log.levels.WARN)
+	end
 
-  -- Setup comment
-  local comment = require('modules.editor.comment')
-  local comment_ok = comment.setup(config.comment or {})
-  if not comment_ok then
-    vim.notify('Failed to setup comment.', vim.log.levels.WARN)
-  end
+	-- Setup comment
+	local comment = require("modules.editor.comment")
+	local comment_ok = comment.setup(config.comment or {})
+	if not comment_ok then
+		vim.notify("Failed to setup comment.", vim.log.levels.WARN)
+	end
 
-  -- Setup session
-  local session = require('modules.editor.session')
-  local session_ok = session.setup(config.session or {})
-  if not session_ok then
-    vim.notify('Failed to setup session.', vim.log.levels.WARN)
-  end
+	-- Setup session
+	local session = require("modules.editor.session")
+	local session_ok = session.setup(config.session or {})
+	if not session_ok then
+		vim.notify("Failed to setup session.", vim.log.levels.WARN)
+	end
 
-  -- Setup keymaps (after all features are initialized)
-  local keymaps = require('modules.editor.keymaps')
-  local keymaps_ok = keymaps.setup()
-  if not keymaps_ok then
-    vim.notify('Failed to setup editor keymaps.', vim.log.levels.ERROR)
-    return false
-  end
+	-- Setup keymaps (after all features are initialized)
+	local keymaps = require("modules.editor.keymaps")
+	local keymaps_ok = keymaps.setup()
+	if not keymaps_ok then
+		vim.notify("Failed to setup editor keymaps.", vim.log.levels.ERROR)
+		return false
+	end
 
-  return true
+	return true
 end
 
 return M

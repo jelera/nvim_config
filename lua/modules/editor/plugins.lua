@@ -17,44 +17,44 @@ is enabled in the main configuration.
 --]]
 
 return {
-  -- Auto-pairs
-  {
-    'windwp/nvim-autopairs',
-    event = 'InsertEnter',
-    config = false,
-  },
+	-- Auto-pairs
+	{
+		"windwp/nvim-autopairs",
+		event = "InsertEnter",
+		config = false,
+	},
 
-  -- Surround
-  {
-    'kylechui/nvim-surround',
-    version = '*', -- Use stable releases
-    event = 'VeryLazy',
-    config = false,
-  },
+	-- Surround
+	{
+		"kylechui/nvim-surround",
+		version = "*", -- Use stable releases
+		event = "VeryLazy",
+		config = false,
+	},
 
-  -- Comment
-  {
-    'numToStr/Comment.nvim',
-    event = 'VeryLazy',
-    dependencies = {
-      'JoosepAlviste/nvim-ts-context-commentstring',
-    },
-    config = false,
-  },
+	-- Comment
+	{
+		"numToStr/Comment.nvim",
+		event = "VeryLazy",
+		dependencies = {
+			"JoosepAlviste/nvim-ts-context-commentstring",
+		},
+		config = false,
+	},
 
-  -- Treesitter context commentstring (for JSX, Vue, etc.)
-  {
-    'JoosepAlviste/nvim-ts-context-commentstring',
-    lazy = true,
-    opts = {
-      enable_autocmd = false,
-    },
-  },
+	-- Treesitter context commentstring (for JSX, Vue, etc.)
+	{
+		"JoosepAlviste/nvim-ts-context-commentstring",
+		lazy = true,
+		opts = {
+			enable_autocmd = false,
+		},
+	},
 
-  -- Session management
-  {
-    'folke/persistence.nvim',
-    event = 'BufReadPre',
-    config = false,
-  },
+	-- Session management
+	{
+		"folke/persistence.nvim",
+		event = "BufReadPre",
+		config = false,
+	},
 }

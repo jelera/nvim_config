@@ -11,18 +11,17 @@ Returns a table that gets merged with default LSP settings.
 --]]
 
 return {
-  -- Angular LS works best with TypeScript projects
-  -- It requires @angular/language-service to be installed in the project
-  root_dir = function(fname)
-    local util = require('lspconfig.util')
-    return util.root_pattern('angular.json', '.angular', 'nx.json')(fname)
-      or util.find_git_ancestor(fname)
-  end,
+	-- Angular LS works best with TypeScript projects
+	-- It requires @angular/language-service to be installed in the project
+	root_dir = function(fname)
+		local util = require("lspconfig.util")
+		return util.root_pattern("angular.json", ".angular", "nx.json")(fname) or util.find_git_ancestor(fname)
+	end,
 
-  settings = {
-    angular = {
-      -- Enable strict mode for better type checking
-      strictTemplates = true,
-    },
-  },
+	settings = {
+		angular = {
+			-- Enable strict mode for better type checking
+			strictTemplates = true,
+		},
+	},
 }

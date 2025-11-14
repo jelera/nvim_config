@@ -37,141 +37,140 @@ API:
 
 local M = {}
 
-local utils = require('nvim.lib.utils')
+local utils = require("nvim.lib.utils")
 
 ---Default TreeSitter configuration
 ---Maximizes TreeSitter features for best IDE experience
 ---@type table
 local default_config = {
-  -- Auto-install parsers when entering buffer
-  auto_install = true,
+	-- Auto-install parsers when entering buffer
+	auto_install = true,
 
-  -- Install parsers for languages in your tech stack
-  -- Your stack: TS/JS, HTML, CSS, SCSS, Ruby, Python, Shell, Lua, Angular
-  ensure_installed = {
-    -- Core languages
-    'typescript',
-    'tsx',
-    'javascript',
-    'html',
-    'css',
-    'scss',
-    'ruby',
-    'python',
-    'bash',
-    'lua',
-    'angular',
+	-- Install parsers for languages in your tech stack
+	-- Your stack: TS/JS, HTML, CSS, SCSS, Ruby, Python, Shell, Lua, Angular
+	ensure_installed = {
+		-- Core languages
+		"typescript",
+		"tsx",
+		"javascript",
+		"html",
+		"css",
+		"scss",
+		"ruby",
+		"python",
+		"bash",
+		"lua",
+		"angular",
 
-    -- Config/data formats
-    'json',
-    'jsonc',
-    'yaml',
-    'toml',
+		-- Config/data formats
+		"json",
+		"jsonc",
+		"yaml",
+		"toml",
 
-    -- Documentation
-    'markdown',
-    'markdown_inline',
-    'luadoc',
-    'vim',
-    'vimdoc',
+		-- Documentation
+		"markdown",
+		"markdown_inline",
+		"luadoc",
+		"vim",
+		"vimdoc",
 
-    -- Git files
-    'git_config',
-    'git_rebase',
-    'gitcommit',
-    'gitignore',
-    'gitattributes',
+		-- Git files
+		"git_config",
+		"git_rebase",
+		"gitcommit",
+		"gitignore",
+		"gitattributes",
 
-    -- Utilities
-    'regex',
-    'comment',
-    'query',  -- For treesitter query files
-  },
+		-- Utilities
+		"regex",
+		"comment",
+		"query", -- For treesitter query files
+	},
 
-  -- Syntax highlighting
-  highlight = {
-    enable = true,
-    -- Disable regex highlighting when TreeSitter is active
-    additional_vim_regex_highlighting = false,
-  },
+	-- Syntax highlighting
+	highlight = {
+		enable = true,
+		-- Disable regex highlighting when TreeSitter is active
+		additional_vim_regex_highlighting = false,
+	},
 
-  -- Smart indentation
-  indent = {
-    enable = true,
-  },
+	-- Smart indentation
+	indent = {
+		enable = true,
+	},
 
-  -- Incremental selection based on AST
-  incremental_selection = {
-    enable = true,
-    keymaps = {
-      init_selection = 'gnn', -- Start selection
-      node_incremental = 'grn', -- Increment to next node
-      scope_incremental = 'grc', -- Increment to next scope
-      node_decremental = 'grm', -- Decrement to previous node
-    },
-  },
+	-- Incremental selection based on AST
+	incremental_selection = {
+		enable = true,
+		keymaps = {
+			init_selection = "gnn", -- Start selection
+			node_incremental = "grn", -- Increment to next node
+			scope_incremental = "grc", -- Increment to next scope
+			node_decremental = "grm", -- Decrement to previous node
+		},
+	},
 
-  -- Text objects for functions, classes, etc.
-  textobjects = {
-    select = {
-      enable = true,
-      lookahead = true, -- Jump forward to textobj if not already in one
-      keymaps = {
-        -- Functions
-        ['af'] = '@function.outer',
-        ['if'] = '@function.inner',
-        -- Classes
-        ['ac'] = '@class.outer',
-        ['ic'] = '@class.inner',
-        -- Conditionals
-        ['ai'] = '@conditional.outer',
-        ['ii'] = '@conditional.inner',
-        -- Loops
-        ['al'] = '@loop.outer',
-        ['il'] = '@loop.inner',
-        -- Parameters/arguments
-        ['aa'] = '@parameter.outer',
-        ['ia'] = '@parameter.inner',
-        -- Comments
-        ['a/'] = '@comment.outer',
-      },
-    },
+	-- Text objects for functions, classes, etc.
+	textobjects = {
+		select = {
+			enable = true,
+			lookahead = true, -- Jump forward to textobj if not already in one
+			keymaps = {
+				-- Functions
+				["af"] = "@function.outer",
+				["if"] = "@function.inner",
+				-- Classes
+				["ac"] = "@class.outer",
+				["ic"] = "@class.inner",
+				-- Conditionals
+				["ai"] = "@conditional.outer",
+				["ii"] = "@conditional.inner",
+				-- Loops
+				["al"] = "@loop.outer",
+				["il"] = "@loop.inner",
+				-- Parameters/arguments
+				["aa"] = "@parameter.outer",
+				["ia"] = "@parameter.inner",
+				-- Comments
+				["a/"] = "@comment.outer",
+			},
+		},
 
-    -- Move between text objects
-    move = {
-      enable = true,
-      set_jumps = true, -- Add to jumplist
-      goto_next_start = {
-        [']m'] = '@function.outer',
-        [']]'] = '@class.outer',
-      },
-      goto_next_end = {
-        [']M'] = '@function.outer',
-        [']['] = '@class.outer',
-      },
-      goto_previous_start = {
-        ['[m'] = '@function.outer',
-        ['[['] = '@class.outer',
-      },
-      goto_previous_end = {
-        ['[M'] = '@function.outer',
-        ['[]'] = '@class.outer',
-      },
-    },
+		-- Move between text objects
+		move = {
+			enable = true,
+			set_jumps = true, -- Add to jumplist
+			goto_next_start = {
+				["]m"] = "@function.outer",
+				["]]"] = "@class.outer",
+			},
+			goto_next_end = {
+				["]M"] = "@function.outer",
+				["]["] = "@class.outer",
+			},
+			goto_previous_start = {
+				["[m"] = "@function.outer",
+				["[["] = "@class.outer",
+			},
+			goto_previous_end = {
+				["[M"] = "@function.outer",
+				["[]"] = "@class.outer",
+			},
+		},
 
-    -- Swap text objects (e.g., swap function parameters)
-    swap = {
-      enable = true,
-      swap_next = {
-        ['<leader>a'] = '@parameter.inner',
-      },
-      swap_previous = {
-        ['<leader>A'] = '@parameter.inner',
-      },
-    },
-  },
+		-- Swap text objects (e.g., swap function parameters)
+		swap = {
+			enable = true,
+			swap_next = {
+				["<leader>a"] = "@parameter.inner",
+			},
+			swap_previous = {
+				["<leader>A"] = "@parameter.inner",
+			},
+		},
+	},
 }
-
 
 ---Setup TreeSitter with configuration
 ---@param config table|nil Configuration options
@@ -183,40 +182,40 @@ local default_config = {
 ---@param config.auto_install boolean|nil Auto-install parsers (default: true)
 ---@return boolean success Whether setup succeeded
 function M.setup(config)
-  -- Try to load nvim-treesitter
-  local ok, ts_configs = pcall(require, 'nvim-treesitter.configs')
-  if not ok then
-    vim.notify(
-      'nvim-treesitter not found. Install it via lazy.nvim',
-      vim.log.levels.WARN,
-      { title = 'TreeSitter Module' }
-    )
-    return false
-  end
+	-- Try to load nvim-treesitter
+	local ok, ts_configs = pcall(require, "nvim-treesitter.configs")
+	if not ok then
+		vim.notify(
+			"nvim-treesitter not found. Install it via lazy.nvim",
+			vim.log.levels.WARN,
+			{ title = "TreeSitter Module" }
+		)
+		return false
+	end
 
-  -- Merge config with defaults using shared utility
-  local merged_config = utils.merge_config(default_config, config)
+	-- Merge config with defaults using shared utility
+	local merged_config = utils.merge_config(default_config, config)
 
-  -- Configure TreeSitter
-  local setup_ok, err = pcall(function()
-    ts_configs.setup(merged_config)
-  end)
+	-- Configure TreeSitter
+	local setup_ok, err = pcall(function()
+		ts_configs.setup(merged_config)
+	end)
 
-  if not setup_ok then
-    vim.notify(
-      'Failed to configure TreeSitter: ' .. tostring(err),
-      vim.log.levels.ERROR,
-      { title = 'TreeSitter Module' }
-    )
-    return false
-  end
+	if not setup_ok then
+		vim.notify(
+			"Failed to configure TreeSitter: " .. tostring(err),
+			vim.log.levels.ERROR,
+			{ title = "TreeSitter Module" }
+		)
+		return false
+	end
 
-  -- Enable folding based on TreeSitter
-  vim.opt.foldmethod = 'expr'
-  vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
-  vim.opt.foldenable = false -- Don't fold by default (use 'zc' to fold)
+	-- Enable folding based on TreeSitter
+	vim.opt.foldmethod = "expr"
+	vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+	vim.opt.foldenable = false -- Don't fold by default (use 'zc' to fold)
 
-  return true
+	return true
 end
 
 return M

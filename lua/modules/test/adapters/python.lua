@@ -23,26 +23,26 @@ local adapter = nil
 ---Setup Python test adapter
 ---@param config? table Configuration options (unused, uses neotest-python defaults)
 ---@return boolean success Whether setup succeeded
-function M.setup(config)
-  config = config or {}
+function M.setup(_config)
+	_config = _config or {}
 
-  -- Try to load neotest-python adapter
-  local ok, neotest_python = pcall(require, 'neotest-python')
-  if not ok then
-    -- Plugin not loaded yet (will be lazy-loaded), return true
-    return true
-  end
+	-- Try to load neotest-python adapter
+	local ok, neotest_python = pcall(require, "neotest-python")
+	if not ok then
+		-- Plugin not loaded yet (will be lazy-loaded), return true
+		return true
+	end
 
-  -- Store adapter instance (neotest-python works out of the box with defaults)
-  adapter = neotest_python
+	-- Store adapter instance (neotest-python works out of the box with defaults)
+	adapter = neotest_python
 
-  return true
+	return true
 end
 
 ---Get the neotest adapter instance
 ---@return table|nil adapter The neotest adapter or nil
 function M.get_adapter()
-  return adapter
+	return adapter
 end
 
 return M

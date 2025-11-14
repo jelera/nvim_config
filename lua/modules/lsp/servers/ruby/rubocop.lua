@@ -11,10 +11,10 @@ Returns a table that gets merged with default LSP settings.
 --]]
 
 return {
-  cmd = { 'rubocop', '--lsp' },
+	cmd = { "rubocop", "--lsp" },
 
-  settings = {
-    -- Rubocop automatically detects .rubocop.yml configuration
-    -- It also detects rubocop-rails and rubocop-rspec if they're in the Gemfile
-  },
+	settings = {
+		-- Rubocop automatically detects .rubocop.yml configuration
+		-- It also detects rubocop-rails and rubocop-rspec if they're in the Gemfile
+	},
 }
