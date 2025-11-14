@@ -142,7 +142,10 @@ function M.get_defaults()
 					end
 				end
 
-				vim.notify(string.format("Startup time: %sms (see buffer for details)", total_time), vim.log.levels.INFO)
+				vim.notify(
+					string.format("Startup time: %sms (see buffer for details)", total_time),
+					vim.log.levels.INFO
+				)
 			end,
 			opts = {
 				desc = "Profile NeoVim startup time and show results",
@@ -160,7 +163,8 @@ function M.get_defaults()
 
 				for i = 1, runs do
 					local profile_file = cache_dir .. "/startup_bench_" .. i .. ".log"
-					local cmd = string.format("nvim --headless --startuptime %s +qall", vim.fn.shellescape(profile_file))
+					local cmd =
+						string.format("nvim --headless --startuptime %s +qall", vim.fn.shellescape(profile_file))
 					vim.fn.system(cmd)
 
 					-- Extract time from log
@@ -207,7 +211,10 @@ function M.get_defaults()
 					vim.cmd("setlocal buftype=nofile bufhidden=wipe noswapfile")
 					vim.api.nvim_buf_set_lines(0, 0, -1, false, results)
 
-					vim.notify(string.format("Benchmark complete: %.1fms avg (best: %.1fms)", avg, min), vim.log.levels.INFO)
+					vim.notify(
+						string.format("Benchmark complete: %.1fms avg (best: %.1fms)", avg, min),
+						vim.log.levels.INFO
+					)
 				else
 					vim.notify("Failed to collect benchmark data", vim.log.levels.ERROR)
 				end

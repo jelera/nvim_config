@@ -115,9 +115,24 @@ return {
 					pattern = "http",
 					callback = function()
 						local bufnr = vim.api.nvim_get_current_buf()
-						vim.keymap.set("n", "<leader>hr", "<Plug>RestNvim", { buffer = bufnr, desc = "Run HTTP request" })
-						vim.keymap.set("n", "<leader>hp", "<Plug>RestNvimPreview", { buffer = bufnr, desc = "Preview HTTP request" })
-						vim.keymap.set("n", "<leader>hl", "<Plug>RestNvimLast", { buffer = bufnr, desc = "Rerun last HTTP request" })
+						vim.keymap.set(
+							"n",
+							"<leader>hr",
+							"<Plug>RestNvim",
+							{ buffer = bufnr, desc = "Run HTTP request" }
+						)
+						vim.keymap.set(
+							"n",
+							"<leader>hp",
+							"<Plug>RestNvimPreview",
+							{ buffer = bufnr, desc = "Preview HTTP request" }
+						)
+						vim.keymap.set(
+							"n",
+							"<leader>hl",
+							"<Plug>RestNvimLast",
+							{ buffer = bufnr, desc = "Rerun last HTTP request" }
+						)
 					end,
 				})
 			end
