@@ -72,13 +72,17 @@ nvim.setup({
 
 -- Initialize all modules after plugins are loaded
 -- Use vim.schedule to defer until after lazy.nvim completes
+-- Note: LSP module now self-configures when plugins load (BufReadPre/BufNewFile)
 vim.schedule(function()
 	for _, module_name in ipairs(module_names) do
-		local ok, module = pcall(require, "modules." .. module_name)
-		if ok and module.setup then
-			local setup_ok, setup_err = pcall(module.setup)
-			if not setup_ok then
-				vim.notify(string.format("Failed to setup %s module: %s", module_name, setup_err), vim.log.levels.WARN)
+		-- Skip LSP module - it self-configures when plugins lazy-load
+		if module_name ~= "lsp" then
+			local ok, module = pcall(require, "modules." .. module_name)
+			if ok and module.setup then
+				local setup_ok, setup_err = pcall(module.setup)
+				if not setup_ok then
+					vim.notify(string.format("Failed to setup %s module: %s", module_name, setup_err), vim.log.levels.WARN)
+				end
 			end
 		end
 	end

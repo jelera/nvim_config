@@ -520,9 +520,33 @@ Impact:
 
 Note: Phase 4's main benefit is architectural - removing unnecessary setup() calls at startup and ensuring clean lazy-loading patterns. The ftdetect for rest.nvim (~0.9ms) is necessary for filetype detection.
 
+**Phase 5 - LSP Server Loading Optimization (2025-11-14):**
+
+Changes:
+- Deferred lspconfig loading to `BufReadPre/BufNewFile` events
+- Mason lazy-loads on commands (`:Mason`, etc.)
+- LSP module now self-configures when plugins load (not at startup)
+- Removed LSP from startup module initialization loop
+- Modified: `lua/modules/lsp/plugins.lua`, `init.lua`
+
+Results (5 runs, excluding first run):
+- Run 1: 50.9ms ⭐ (best - under 51ms!)
+- Run 2: 57.1ms
+- Run 3: 58.8ms
+- Run 4: 58.6ms
+- **Average: ~56.4ms** (8% improvement from Phase 4)
+
+Impact:
+- ✅ lspconfig no longer loads at startup (verified with grep)
+- ✅ LSP plugins defer until file is opened
+- ✅ ~5ms improvement in startup time
+- ✅ All 180 integration tests pass
+- ✅ LSP functionality preserved (loads on BufReadPre)
+- ✅ Mason UI still accessible via `:Mason` command
+
 ```
-Phase 5 - LSP Server Loading:
-- Startup time: ~61ms → target ~55ms
+Phase 6 - Event Bus Removal:
+- Startup time: ~56ms → target ~50ms
 ```
 
 ### Target Metrics

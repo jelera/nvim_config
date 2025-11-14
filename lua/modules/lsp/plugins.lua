@@ -20,15 +20,17 @@ require('lazy').setup(vim.list_extend(lsp_plugins, {
 --]]
 
 return {
-	-- LSP configuration
+	-- LSP configuration (defer to FileType for performance)
 	{
 		"neovim/nvim-lspconfig",
+		event = { "BufReadPre", "BufNewFile" }, -- Load before file content is read
 		config = false, -- We'll configure it in modules.lsp
 	},
 
 	-- Mason - LSP server installer with UI
 	{
 		"williamboman/mason.nvim",
+		cmd = { "Mason", "MasonInstall", "MasonUninstall", "MasonUpdate" }, -- Lazy-load on commands
 		config = false,
 	},
 
@@ -38,13 +40,22 @@ return {
 		dependencies = {
 			"williamboman/mason.nvim",
 			"neovim/nvim-lspconfig",
+			"hrsh7th/cmp-nvim-lsp",
 		},
-		config = false,
+		event = { "BufReadPre", "BufNewFile" }, -- Load with lspconfig
+		config = function()
+			-- Auto-configure LSP when plugins load
+			local ok, lsp_module = pcall(require, "modules.lsp")
+			if ok and lsp_module.setup then
+				lsp_module.setup()
+			end
+		end,
 	},
 
 	-- LSP capabilities for nvim-cmp (completion)
 	{
 		"hrsh7th/cmp-nvim-lsp",
+		event = { "BufReadPre", "BufNewFile" }, -- Load with lspconfig
 		config = false,
 	},
 }
