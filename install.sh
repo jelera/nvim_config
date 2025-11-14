@@ -45,6 +45,9 @@ readonly NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly SCRIPT_DIR
 
+# Log file location
+LOG_FILE="${SCRIPT_DIR}/install.log"
+
 # Supported Ubuntu LTS versions
 readonly SUPPORTED_UBUNTU_LTS=("22.04" "24.04")
 
@@ -54,6 +57,28 @@ PKG_MANAGER=""
 #------------------------------------------------------------------------------
 # Helper Functions
 #------------------------------------------------------------------------------
+
+# Log message to file with timestamp (only for warnings and errors)
+log_to_file() {
+    local level="$1"
+    shift
+    local message="$*"
+    local timestamp
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+
+    # Initialize log file with header if this is the first warning/error
+    if [[ ! -f "$LOG_FILE" ]]; then
+        {
+            echo "═══════════════════════════════════════════════════════════════"
+            echo "NeoVim IDE Configuration - Installation Log"
+            echo "Started: $(date '+%Y-%m-%d %H:%M:%S')"
+            echo "═══════════════════════════════════════════════════════════════"
+            echo ""
+        } > "$LOG_FILE"
+    fi
+
+    echo "[$timestamp] [$level] $message" >> "$LOG_FILE"
+}
 
 # Print colored messages
 color_echo() {
@@ -74,10 +99,12 @@ print_success() {
 
 print_warning() {
     color_echo "${YELLOW}⚠️${NC}  $*"
+    log_to_file "WARNING" "$*"
 }
 
 print_error() {
     color_echo "${RED}❌${NC} $*" >&2
+    log_to_file "ERROR" "$*"
 }
 
 # Check if command exists
@@ -243,7 +270,8 @@ install_homebrew_packages() {
         "eza"       # Better ls (formerly exa)
         "fzf"       # Fuzzy finder (general use)
         "gh"        # GitHub CLI
-        "jq"        # JSON processor
+        "jq"        # JSON processor (for rest.nvim HTTP client)
+        "tidy-html5" # HTML formatter (for rest.nvim)
         "tree"      # Directory tree viewer
         "shellcheck" # Shell script linter
         "shfmt"     # Shell script formatter
@@ -356,7 +384,8 @@ install_apt_packages() {
         "lazygit"    # Git TUI (from PPA)
         "bat"        # Better cat with syntax highlighting
         "fzf"        # Fuzzy finder
-        "jq"         # JSON processor
+        "jq"         # JSON processor (for rest.nvim HTTP client)
+        "tidy"       # HTML formatter (for rest.nvim)
         "tree"       # Directory tree viewer
         "shellcheck" # Shell script linter
         "shfmt"      # Shell script formatter
@@ -497,10 +526,13 @@ install_node_packages() {
         "typescript"                       # TypeScript compiler
         "@typescript-eslint/parser"        # TypeScript parser for ESLint
         "@typescript-eslint/eslint-plugin" # TypeScript rules for ESLint
+        "eslint-config-standard"           # Standard.js config for ESLint (optional)
         "markdownlint-cli"                 # Markdown linter
         "prettier"                         # Code formatter (JS/TS/JSON/Markdown/YAML)
         "eslint-config-prettier"           # Disable ESLint rules that conflict with Prettier
         "eslint-plugin-prettier"           # Run Prettier as an ESLint rule
+        "@olrtg/emmet-language-server"     # Emmet abbreviations LSP
+        "ts-node"                          # TypeScript REPL for iron.nvim
     )
 
     for package in "${node_packages[@]}"; do
@@ -565,10 +597,13 @@ install_ruby_gems() {
 
     local ruby_gems=(
         "neovim"              # NeoVim Ruby provider (required)
-        "solargraph"          # Ruby LSP
+        "solargraph"          # Ruby LSP for Rails projects
+        "debug"               # Ruby debugger (rdbg) for DAP integration
         "rubocop"             # Ruby linter and formatter
         "rubocop-performance" # Performance cops for RuboCop
         "rubocop-rspec"       # RSpec cops for RuboCop
+        "rubocop-rails"       # Rails cops for RuboCop
+        "standardrb"          # Ruby Standard Style (alternative to Rubocop)
     )
 
     for gem_name in "${ruby_gems[@]}"; do
@@ -1149,6 +1184,14 @@ main() {
         color_echo "║  ${GREEN}${BOLD}Installation Complete!${NC}                                        ║"
         color_echo "╚════════════════════════════════════════════════════════════════╝"
         echo ""
+
+        # Check if there were any warnings/errors logged
+        if [[ -f "$LOG_FILE" ]]; then
+            color_echo "${YELLOW}⚠️  Some warnings were encountered during installation${NC}"
+            color_echo "   Check the log file for details: ${YELLOW}$LOG_FILE${NC}"
+            echo ""
+        fi
+
         color_echo "${BOLD}📝 Next Steps:${NC}"
         color_echo "  ${CYAN}1.${NC} Restart your shell or activate mise:"
         color_echo "     ${YELLOW}eval \"\$(mise activate bash)\"${NC}  # for bash"
@@ -1183,6 +1226,11 @@ main() {
         color_echo "  • Run: ${YELLOW}./install.sh --verify-only${NC} to check what's missing"
         echo "  • See: docs/TROUBLESHOOTING.md"
         echo "  • Check: mise doctor"
+        if [[ -f "$LOG_FILE" ]]; then
+            color_echo "  • View log: ${YELLOW}cat $LOG_FILE${NC}"
+            echo ""
+            color_echo "${BOLD}📋 Full log with errors and warnings:${NC} ${YELLOW}$LOG_FILE${NC}"
+        fi
         echo ""
     fi
 }

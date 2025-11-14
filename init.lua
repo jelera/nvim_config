@@ -25,10 +25,12 @@ local module_names = {
   'completion',
   'debug',
   'editor',
+  'frameworks',
   'git',
   'lsp',
   'navigation',
   'test',
+  'tooling',
   'treesitter',
   'ui',
 }

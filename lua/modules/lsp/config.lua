@@ -23,18 +23,62 @@ local M = {}
 M.default_config = {
   -- Core servers to auto-install upfront
   ensure_installed = {
-    'lua_ls', -- Lua
-    'ts_ls', -- JavaScript/TypeScript
-    'pyright', -- Python
-    'solargraph', -- Ruby
-    'bashls', -- Bash
-    'postgres_lsp', -- PostgreSQL
-    'marksman', -- Markdown
-    'dockerls', -- Docker
-    'html', -- HTML
+    -- Lua
+    'lua_ls',
+
+    -- JavaScript/TypeScript/Node/Angular
+    'ts_ls', -- TypeScript/JavaScript LSP
+    'eslint', -- JavaScript/TypeScript linter (can be configured for Standard style)
+    'angularls', -- Angular Language Service
+
+    -- Python
+    'pyright',
+
+    -- Ruby/Rails
+    'solargraph', -- Ruby LSP for Rails (intellisense, goto def)
+    'ruby_lsp', -- Official Ruby LSP (faster, for non-Rails)
+    'rubocop', -- Ruby linter/formatter
+    'standardrb', -- Ruby Standard Style (alternative)
+
+    -- Elixir
+    'elixirls',
+
+    -- Shell
+    'bashls',
+
+    -- Vim Script
+    'vimls',
+
+    -- Database
+    'postgres_lsp',
+
+    -- Markdown
+    'marksman',
+
+    -- Docker
+    'dockerls',
+    'docker_compose_language_service', -- Docker Compose
+
+    -- Web
+    'html',
     'cssls', -- CSS/SCSS
-    'terraformls', -- Terraform
-    'gh_actions_ls', -- GitHub Actions
+    'emmet_language_server', -- Emmet abbreviations
+
+    -- YAML
+    'yamlls',
+
+    -- Infrastructure/Cloud
+    'terraformls',
+
+    -- Linters/Security/Quality
+    'actionlint', -- GitHub Actions linter
+    'codeqlls', -- CodeQL security analysis
+    'codespell', -- Spell checker
+    'commitlint', -- Git commit message linter
+    'gitleaks', -- Git secrets scanner
+
+    -- GitHub Actions
+    'gh_actions_ls',
   },
 
   -- Automatically enable installed LSP servers
@@ -80,8 +124,10 @@ function M.load_server_config(server_name)
     lua_ls = 'lua',
 
     -- JavaScript/TypeScript
-    -- (Can add multiple: ts_ls, eslint, etc.)
+    -- (Can add multiple: ts_ls, eslint, angularls, etc.)
     ts_ls = 'javascript',
+    eslint = 'javascript',
+    angularls = 'angular',
 
     -- Python
     -- (Can add multiple: pyright, ruff_lsp, etc.)
@@ -89,6 +135,9 @@ function M.load_server_config(server_name)
 
     -- Ruby
     solargraph = 'ruby',
+    ruby_lsp = 'ruby',
+    rubocop = 'ruby',
+    standardrb = 'ruby',
 
     -- Bash
     bashls = 'bash',
@@ -113,6 +162,27 @@ function M.load_server_config(server_name)
 
     -- GitHub Actions
     gh_actions_ls = 'github',
+    actionlint = 'github',
+
+    -- Elixir
+    elixirls = 'elixir',
+
+    -- Vim Script
+    vimls = 'vim',
+
+    -- YAML
+    yamlls = 'yaml',
+
+    -- Docker Compose
+    docker_compose_language_service = 'docker',
+
+    -- CodeQL
+    codeqlls = 'codeql',
+
+    -- Linters (language-agnostic)
+    codespell = 'text',
+    commitlint = 'git',
+    gitleaks = 'git',
 
     -- Go
     gopls = 'go',

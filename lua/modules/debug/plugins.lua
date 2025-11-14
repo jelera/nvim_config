@@ -59,4 +59,22 @@ return {
     event = { 'BufReadPre', 'BufNewFile' },
     config = false,
   },
+
+  -- JavaScript/TypeScript debugger (vscode-js-debug)
+  {
+    'microsoft/vscode-js-debug',
+    lazy = true,
+    build = 'npm install --legacy-peer-deps && npx gulp vsDebugServerBundle && mv dist out',
+  },
+
+  -- JS/TS debug adapter wrapper
+  {
+    'mxsdev/nvim-dap-vscode-js',
+    dependencies = {
+      'mfussenegger/nvim-dap',
+      'microsoft/vscode-js-debug',
+    },
+    ft = { 'javascript', 'typescript', 'javascriptreact', 'typescriptreact' },
+    config = false,
+  },
 }

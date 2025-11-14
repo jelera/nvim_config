@@ -40,6 +40,12 @@ describe('modules.lsp #integration', function()
 
     -- Mock vim APIs
     vim.diagnostic = {
+      severity = {
+        ERROR = 1,
+        WARN = 2,
+        HINT = 3,
+        INFO = 4,
+      },
       config = function(config)
         _G._test_diagnostic_config = config
       end,
@@ -323,16 +329,17 @@ describe('modules.lsp #integration', function()
       assert.is_not_nil(_G._test_diagnostic_config)
     end)
 
-    it('should enable virtual text', function()
+    it('should disable virtual text (shown in lualine instead)', function()
       lsp.setup()
 
-      assert.is_true(_G._test_diagnostic_config.virtual_text)
+      assert.is_false(_G._test_diagnostic_config.virtual_text)
     end)
 
-    it('should enable signs', function()
+    it('should enable signs with custom icons', function()
       lsp.setup()
 
-      assert.is_true(_G._test_diagnostic_config.signs)
+      assert.is_table(_G._test_diagnostic_config.signs)
+      assert.is_table(_G._test_diagnostic_config.signs.text)
     end)
 
     it('should enable severity sorting', function()

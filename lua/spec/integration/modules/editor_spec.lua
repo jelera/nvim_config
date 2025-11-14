@@ -127,12 +127,7 @@ describe('modules.editor #integration #editor', function()
       assert.is_function(comment.setup)
     end)
 
-    it('should load project submodule', function()
-      package.preload['modules.editor.project'] = nil
-      local project = require('modules.editor.project')
-      assert.is_table(project)
-      assert.is_function(project.setup)
-    end)
+    -- project submodule removed in favor of vim-projectionist
 
     it('should load session submodule', function()
       package.preload['modules.editor.session'] = nil
@@ -244,23 +239,8 @@ describe('modules.editor #integration #editor', function()
     end)
   end)
 
-  describe('project.setup()', function()
-    it('should setup with default config', function()
-      package.preload['modules.editor.project'] = nil
-      local project = require('modules.editor.project')
-      local result = project.setup()
-      assert.is_true(result)
-    end)
-
-    it('should accept custom detection methods', function()
-      package.preload['modules.editor.project'] = nil
-      local project = require('modules.editor.project')
-      local result = project.setup({
-        detection_methods = { 'pattern', 'lsp' }
-      })
-      assert.is_true(result)
-    end)
-  end)
+  -- project module removed in favor of vim-projectionist
+  -- Tests removed
 
   describe('session.setup()', function()
     it('should setup with default config', function()

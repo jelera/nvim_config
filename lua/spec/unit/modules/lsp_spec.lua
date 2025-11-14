@@ -38,6 +38,12 @@ describe('modules.lsp #unit', function()
 
     -- Mock vim.diagnostic
     vim.diagnostic = {
+      severity = {
+        ERROR = 1,
+        WARN = 2,
+        HINT = 3,
+        INFO = 4,
+      },
       config = function(config)
         _G._test_diagnostic_config = config
       end,

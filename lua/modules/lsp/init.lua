@@ -123,34 +123,87 @@ function M.setup(config)
   -- Get default capabilities from cmp_nvim_lsp
   local capabilities = cmp_nvim_lsp.default_capabilities()
 
-  -- Create on_attach callback
+  -- Create on_attach callback with project detection
   local on_attach = event_handlers.create_on_attach(merged_config)
+
+  -- Load project detection modules
+  local ruby_detection = require('modules.lsp.detection.ruby')
+  local js_detection = require('modules.lsp.detection.javascript')
+
+  -- Detect project configuration
+  local ruby_config = ruby_detection.detect()
+  local js_config = js_detection.detect()
+
+  -- Build list of servers to enable based on project detection
+  local servers_to_enable = {}
+
+  -- Add Ruby servers based on detection
+  for _, server in ipairs(ruby_config.servers) do
+    servers_to_enable[server] = true
+  end
+
+  -- Add JavaScript servers based on detection
+  for _, server in ipairs(js_config.servers) do
+    servers_to_enable[server] = true
+  end
+
+  -- Add language-agnostic servers (always enable)
+  local always_enable = {
+    'lua_ls',
+    'pyright',
+    'bashls',
+    'vimls',
+    'postgres_lsp',
+    'marksman',
+    'dockerls',
+    'docker_compose_language_service',
+    'html',
+    'cssls',
+    'yamlls',
+    'terraformls',
+    'elixirls',
+    'gh_actions_ls',
+    'actionlint',
+    'codeqlls',
+    'codespell',
+    'commitlint',
+    'gitleaks',
+    'gopls',
+    'rust_analyzer',
+  }
+
+  for _, server in ipairs(always_enable) do
+    servers_to_enable[server] = true
+  end
 
   -- With automatic_enable = true, mason-lspconfig will automatically enable servers
   -- We need to manually configure each installed server with our settings
   local installed_servers = mason_lspconfig.get_installed_servers()
   for _, server_name in ipairs(installed_servers) do
-    -- Load per-language config if it exists
-    local server_config = lsp_config.load_server_config(server_name) or {}
+    -- Only enable servers that are appropriate for this project
+    if servers_to_enable[server_name] then
+      -- Load per-language config if it exists
+      local server_config = lsp_config.load_server_config(server_name) or {}
 
-    -- Merge with default settings
-    local final_config = utils.deep_merge({
-      capabilities = capabilities,
-      on_attach = on_attach,
-    }, server_config)
+      -- Merge with default settings
+      local final_config = utils.deep_merge({
+        capabilities = capabilities,
+        on_attach = on_attach,
+      }, server_config)
 
-    -- Setup the server using the new Neovim 0.11 vim.lsp.config API
-    local setup_ok, setup_err = pcall(function()
-      vim.lsp.config(server_name, final_config)
-      vim.lsp.enable(server_name)
-    end)
+      -- Setup the server using the new Neovim 0.11 vim.lsp.config API
+      local setup_ok, setup_err = pcall(function()
+        vim.lsp.config(server_name, final_config)
+        vim.lsp.enable(server_name)
+      end)
 
-    if not setup_ok then
-      vim.notify(
-        string.format('Failed to setup LSP server %s: %s', server_name, setup_err),
-        vim.log.levels.WARN,
-        { title = 'LSP Module' }
-      )
+      if not setup_ok then
+        vim.notify(
+          string.format('Failed to setup LSP server %s: %s', server_name, setup_err),
+          vim.log.levels.WARN,
+          { title = 'LSP Module' }
+        )
+      end
     end
   end
 

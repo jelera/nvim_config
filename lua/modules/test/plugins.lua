@@ -80,12 +80,22 @@ return {
     config = false,
   },
 
-  -- Ruby: RSpec adapter
+  -- ========================================
+  -- Ruby Test Adapters
+  -- ========================================
+
+  -- RSpec
   {
     'olimorris/neotest-rspec',
-    dependencies = {
-      'nvim-neotest/neotest',
-    },
+    dependencies = { 'nvim-neotest/neotest' },
+    ft = 'ruby',
+    config = false,
+  },
+
+  -- Minitest
+  {
+    'zidhuss/neotest-minitest',
+    dependencies = { 'nvim-neotest/neotest' },
     ft = 'ruby',
     config = false,
   },
