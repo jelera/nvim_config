@@ -5,6 +5,7 @@
 ## Project Overview
 
 A **production-ready, test-driven NeoVim IDE configuration** built from scratch with:
+
 - **Pure Lua** configuration (no VimScript)
 - **Test-Driven Development** with 786 passing tests
 - **Modular architecture** with clean separation of concerns
@@ -16,6 +17,7 @@ A **production-ready, test-driven NeoVim IDE configuration** built from scratch 
 ## Technology Stack (2025)
 
 ### Core Tools
+
 - **Plugin Manager:** `lazy.nvim` - Modern, fast, lazy-loading
 - **LSP:** `nvim-lspconfig` + `mason.nvim` (9 language servers)
 - **Completion:** `nvim-cmp` + `LuaSnip` + multiple sources
@@ -26,6 +28,7 @@ A **production-ready, test-driven NeoVim IDE configuration** built from scratch 
 - **AI:** `sidekick.nvim` (Copilot NES + AI terminal)
 
 ### Supported Languages
+
 - Lua, TypeScript/JavaScript, Python, Ruby, Go, Rust, Bash, SQL, Markdown
 
 ## Architecture
@@ -76,6 +79,7 @@ return M
 ```
 
 **Key principles:**
+
 - `init.lua` orchestrates, delegates to sub-modules
 - Configuration uses `utils.merge_config()` for deep merging
 - Each module exports a `setup(config)` function
@@ -98,6 +102,7 @@ modules/lsp/servers/
 ```
 
 Each server file exports:
+
 ```lua
 return {
   settings = { ... },           # LSP-specific settings
@@ -135,6 +140,7 @@ return {
 4. Run tests with `./scripts/test.sh`
 
 **Test structure:**
+
 ```lua
 describe('modules.example #unit', function()
   before_each(function()
@@ -151,6 +157,7 @@ end)
 ### Pre-commit Checks
 
 Installed hooks run automatically on `git commit`:
+
 1. **Lint checks** - luacheck, eslint, ruff, rubocop, markdownlint, shellcheck
 2. **Type checks** - TypeScript, Python
 3. **Format checks** - stylua, prettier, shfmt
@@ -160,17 +167,20 @@ Installed hooks run automatically on `git commit`:
 ### CI/CD Workflows
 
 **PR Checks** (`.github/workflows/lint-pr.yml`):
+
 - Runs only when relevant files change (`.md`, `.sh`, `.ts`, `.js`, `.json`, `.lua`)
 - Lints only changed files
 - Checks formatting on changed files
 - Fast feedback loop
 
 **Full Lua Checks** (`.github/workflows/lint-and-type-check.yml`):
+
 - Runs only when Lua files or configs change
 - Full luacheck linting
 - Full stylua format checking
 
 **Tests** (`.github/workflows/test.yml`):
+
 - Runs all 786 tests
 - Ubuntu-based environment
 
@@ -179,6 +189,7 @@ Installed hooks run automatically on `git commit`:
 ### Configuration Merging
 
 **Always use** `utils.merge_config()` for deep merging:
+
 ```lua
 local utils = require('nvim.utils')
 local merged = utils.merge_config(default_config, user_config)
@@ -189,6 +200,7 @@ local merged = utils.merge_config(default_config, user_config)
 ### Module Loading
 
 Use `module_loader` for dynamic loading with error handling:
+
 ```lua
 local loader = require('nvim.core.module_loader')
 local success = loader.load('modules.lsp')
@@ -209,6 +221,7 @@ local success = loader.load('modules.lsp')
 ### Plugin Specifications
 
 Define in separate `plugins.lua` files using lazy.nvim format:
+
 ```lua
 return {
   {
@@ -227,18 +240,21 @@ return {
 
 1. Create `modules/lsp/servers/<language>/<server_name>.lua`
 2. Export server configuration:
+
    ```lua
    return {
      settings = { ... },
      on_attach = function(client, bufnr) end
    }
    ```
+
 3. Add to `ensure_installed` in `modules/lsp/config.lua`
 4. Write integration test in `spec/integration/modules/lsp_spec.lua`
 
 ### Linters & Formatters
 
 **Installed via `install.sh`:**
+
 - **TypeScript/JS:** eslint, prettier
 - **Python:** ruff, mypy, black
 - **Ruby:** rubocop (+ performance, rspec extensions)
@@ -248,6 +264,7 @@ return {
 - **Shell:** shellcheck, shfmt
 
 **Configuration files:**
+
 - `.luacheckrc` - Lua linter config
 - `.stylua.toml` - Lua formatter config
 - `.eslintrc.json` - TypeScript/JS linter
@@ -257,6 +274,7 @@ return {
 ## Project State
 
 **Completed Phases (14/14):**
+
 1. ✅ Foundation & TDD Infrastructure (310 tests)
 2. ✅ Core Module (170 tests)
 3. ✅ UI & Visual (11 tests)
@@ -313,16 +331,19 @@ vim.api.nvim_create_autocmd('FileType', {
 ## Troubleshooting
 
 ### Tests Failing
+
 1. Check busted is installed: `luarocks list | grep busted`
 2. Run specific test: `./scripts/test.sh lua/spec/unit/<file>_spec.lua`
 3. Check test tags: Tests should have `#unit` or `#integration`
 
 ### LSP Not Attaching
+
 1. Check Mason: `:Mason` in NeoVim
 2. Verify server installed: `:LspInfo`
 3. Check server config in `modules/lsp/servers/<language>/`
 
 ### Linting Errors
+
 1. Run lint manually: `./scripts/lint-check.sh`
 2. Auto-fix: `./scripts/auto-fix.sh`
 3. Check tool installed: `which luacheck`, `which eslint`, etc.

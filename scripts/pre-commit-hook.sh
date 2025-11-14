@@ -34,26 +34,26 @@ PROJECT_ROOT=$(git rev-parse --show-toplevel)
 # Run lint checks
 echo -e "${BLUE}📋 Step 1: Lint checks${NC}"
 if ! "$PROJECT_ROOT/scripts/lint-check.sh"; then
-  echo -e "${RED}❌ Pre-commit checks failed: Lint errors found${NC}"
-  echo -e "${RED}Fix the errors above or use 'git commit --no-verify' to bypass${NC}"
-  exit 1
+	echo -e "${RED}❌ Pre-commit checks failed: Lint errors found${NC}"
+	echo -e "${RED}Fix the errors above or use 'git commit --no-verify' to bypass${NC}"
+	exit 1
 fi
 
 # Run type checks
 echo -e "${BLUE}🔍 Step 2: Type checks${NC}"
 if ! "$PROJECT_ROOT/scripts/type-check.sh"; then
-  echo -e "${RED}❌ Pre-commit checks failed: Type errors found${NC}"
-  echo -e "${RED}Fix the errors above or use 'git commit --no-verify' to bypass${NC}"
-  exit 1
+	echo -e "${RED}❌ Pre-commit checks failed: Type errors found${NC}"
+	echo -e "${RED}Fix the errors above or use 'git commit --no-verify' to bypass${NC}"
+	exit 1
 fi
 
 # Run format checks
 echo -e "${BLUE}🎨 Step 3: Format checks${NC}"
 if ! "$PROJECT_ROOT/scripts/auto-fix.sh" --check; then
-  echo -e "${RED}❌ Pre-commit checks failed: Files are not properly formatted${NC}"
-  echo -e "${RED}Run './scripts/auto-fix.sh' to fix formatting, then try again${NC}"
-  echo -e "${RED}Or use 'git commit --no-verify' to bypass${NC}"
-  exit 1
+	echo -e "${RED}❌ Pre-commit checks failed: Files are not properly formatted${NC}"
+	echo -e "${RED}Run './scripts/auto-fix.sh' to fix formatting, then try again${NC}"
+	echo -e "${RED}Or use 'git commit --no-verify' to bypass${NC}"
+	exit 1
 fi
 
 echo -e "${GREEN}✅ All pre-commit checks passed!${NC}"

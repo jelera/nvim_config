@@ -48,6 +48,7 @@ end
 ```
 
 **Key points:**
+
 - Init.lua is just an orchestrator
 - Each submodule is independent
 - Configuration merged with sensible defaults
@@ -69,6 +70,7 @@ return {
 ```
 
 **Strategy:**
+
 - Plugins load on-demand (events, keys, commands)
 - Modules configure plugins, not plugin specs
 - No duplicate configuration
@@ -112,6 +114,7 @@ end)
 ```
 
 **Why integration tests:**
+
 - Tests real behavior, not implementation
 - Faster to write and maintain
 - Better coverage with fewer tests
@@ -138,15 +141,18 @@ lspconfig.lua_ls.setup(merged)
 ## Key Design Decisions
 
 ### 1. Simple Orchestrators
+
 Modules don't manage state - they just call setup functions.
 
 ❌ **Don't:**
+
 ```lua
 local state = { enabled = false }
 function M.enable() state.enabled = true end
 ```
 
 ✅ **Do:**
+
 ```lua
 function M.setup(config)
   require('plugin').setup(config)
@@ -155,9 +161,11 @@ end
 ```
 
 ### 2. Plugin Defaults
+
 Don't override unless necessary.
 
 ❌ **Don't:**
+
 ```lua
 require('plugin').setup({
   option1 = value1,  -- Default value
@@ -167,6 +175,7 @@ require('plugin').setup({
 ```
 
 ✅ **Do:**
+
 ```lua
 require('plugin').setup({
   option3 = value3,  -- Only custom value
@@ -174,14 +183,17 @@ require('plugin').setup({
 ```
 
 ### 3. Lazy Loading
+
 Load on-demand, not at startup.
 
 ❌ **Don't:**
+
 ```lua
 { 'plugin/name', lazy = false }
 ```
 
 ✅ **Do:**
+
 ```lua
 { 'plugin/name', event = 'VeryLazy' }
 { 'plugin/name', keys = '<leader>x' }
@@ -189,9 +201,11 @@ Load on-demand, not at startup.
 ```
 
 ### 4. Config in Modules
+
 Plugin specs should not contain configuration.
 
 ❌ **Don't:**
+
 ```lua
 -- plugins.lua
 {
@@ -203,6 +217,7 @@ Plugin specs should not contain configuration.
 ```
 
 ✅ **Do:**
+
 ```lua
 -- plugins.lua
 { 'plugin/name', config = false }

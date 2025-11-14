@@ -5,9 +5,11 @@ This directory contains reusable scripts for code quality checks that work acros
 ## Available Scripts
 
 ### 🔍 lint-check.sh
+
 Runs appropriate linters on code files based on their extension.
 
 **Supported languages:**
+
 - **Lua**: luacheck
 - **TypeScript/JavaScript**: eslint (with Prettier integration)
 - **Python**: ruff
@@ -17,6 +19,7 @@ Runs appropriate linters on code files based on their extension.
 - **Markdown**: markdownlint
 
 **Usage:**
+
 ```bash
 # Check specific file
 ./scripts/lint-check.sh path/to/file.lua
@@ -29,9 +32,11 @@ Runs appropriate linters on code files based on their extension.
 ```
 
 ### 🔍 type-check.sh
+
 Performs static type checking for statically-typed languages.
 
 **Supported languages:**
+
 - **TypeScript**: tsc --noEmit
 - **Python**: mypy
 - **Rust**: cargo check
@@ -39,6 +44,7 @@ Performs static type checking for statically-typed languages.
 - **Lua**: Informational only (consider teal for static typing)
 
 **Usage:**
+
 ```bash
 # Check specific file
 ./scripts/type-check.sh path/to/file.ts
@@ -51,9 +57,11 @@ Performs static type checking for statically-typed languages.
 ```
 
 ### 🔧 auto-fix.sh
+
 Automatically fixes linting and formatting issues using formatters and auto-fixers.
 
 **Supported formatters:**
+
 - **Lua**: stylua
 - **TypeScript/JavaScript**: Prettier + ESLint --fix
 - **Python**: ruff format + ruff check --fix
@@ -63,6 +71,7 @@ Automatically fixes linting and formatting issues using formatters and auto-fixe
 - **Markdown**: markdownlint --fix
 
 **Usage:**
+
 ```bash
 # Fix specific file
 ./scripts/auto-fix.sh path/to/file.lua
@@ -80,9 +89,11 @@ Automatically fixes linting and formatting issues using formatters and auto-fixe
 **Note**: This script modifies files in place. Always commit your work first!
 
 ### 🪝 pre-commit-hook.sh
+
 Git pre-commit hook that runs both lint and type checks before allowing commits.
 
 **Installation:**
+
 ```bash
 # Install as git hook
 ln -sf ../../scripts/pre-commit-hook.sh .git/hooks/pre-commit
@@ -92,6 +103,7 @@ ln -sf ../../scripts/pre-commit-hook.sh .git/hooks/pre-commit
 ```
 
 **Bypass (when needed):**
+
 ```bash
 git commit --no-verify
 ```
@@ -99,11 +111,13 @@ git commit --no-verify
 ## Integration Points
 
 ### 1. Claude Code Hooks
+
 **Location**: `.claude/settings.json`
 
 These scripts automatically run when you Edit or Write files through Claude Code, providing immediate feedback on code quality.
 
 **Configuration:**
+
 ```json
 {
   "hooks": {
@@ -129,21 +143,25 @@ These scripts automatically run when you Edit or Write files through Claude Code
 ```
 
 ### 2. Git Hooks
+
 **Location**: `.git/hooks/pre-commit` (symlinked from `scripts/pre-commit-hook.sh`)
 
 Automatically checks all staged files before each commit.
 
 **Install:**
+
 ```bash
 ln -sf ../../scripts/pre-commit-hook.sh .git/hooks/pre-commit
 ```
 
 ### 3. CI/CD (GitHub Actions)
+
 **Location**: `.github/workflows/lint-and-type-check.yml`
 
 Runs on every push and pull request to main/develop branches.
 
 **Features:**
+
 - Installs all necessary tools via mise
 - Runs lint checks
 - Runs type checks
@@ -151,6 +169,7 @@ Runs on every push and pull request to main/develop branches.
 - Uploads coverage reports
 
 ### 4. Manual Development
+
 Run scripts directly during development:
 
 ```bash
@@ -173,6 +192,7 @@ All scripts use consistent exit codes:
 - **1**: Non-blocking error - Tool not found, file skipped
 
 This makes them work seamlessly with:
+
 - Claude Code hooks (exit 2 blocks the operation)
 - Git hooks (non-zero exits prevent commits)
 - CI/CD pipelines (non-zero exits fail the build)
@@ -182,6 +202,7 @@ This makes them work seamlessly with:
 All tools can be installed automatically via `./install.sh`, or manually as shown below:
 
 ### Lua
+
 ```bash
 # Linter
 luarocks install luacheck
@@ -191,6 +212,7 @@ cargo install stylua
 ```
 
 ### TypeScript/JavaScript
+
 ```bash
 # Linter and type checker with Prettier integration
 npm install -g eslint typescript \
@@ -203,34 +225,40 @@ npm install -g eslint typescript \
 
 **ESLint + Prettier Integration**:
 The configuration ensures ESLint and Prettier work together without conflicts:
+
 - `.eslintrc.json` uses `plugin:prettier/recommended`
 - ESLint defers formatting rules to Prettier
 - Both tools run automatically during lint and auto-fix
 
 ### Python
+
 ```bash
 # Linter, formatter, and type checker
 pip install ruff mypy black
 ```
 
 ### Ruby
+
 ```bash
 gem install rubocop
 ```
 
 ### Go
+
 ```bash
 # Linter (gofmt is included with Go)
 curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
 ```
 
 ### Rust
+
 ```bash
 # Included with cargo
 rustup component add clippy
 ```
 
 ### Markdown
+
 ```bash
 npm install -g markdownlint-cli
 ```
@@ -240,6 +268,7 @@ npm install -g markdownlint-cli
 ### Adding New Languages
 
 1. **Edit lint-check.sh**:
+
    ```bash
    check_newlang() {
      local file="$1"
@@ -253,6 +282,7 @@ npm install -g markdownlint-cli
    ```
 
 2. **Edit type-check.sh**:
+
    ```bash
    check_newlang_project() {
      # Add your type checker logic here

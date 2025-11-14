@@ -9,6 +9,7 @@ This directory contains Claude Code hooks that automatically run code quality ch
 ### PostToolUse: Edit|Write
 
 Configured checks:
+
 1. **Lint Check** (`scripts/lint-check.sh`) - Blocks on linting errors
 2. **Type Check** (`scripts/type-check.sh`) - Blocks on type errors
 

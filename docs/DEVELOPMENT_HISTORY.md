@@ -3,6 +3,7 @@
 ## Project Overview
 
 Building a modern, IDE-like NeoVim configuration from scratch using:
+
 - **Pure Lua** for all configuration
 - **Test-Driven Development (TDD)** with busted
 - **Modular architecture** with dependency injection
@@ -12,12 +13,14 @@ Building a modern, IDE-like NeoVim configuration from scratch using:
 ## Technology Stack (2025 - Most Popular & Actively Maintained)
 
 ### Core Infrastructure
+
 - **Plugin Manager**: `lazy.nvim` (by folke) - Modern, fast, automatic lazy-loading
   - Replaces archived `packer.nvim`
   - Built-in profiling and UI
   - Automatic byte-compilation
 
 ### Language Support
+
 - **LSP Configuration**: `nvim-lspconfig` (official)
 - **LSP Installer**: `mason.nvim` + `mason-lspconfig.nvim`
   - Replaces deprecated `nvim-lsp-installer`
@@ -25,18 +28,21 @@ Building a modern, IDE-like NeoVim configuration from scratch using:
 - **Syntax Highlighting**: `nvim-treesitter` with `nvim-treesitter-textobjects`
 
 ### Completion & Snippets
+
 - **Completion Engine**: `nvim-cmp` (most popular)
   - Sources: `cmp-nvim-lsp`, `cmp-buffer`, `cmp-path`, `cmp-cmdline`
 - **Snippet Engine**: `LuaSnip` + `friendly-snippets`
   - Pure Lua, fast, extensible
 
 ### Navigation & Search
+
 - **Fuzzy Finder**: `telescope.nvim` (most popular, highly extensible)
   - Alternative: `fzf-lua` (faster but less extensible)
 - **File Explorer**: `oil.nvim` (modern, buffer-based) or `nvim-tree.lua` (traditional)
 - **Quick Navigation**: `flash.nvim` or `leap.nvim` (motion plugins)
 
 ### UI & Visual
+
 - **Statusline**: `lualine.nvim` (most popular, highly configurable)
 - **Bufferline**: `bufferline.nvim` (tab-like buffer display)
 - **Colorscheme**: `gruvbox.nvim` (modern Lua port of gruvbox)
@@ -46,24 +52,29 @@ Building a modern, IDE-like NeoVim configuration from scratch using:
 - **Notifications**: `nvim-notify`
 
 ### Git Integration
+
 - **Git Operations**: `vim-fugitive` (Tim Pope's classic, still best)
 - **Git Signs**: `gitsigns.nvim` (blame, hunk operations)
 - **Diff View**: `diffview.nvim`
 
 ### Debugging (DAP)
+
 - **Core**: `nvim-dap` + `nvim-dap-ui`
 - **Virtual Text**: `nvim-dap-virtual-text`
 - **Language Adapters**: Language-specific DAP adapters via Mason
 
 ### Testing
+
 - **Test Runner**: `neotest` (modern, async, multi-language)
 - **Adapters**: Language-specific neotest adapters
 
 ### AI Integration
+
 - **Copilot**: `copilot.lua` (official, maintained)
 - **Copilot Chat**: `CopilotChat.nvim`
 
 ### Utilities
+
 - **Commenting**: `comment.nvim` (modern Lua version)
 - **Auto Pairs**: `nvim-autopairs`
 - **Surround**: `nvim-surround` (modern Lua version)
@@ -239,6 +250,7 @@ nvimconfig/
 ## Development Phases
 
 ### Phase 1: Foundation & TDD Infrastructure ✅ COMPLETE
+
 **Goal**: Set up testing framework and core module system
 
 **310 tests passing** - All framework components implemented and tested.
@@ -246,6 +258,7 @@ nvimconfig/
 ---
 
 ### Phase 2: Core Module ✅ COMPLETE
+
 **Goal**: Basic Vim configuration and behavior
 
 **170 tests passing** - Options, keymaps, autocmds, commands all implemented.
@@ -253,6 +266,7 @@ nvimconfig/
 ---
 
 ### Phase 3: UI & Visual ✅ COMPLETE
+
 **Goal**: Make NeoVim look good and provide visual feedback
 
 **11 tests passing** - Unified UI module with colorscheme, statusline, icons, indent guides, notifications.
@@ -260,6 +274,7 @@ nvimconfig/
 ---
 
 ### Phase 4: TreeSitter ✅ COMPLETE
+
 **Goal**: Modern syntax highlighting and code understanding
 
 **37 tests passing** - Full TreeSitter with highlighting, indent, folding, text objects, incremental selection.
@@ -267,6 +282,7 @@ nvimconfig/
 ---
 
 ### Phase 5: LSP System ✅ COMPLETE
+
 **Goal**: Full language server support
 
 **47 tests passing** - Mason + lspconfig with 9 language servers (Lua, TypeScript, Python, Ruby, Go, Rust, Bash, SQL, Markdown).
@@ -276,6 +292,7 @@ Split into focused modules: init, config, event_handlers, keymaps, diagnostics. 
 ---
 
 ### Phase 6: Completion ✅ COMPLETE
+
 **Goal**: Intelligent auto-completion
 
 **33 tests passing** - nvim-cmp with 5 sources (LSP, snippets, buffer, path, cmdline), LuaSnip + friendly-snippets, super-tab navigation.
@@ -285,6 +302,7 @@ Modular structure: init.lua (orchestrator) + snippets.lua + completion.lua. Comm
 ---
 
 ### Phase 7: Navigation & Search ✅ COMPLETE
+
 **Goal**: Fast file navigation and code search
 
 **57 tests passing** - Telescope fuzzy finder + nvim-tree file explorer with complete keymap set from user's dotfiles.
@@ -292,6 +310,7 @@ Modular structure: init.lua (orchestrator) + snippets.lua + completion.lua. Comm
 Modular structure: init.lua (orchestrator) + telescope.lua (with fzf-native) + tree.lua (nvim-tree config) + keymaps.lua (all navigation keymaps).
 
 Keymaps preserved from dotfiles:
+
 - Telescope: `<C-p>g` (files), `<C-p>p` (git files), `<C-p>h` (recent), `<C-p>b` (buffers), `<leader>rg` (grep), etc.
 - Tree: `<C-t>` (toggle), `<C-B>t` (find file), `<leader>e` (focus)
 - Buffer/window/quickfix/tab/location navigation included
@@ -299,6 +318,7 @@ Keymaps preserved from dotfiles:
 ---
 
 ### Phase 8: Git Integration ✅ COMPLETE
+
 **Goal**: Seamless git operations
 
 **21 tests passing** - Gitsigns + vim-fugitive + diffview with comprehensive git keymaps.
@@ -306,11 +326,13 @@ Keymaps preserved from dotfiles:
 Modular structure: init.lua (orchestrator) + signs.lua (gitsigns config) + fugitive.lua (fugitive setup) + diffview.lua (diffview config) + keymaps.lua (git keymaps).
 
 Features:
+
 - Gitsigns: Visual git indicators (add/change/delete), current line blame, hunk operations
 - Fugitive: Git commands (`:Git`, `:Gstatus`, `:Gcommit`, etc.)
 - Diffview: Advanced diff visualization and file history
 
 Git keymaps:
+
 - Fugitive: `<leader>gs` (status), `<leader>gc` (commit), `<leader>gp` (push), `<leader>gl` (pull), `<leader>gb` (blame), `<leader>gd` (diff)
 - Gitsigns: `]h`/`[h` (hunk navigation), `<leader>gh` (preview), `<leader>gH` (reset), `<leader>gS` (stage), `<leader>gB` (toggle blame)
 - Diffview: `<leader>gdo` (open), `<leader>gdc` (close), `<leader>gdh` (history)
@@ -318,6 +340,7 @@ Git keymaps:
 ---
 
 ### Phase 9: Debugging (DAP) ✅ COMPLETE
+
 **Goal**: Full debugging support
 
 **30 tests passing** - nvim-dap + dap-ui + virtual-text with 4 language adapters.
@@ -325,6 +348,7 @@ Git keymaps:
 Modular structure: init.lua (orchestrator) + dap.lua (core DAP) + ui.lua (DAP UI) + adapters.lua (language adapters) + keymaps.lua (debug keymaps).
 
 Features:
+
 - Core DAP: Breakpoints, stepping, variable inspection, virtual text
 - DAP UI: Visual debugging with scopes, watches, stacks, REPL, console
 - Language Adapters: JavaScript/TypeScript, Python, Ruby, Lua
@@ -332,6 +356,7 @@ Features:
 - Lazy-install: Ruby and Lua adapters installed on first filetype open
 
 Debug keymaps:
+
 - F-keys: `<F5>` (continue), `<F10>` (step over), `<F11>` (step into), `<F12>` (step out)
 - Breakpoints: `<leader>db` (toggle), `<leader>dB` (conditional)
 - Controls: `<leader>dr` (REPL), `<leader>dl` (run last), `<leader>dt` (terminate), `<leader>du` (toggle UI)
@@ -340,6 +365,7 @@ Debug keymaps:
 ---
 
 ### Phase 10: Testing Framework ✅ COMPLETE
+
 **Goal**: Run tests from within NeoVim
 
 **30 tests passing** - Neotest with per-language adapters for 4 languages.
@@ -347,6 +373,7 @@ Debug keymaps:
 Modular structure: init.lua (orchestrator) + neotest.lua (core setup) + adapters/javascript.lua + adapters/python.lua + adapters/ruby.lua + adapters/lua.lua + keymaps.lua (test keymaps).
 
 Features:
+
 - Neotest: Modern async test runner with UI, summary, and output panels
 - JavaScript/TypeScript: Jest (via neotest-jest) + Karma (via neotest-vim-test)
 - Python: Pytest (via neotest-python)
@@ -355,6 +382,7 @@ Features:
 - Per-language adapters: Clean separation, easy to extend
 
 Test keymaps:
+
 - Run: `<leader>tt` (nearest), `<leader>tf` (file), `<leader>ts` (suite), `<leader>tl` (last)
 - Debug: `<leader>td` (debug nearest test)
 - Output: `<leader>to` (output), `<leader>tO` (output panel), `<leader>tc` (summary)
@@ -363,6 +391,7 @@ Test keymaps:
 ---
 
 ### Phase 11: AI Integration ✅ COMPLETE
+
 **Goal**: AI-assisted coding
 
 **18 tests passing** - Sidekick.nvim with Copilot NES and AI CLI terminal.
@@ -370,12 +399,14 @@ Test keymaps:
 Modular structure: init.lua (orchestrator) + sidekick.lua (sidekick.nvim config) + keymaps.lua (AI keymaps).
 
 Features:
+
 - Copilot NES: Multi-line refactorings and edit suggestions (better than inline completion)
 - AI Terminal: Built-in terminal for Claude, Gemini, Grok, Amazon Q, Aider, Cursor, and more
 - Unified interface: One plugin instead of multiple AI providers
 - Uses sidekick.nvim's excellent defaults (by folke, creator of lazy.nvim)
 
 AI keymaps:
+
 - NES: `<leader>aa` (accept), `<leader>an` (next hunk), `<leader>ap` (prev hunk), `<leader>ar` (reject)
 - Terminal: `<leader>at` (open), `<leader>ac` (chat), `<leader>as` (send selection), `<leader>aq` (close)
 - Control: `<leader>ai` (toggle sidekick)
@@ -383,11 +414,13 @@ AI keymaps:
 ---
 
 ### Phase 12: Editor Enhancements ✅ COMPLETE
+
 **Goal**: Quality of life improvements
 
 **22 tests passing** - All editor enhancements implemented.
 
 Tasks completed:
+
 1. ✅ Set up autopairs (nvim-autopairs with TreeSitter)
 2. ✅ Configure surround motions (nvim-surround)
 3. ✅ Add commenting plugin (Comment.nvim with TS context)
@@ -395,6 +428,7 @@ Tasks completed:
 5. ✅ Configure session management (persistence.nvim)
 
 Files created:
+
 - `lua/modules/editor/init.lua` - Orchestrator
 - `lua/modules/editor/autopairs.lua` - Auto-pairs config
 - `lua/modules/editor/surround.lua` - Surround config
@@ -408,9 +442,11 @@ Files created:
 ---
 
 ### Phase 13: Documentation & Polish ✅ COMPLETE
+
 **Goal**: Comprehensive documentation
 
 Tasks completed:
+
 1. ✅ Write architecture documentation (docs/ARCHITECTURE.md)
 2. ✅ Document all keymaps (docs/KEYMAPS.md)
 3. ✅ Create troubleshooting guide (docs/TROUBLESHOOTING.md)
@@ -422,9 +458,11 @@ Tasks completed:
 ---
 
 ### Phase 14: CI/CD & Distribution ✅ COMPLETE
+
 **Goal**: Automated testing and easy installation
 
 Tasks completed:
+
 1. ✅ Set up GitHub Actions (2 workflows: test.yml, lint.yml)
 2. ✅ Run tests on commit (786 tests on every push/PR)
 3. ✅ Create installation script (`install.sh` - comprehensive, multi-platform)
@@ -432,12 +470,14 @@ Tasks completed:
 5. ⏭️ Migration guide (skipped - fresh install, not migrating from old config)
 
 **CI Workflows:**
+
 - `.github/workflows/test.yml` - Runs full test suite (786 tests)
 - `.github/workflows/lint.yml` - Runs luacheck linting
 - Triggers on push/PR to main branch
 - Ubuntu-based, installs Lua 5.1 + dependencies
 
 **Installation:**
+
 - Comprehensive `install.sh` script with multi-platform support
 - Auto-detects OS (macOS, Ubuntu)
 - Supports Homebrew and apt package managers
@@ -449,36 +489,42 @@ Tasks completed:
 ## Key Design Principles
 
 ### 1. Test-Driven Development (TDD)
+
 - Write tests BEFORE implementation
 - Achieve 80%+ code coverage
 - Use mocks for NeoVim APIs
 - Test in isolation (unit) and integration
 
 ### 2. Modular Architecture
+
 - Each module is self-contained
 - Clear interfaces and dependencies
 - Lazy loading for performance
 - Easy to enable/disable modules
 
 ### 3. Extensibility
+
 - Plugin/extension hook system
 - Event bus for inter-module communication
 - Clear extension API
 - Example extensions provided
 
 ### 4. Documentation First
+
 - Every function has docstring
 - Every module has explanation
 - Examples for complex features
 - User-friendly for Lua beginners
 
 ### 5. Performance
+
 - Lazy loading by default
 - Async operations where possible
 - Minimal startup time (<100ms)
 - Efficient memory usage
 
 ### 6. IDE-like Experience
+
 - Smart completion
 - Inline diagnostics
 - Integrated debugging
@@ -491,6 +537,7 @@ Tasks completed:
 ## Code Style Guidelines
 
 ### Lua Conventions
+
 ```lua
 -- Module structure (every module follows this pattern)
 --[[
@@ -515,6 +562,7 @@ module.setup({
 ```
 
 API:
+
 - setup(config) - Initialize the module
 - enable() - Enable module features
 - disable() - Disable module features
@@ -564,6 +612,7 @@ function M.disable()
 end
 
 return M
+
 ```
 
 ### Testing Conventions
@@ -607,6 +656,7 @@ end)
 ```
 
 ### Documentation Annotations (LuaLS)
+
 ```lua
 ---@class ModuleConfig Configuration for the module
 ---@field option1 string Description of option1
@@ -626,12 +676,14 @@ end
 ### Leader Key: `,` (comma)
 
 ### Core Editing
+
 - `<leader><space>` - Clear search highlighting
 - `<leader>w` - Save file
 - `<leader>q` - Quit window
 - `<leader>Q` - Quit all
 
 ### File Navigation (Telescope)
+
 - `<leader>ff` - Find files
 - `<leader>fg` - Live grep (search in files)
 - `<leader>fb` - Find buffers
@@ -642,10 +694,12 @@ end
 - `<C-p>` - Quick file finder (alias for ff)
 
 ### File Explorer
+
 - `<leader>e` - Toggle file explorer
 - `-` - Open parent directory
 
 ### LSP
+
 - `gd` - Go to definition
 - `gD` - Go to declaration
 - `gr` - Go to references
@@ -660,6 +714,7 @@ end
 - `<leader>d` - Show line diagnostics
 
 ### Completion
+
 - `<C-Space>` - Trigger completion
 - `<Tab>` - Next item / expand snippet
 - `<S-Tab>` - Previous item
@@ -667,6 +722,7 @@ end
 - `<C-e>` - Close completion
 
 ### Git
+
 - `<leader>gs` - Git status
 - `<leader>gc` - Git commit
 - `<leader>gp` - Git push
@@ -679,6 +735,7 @@ end
 - `]h` - Next hunk
 
 ### Debugging
+
 - `<F5>` - Continue / Start debugging
 - `<F10>` - Step over
 - `<F11>` - Step into
@@ -690,6 +747,7 @@ end
 - `<leader>dt` - Terminate session
 
 ### Testing
+
 - `<leader>tt` - Run nearest test
 - `<leader>tf` - Run file tests
 - `<leader>ts` - Run test suite
@@ -699,6 +757,7 @@ end
 - `<leader>tc` - Show coverage
 
 ### AI (Copilot)
+
 - `<C-g><C-g>` - Accept suggestion (insert mode)
 - `<leader>ai` - Toggle Copilot
 - `<leader>ac` - Open Copilot chat
@@ -706,6 +765,7 @@ end
 - `<leader>af` - Fix code
 
 ### Window Management
+
 - `<C-h>` - Move to left window
 - `<C-j>` - Move to down window
 - `<C-k>` - Move to up window
@@ -720,24 +780,28 @@ end
 ## Testing Strategy
 
 ### Unit Tests
+
 - Test each function in isolation
 - Mock external dependencies (vim APIs, plugins)
 - Test edge cases and error handling
 - Aim for 80%+ coverage per module
 
 ### Integration Tests
+
 - Test module interactions
 - Test plugin loading
 - Test LSP + completion integration
 - Test debugging workflow
 
 ### Performance Tests
+
 - Measure startup time
 - Profile plugin loading
 - Test with large files
 - Memory usage checks
 
 ### Manual Testing Checklist
+
 - [ ] NeoVim starts without errors
 - [ ] All plugins load successfully
 - [ ] LSP attaches to buffers
@@ -753,6 +817,7 @@ end
 ## Dependencies & Installation
 
 ### Required
+
 - NeoVim 0.9.5+ (latest stable)
 - Git 2.30+
 - Node.js 18+ (for LSP servers)
@@ -761,12 +826,14 @@ end
 - Luarocks (for installing busted)
 
 ### Optional but Recommended
+
 - ripgrep (for faster Telescope grep)
 - fd (for faster file finding)
 - A Nerd Font (for icons)
 - lazygit (for git TUI)
 
 ### Installation Commands
+
 ```bash
 # Install busted (testing framework)
 luarocks install busted
@@ -795,6 +862,7 @@ busted
 ## Current Progress Tracker
 
 ### Completed ✅
+
 - [x] Phase 1: Foundation & TDD Infrastructure (310 tests)
 - [x] Phase 2: Core Module (170 tests)
 - [x] Phase 3: UI & Visual (11 tests)
@@ -815,7 +883,9 @@ busted
 **🎉 ALL 14 PHASES COMPLETE! 🎉**
 
 ### Project Status
+
 ✅ **Production Ready** - Fully functional NeoVim IDE configuration with:
+
 - Complete test coverage (786 tests)
 - Comprehensive documentation
 - Automated CI/CD
@@ -827,12 +897,14 @@ busted
 ## Notes for Future Sessions
 
 ### Context Preservation
+
 - This file (`CLAUDE.md`) contains the complete project context
 - Always read this file at the start of each session
 - Update progress tracker after completing tasks
 - Add notes about decisions and changes
 
 ### Code Quality Standards
+
 - Every function must have docstring
 - Every module must have explanation
 - Every feature must have tests
@@ -840,12 +912,14 @@ busted
 - Code must pass luacheck linting
 
 ### Learning Resources (for user)
+
 - [Learn Lua in Y minutes](https://learnxinyminutes.com/docs/lua/)
 - [Neovim Lua Guide](https://neovim.io/doc/user/lua-guide.html)
 - [Lua 5.1 Reference](https://www.lua.org/manual/5.1/)
 - [LuaLS Annotations](https://luals.github.io/wiki/annotations/)
 
 ### Key Decisions Made
+
 1. **Plugin Manager**: lazy.nvim (most popular, packer archived)
 2. **Testing**: busted (most mature Lua testing framework)
 3. **LSP**: nvim-lspconfig + mason.nvim (standard stack)
@@ -854,6 +928,7 @@ busted
 6. **Statusline**: lualine.nvim (most popular)
 
 ### Architecture Decisions
+
 1. **Modular Design**: Each feature is a separate module
 2. **Dependency Injection**: Modules declare dependencies explicitly
 3. **Event Bus**: Inter-module communication via events
@@ -861,6 +936,7 @@ busted
 5. **Extension System**: Users can add custom modules via hooks
 
 ### Gotchas & Pitfalls
+
 1. **Lua Indexing**: Tables are 1-indexed, not 0-indexed
 2. **Global Scope**: Always use `local` unless explicitly global
 3. **Module Caching**: `require()` caches modules, reload with `package.loaded[name] = nil`

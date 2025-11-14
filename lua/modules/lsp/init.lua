@@ -63,8 +63,8 @@ function M.setup(config)
 	end
 
 	-- Load nvim-lspconfig to make configs available to vim.lsp.config
-	-- We don't need to use lspconfig directly, just ensure it's loaded
-	-- so that vim.lsp.config can find the server configurations
+	-- We don't need to use lspconfig directly - just loading it registers server configs with Neovim
+	-- vim.lsp.config() will automatically use the lspconfig defaults when available
 	local lspconfig_ok = pcall(require, "lspconfig")
 	if not lspconfig_ok then
 		vim.notify("nvim-lspconfig not found", vim.log.levels.WARN, { title = "LSP Module" })
@@ -117,8 +117,8 @@ function M.setup(config)
 		servers_to_enable[server] = true
 	end
 
-	-- Add language-agnostic servers (always enable)
-	local always_enable = {
+	-- Add language-agnostic servers (configure, but lazy-load based on filetype)
+	local servers_to_configure = {
 		"lua_ls",
 		"pyright",
 		"bashls",
@@ -137,31 +137,41 @@ function M.setup(config)
 		"rust_analyzer",
 	}
 
-	for _, server in ipairs(always_enable) do
+	for _, server in ipairs(servers_to_configure) do
 		servers_to_enable[server] = true
 	end
 
 	-- Setup mason-lspconfig with handlers
-	-- This approach ensures servers are configured as they become available
+	-- Servers are registered but lazy-loaded (they auto-start when you open a matching filetype)
+	-- Filter out gopls from ensure_installed since it's managed by mise
+	-- gopls will still be configured (it's in servers_to_configure), but installed via mise instead of mason
+	local filtered_ensure_installed = {}
+	for _, server in ipairs(merged_config.ensure_installed) do
+		if server ~= "gopls" then
+			table.insert(filtered_ensure_installed, server)
+		end
+	end
+
 	local mason_lsp_setup_ok, mason_lsp_err = pcall(function()
 		mason_lspconfig.setup({
-			ensure_installed = merged_config.ensure_installed,
+			ensure_installed = filtered_ensure_installed,
 			automatic_installation = false, -- We control which servers to enable
 			handlers = {
 				-- Default handler - called for each installed server
 				function(server_name)
-					-- Only enable servers that are appropriate for this project
+					-- Only configure servers that are appropriate for this project
 					if servers_to_enable[server_name] then
 						-- Load per-language config if it exists
 						local server_config = lsp_config.load_server_config(server_name) or {}
 
-						-- Merge with default settings
+						-- Merge our config (capabilities, on_attach) with per-language config
+						-- vim.lsp.config() will automatically use lspconfig defaults (cmd, filetypes, root_dir, etc.)
 						local final_config = utils.deep_merge({
 							capabilities = capabilities,
 							on_attach = on_attach,
 						}, server_config)
 
-						-- Setup the server using the new Neovim 0.11 vim.lsp.config API
+						-- Register and enable the server configuration (will auto-start on matching filetype)
 						local setup_ok, setup_err = pcall(function()
 							vim.lsp.config(server_name, final_config)
 							vim.lsp.enable(server_name)
@@ -169,7 +179,7 @@ function M.setup(config)
 
 						if not setup_ok then
 							vim.notify(
-								string.format("Failed to setup LSP server %s: %s", server_name, setup_err),
+								string.format("Failed to configure LSP server %s: %s", server_name, setup_err),
 								vim.log.levels.WARN,
 								{ title = "LSP Module" }
 							)
@@ -187,6 +197,21 @@ function M.setup(config)
 			{ title = "LSP Module" }
 		)
 		return false
+	end
+
+	-- Configure gopls manually (managed by mise, not mason)
+	-- This ensures gopls is registered even though it's not installed via mason
+	if vim.fn.executable("gopls") == 1 and servers_to_enable["gopls"] then
+		local gopls_config = lsp_config.load_server_config("gopls") or {}
+		local final_gopls_config = utils.deep_merge({
+			capabilities = capabilities,
+			on_attach = on_attach,
+		}, gopls_config)
+
+		pcall(function()
+			vim.lsp.config("gopls", final_gopls_config)
+			vim.lsp.enable("gopls")
+		end)
 	end
 
 	return true

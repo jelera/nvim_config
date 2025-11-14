@@ -458,4 +458,93 @@ describe("modules.lsp #integration", function()
 			assert.is_true(true) -- If we get here, error was handled
 		end)
 	end)
+
+	describe("Neovim 0.11+ API usage", function()
+		it("should use vim.lsp.config() for server configuration", function()
+			local config_calls = {}
+
+			-- Track vim.lsp.config calls
+			vim.lsp.config = function(server_name, config)
+				table.insert(config_calls, { server = server_name, config = config })
+				_G._test_lsp_servers_setup[server_name] = config
+			end
+
+			vim.lsp.enable = function(server_name)
+				-- Track enable calls
+			end
+
+			lsp.setup()
+
+			-- Should have called vim.lsp.config for each server
+			assert.is_true(#config_calls >= 1)
+
+			-- Each call should have server name and config
+			for _, call in ipairs(config_calls) do
+				assert.is_string(call.server)
+				assert.is_table(call.config)
+				assert.is_not_nil(call.config.capabilities)
+				assert.is_function(call.config.on_attach)
+			end
+		end)
+
+		it("should call vim.lsp.enable() after vim.lsp.config()", function()
+			local call_order = {}
+
+			vim.lsp.config = function(server_name, config)
+				table.insert(call_order, { type = "config", server = server_name })
+				_G._test_lsp_servers_setup[server_name] = config
+			end
+
+			vim.lsp.enable = function(server_name)
+				table.insert(call_order, { type = "enable", server = server_name })
+			end
+
+			lsp.setup()
+
+			-- For each server, enable should be called after config
+			local servers_seen = {}
+			for _, call in ipairs(call_order) do
+				if call.type == "config" then
+					servers_seen[call.server] = { config = true, enable = false }
+				elseif call.type == "enable" then
+					-- Enable should come after config for this server
+					assert.is_not_nil(servers_seen[call.server])
+					assert.is_true(servers_seen[call.server].config)
+					servers_seen[call.server].enable = true
+				end
+			end
+		end)
+
+		it("should not access deprecated lspconfig framework API", function()
+			-- This test ensures we don't use lspconfig[server_name].setup()
+			-- or lspconfig[server_name].document_config which are deprecated
+
+			local lspconfig_accessed = false
+
+			-- Mock lspconfig with metatable to detect access
+			package.loaded["lspconfig"] = nil
+			package.preload["lspconfig"] = function()
+				local mock = {}
+				setmetatable(mock, {
+					__index = function(t, key)
+						if key ~= "util" and key ~= "configs" then
+							lspconfig_accessed = true
+						end
+						return nil
+					end,
+				})
+				return mock
+			end
+
+			-- Reload LSP module with new lspconfig mock
+			package.loaded["modules.lsp"] = nil
+			package.loaded["modules.lsp.init"] = nil
+			lsp = require("modules.lsp")
+
+			lsp.setup()
+
+			-- Should not have accessed lspconfig[server_name] (deprecated framework)
+			assert.is_false(lspconfig_accessed)
+		end)
+	end)
 end)

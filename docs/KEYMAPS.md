@@ -114,11 +114,13 @@ Quick reference for all keybindings. Leader key: `,`
 ## Editor Enhancements
 
 ### Auto-pairs
+
 | Key | Mode | Action |
 |-----|------|--------|
 | `<M-e>` | i | Fast wrap |
 
 ### Surround
+
 | Key | Mode | Action |
 |-----|------|--------|
 | `ys{motion}{char}` | n | Add surround |
@@ -128,6 +130,7 @@ Quick reference for all keybindings. Leader key: `,`
 | `S{char}` | v | Surround selection |
 
 ### Comment
+
 | Key | Mode | Action |
 |-----|------|--------|
 | `gcc` | n | Toggle line comment |
@@ -137,6 +140,7 @@ Quick reference for all keybindings. Leader key: `,`
 | `gc` | v | Comment selection |
 
 ### Sessions & Projects
+
 | Key | Mode | Action |
 |-----|------|--------|
 | `<leader>sr` | n | Restore last session |

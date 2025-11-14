@@ -5,6 +5,7 @@
 ## Quick Reference
 
 This NeoVim IDE configuration is:
+
 - ✅ **Production-ready** with 786 passing tests
 - ✅ **Test-Driven Development** (TDD) - always write tests first
 - ✅ **Modular architecture** - keep files under ~130 lines

@@ -42,6 +42,7 @@ end)
 ### When to Use Each Type
 
 **Unit Tests (`#unit`):**
+
 - Testing individual functions in isolation
 - No external dependencies
 - Fast execution (< 100ms per test suite)
@@ -49,6 +50,7 @@ end)
 - Run frequently during development
 
 **Integration Tests (`#integration`):**
+
 - Testing interactions between modules
 - Complex workflows involving multiple components
 - May be slower (seconds)
@@ -58,12 +60,14 @@ end)
 ## Running Tests
 
 ### All Tests (Default)
+
 ```bash
 busted
 ./scripts/test.sh
 ```
 
 ### Unit Tests Only (Fast TDD)
+
 ```bash
 # By directory:
 busted lua/spec/unit
@@ -75,6 +79,7 @@ busted --tags=unit
 ```
 
 ### Integration Tests Only
+
 ```bash
 # By directory:
 busted lua/spec/integration
@@ -86,18 +91,21 @@ busted --tags=integration
 ```
 
 ### Exclude Slow Tests (Rapid TDD)
+
 ```bash
 busted --exclude-tags=integration
 ./scripts/test.sh --exclude-tags=integration
 ```
 
 ### Specific Test File
+
 ```bash
 busted lua/spec/unit/nvim/core/module_loader_spec.lua
 ./scripts/test.sh lua/spec/unit/nvim/core/module_loader_spec.lua
 ```
 
 ### Pattern Matching
+
 ```bash
 busted --filter="module loader"
 ./scripts/test.sh --filter="event emission"
@@ -106,24 +114,30 @@ busted --filter="module loader"
 ## Debugging Failed Tests
 
 ### Test Shuffling
+
 By default, tests run in random order to catch test interdependencies. When a test fails:
 
 1. Note the seed value from the output
 2. Re-run with that seed:
+
    ```bash
    busted --seed=1234567890
    ```
+
 3. Or disable shuffling for debugging:
+
    ```bash
    busted --no-shuffle lua/spec/unit
    ```
 
 ### Verbose Output
+
 ```bash
 busted --verbose
 ```
 
 ### Coverage Report
+
 ```bash
 busted --coverage
 ```
@@ -133,18 +147,21 @@ busted --coverage
 ### Red-Green-Refactor Cycle
 
 1. **RED**: Write failing tests first
+
    ```bash
    # Run unit tests to see them fail
    ./scripts/test.sh --tags=unit
    ```
 
 2. **GREEN**: Implement minimal code to pass tests
+
    ```bash
    # Re-run frequently during implementation
    ./scripts/test.sh --tags=unit
    ```
 
 3. **REFACTOR**: Improve code while keeping tests green
+
    ```bash
    # Ensure tests still pass after refactoring
    ./scripts/test.sh
@@ -295,6 +312,7 @@ local fixture = spec_helper.load_fixture('fixture_name')
 ## CI/CD Integration
 
 Tests run automatically on:
+
 - Pull requests
 - Commits to main branch
 
@@ -344,7 +362,8 @@ exec busted "$@"
 
 ## Best Practices
 
-### DO:
+### DO
+
 - ✅ Tag all tests with `#unit` or `#integration`
 - ✅ Keep unit tests fast (< 100ms per suite)
 - ✅ Use `before_each`/`after_each` for test isolation
@@ -354,7 +373,8 @@ exec busted "$@"
 - ✅ Test error conditions and edge cases
 - ✅ Write tests before implementation (TDD)
 
-### DON'T:
+### DON'T
+
 - ❌ Mix unit and integration tests in same file
 - ❌ Let unit tests depend on external systems
 - ❌ Write slow unit tests (> 100ms)
@@ -366,20 +386,24 @@ exec busted "$@"
 ## Troubleshooting
 
 ### Module Not Found
+
 ```
 Error: module 'nvim.core.module_name' not found
 ```
+
 - Ensure `LUA_PATH` includes `./lua/?.lua;./lua/?/init.lua`
 - Use `./scripts/test.sh` instead of `busted` directly
 - Check module file exists at correct path
 
 ### Tests Pass Individually But Fail Together
+
 - Likely test interdependency
 - Check for shared state
 - Ensure `before_each` properly resets state
 - Run with `--no-shuffle` to debug
 
 ### Spy Not Working
+
 - Use simple counters instead of spies when possible
 - luassert spies can interfere with `type()` checks
 - See `module_loader_spec.lua` for counter pattern
@@ -387,6 +411,7 @@ Error: module 'nvim.core.module_name' not found
 ## Examples
 
 ### Unit Test Example
+
 ```lua
 describe('calculator #unit', function()
   local calculator
@@ -414,6 +439,7 @@ end)
 ```
 
 ### Integration Test Example
+
 ```lua
 describe('plugin_loader #integration', function()
   local module_loader
@@ -450,6 +476,7 @@ end)
 ## Questions?
 
 For testing questions or issues:
+
 1. Check this guide first
 2. Review example tests in `lua/spec/unit/`
 3. Check `.busted` configuration

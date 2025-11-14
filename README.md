@@ -25,11 +25,13 @@ Modern, IDE-like NeoVim configuration built with TDD and modular architecture.
 **Fully automated (recommended):**
 
 Using curl:
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/jelera/nvim_config/main/quick-start.sh | bash -s -- -y
 ```
 
 Using wget:
+
 ```bash
 wget -qO- https://raw.githubusercontent.com/jelera/nvim_config/main/quick-start.sh | bash -s -- -y
 ```
@@ -37,16 +39,19 @@ wget -qO- https://raw.githubusercontent.com/jelera/nvim_config/main/quick-start.
 **Interactive (with confirmation prompts):**
 
 Using curl:
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/jelera/nvim_config/main/quick-start.sh | bash
 ```
 
 Using wget:
+
 ```bash
 wget -qO- https://raw.githubusercontent.com/jelera/nvim_config/main/quick-start.sh | bash
 ```
 
 The quick-start script safely handles existing configurations by:
+
 - Checking for existing `~/.config/nvim` before cloning
 - Prompting for confirmation if config exists
 - Creating automatic timestamped backups
@@ -55,6 +60,7 @@ The quick-start script safely handles existing configurations by:
 The `-y` flag auto-confirms all prompts for a completely hands-off installation.
 
 **Alternative: Using GitHub CLI (gh):**
+
 ```bash
 # Clone to temporary location, then run installer
 gh repo clone jelera/nvim_config /tmp/nvim_config && cd /tmp/nvim_config && ./install.sh
@@ -78,6 +84,7 @@ cd ~/my-nvim-config
 ```
 
 **What it installs:**
+
 - **Development tools** (via mise): NeoVim, Node.js, Python, Ruby, Lua, Go, Rust
 - **System packages**: Git, luarocks, ripgrep, fd, lazygit, bat, delta, eza, fzf, gh, jq, tree, shellcheck, shfmt
 - **Linters & Formatters**:
@@ -93,11 +100,13 @@ cd ~/my-nvim-config
 - **NeoVim config**: Creates symlink to `~/.config/nvim`
 
 **Supported platforms:**
+
 - macOS + Homebrew
 - Ubuntu 24.04 LTS + Homebrew or apt
 - Ubuntu 22.04 LTS + Homebrew or apt
 
 **Options:**
+
 ```bash
 ./install.sh --help              # Show all options
 ./install.sh -y                  # Auto-confirm all prompts
@@ -110,6 +119,7 @@ cd ~/my-nvim-config
 ## Requirements
 
 **Required:**
+
 - NeoVim 0.10.2+
 - Git 2.30+
 - Node.js 18+ (for LSP servers)
@@ -118,6 +128,7 @@ cd ~/my-nvim-config
 - luarocks (Lua package manager)
 
 **Optional but recommended:**
+
 - ripgrep (faster Telescope search)
 - fd (faster file finding)
 - lazygit (Git TUI)
@@ -133,6 +144,7 @@ cd ~/my-nvim-config
 Leader key: `,`
 
 **Quick Reference:**
+
 - `<C-p>g` - Find files
 - `<leader>rg` - Live grep
 - `<C-t>` - Toggle file tree
@@ -145,6 +157,7 @@ Leader key: `,`
 ## Language Support
 
 Pre-configured LSP servers:
+
 - Lua (lua_ls)
 - TypeScript/JavaScript (ts_ls)
 - Python (pyright)
@@ -169,11 +182,13 @@ Automatically check code quality before commits:
 ```
 
 The pre-commit hook runs:
+
 1. **Lint checks** - luacheck, eslint, ruff, rubocop, markdownlint, shellcheck
 2. **Type checks** - TypeScript, Python
 3. **Format checks** - stylua, prettier, shfmt
 
 **Auto-fix formatting issues:**
+
 ```bash
 ./scripts/auto-fix.sh          # Fix staged files
 ./scripts/auto-fix.sh --all    # Fix all files
@@ -181,12 +196,14 @@ The pre-commit hook runs:
 ```
 
 **Manual linting:**
+
 ```bash
 ./scripts/lint-check.sh        # Lint staged files
 ./scripts/type-check.sh        # Type check staged files
 ```
 
 **Bypass hook (not recommended):**
+
 ```bash
 git commit --no-verify
 ```
@@ -211,18 +228,21 @@ See [TESTING.md](TESTING.md) for detailed testing guide.
 Automated checks run on every PR (only when relevant files change):
 
 **PR Checks** (`.github/workflows/lint-pr.yml`):
+
 - Triggers only when code files change (`.md`, `.sh`, `.ts`, `.js`, `.json`, `.lua`)
 - Lints only changed files (Markdown, Shell, TS/JS, Lua)
 - Checks formatting on changed files (JSON, TS/JS, Shell, Lua)
 - Fast feedback on incremental changes
 
 **Full Lua Checks** (`.github/workflows/lint-and-type-check.yml`):
+
 - Triggers only when Lua files or config change (`.lua`, `.luacheckrc`, `.stylua.toml`)
 - Full Lua linting with luacheck
 - Full Lua format checking with stylua
 - Runs on push to main and PRs
 
 **Tests** (`.github/workflows/test.yml`):
+
 - Runs full test suite (786 tests)
 - Ubuntu-based CI environment
 - Runs on all PRs and pushes to main
@@ -232,6 +252,7 @@ Automated checks run on every PR (only when relevant files change):
 This project supports multiple AI coding assistants through the **[agents.md](https://agents.md) standard**:
 
 **Supported Tools:**
+
 - ✅ **Claude Code** - Auto-reads `AGENTS.md`, configured hooks in `.claude/`
 - ✅ **GitHub Copilot** - Reads `.github/copilot-instructions.md` (references `AGENTS.md`)
 - ✅ **Cursor** - Auto-reads `AGENTS.md`
@@ -239,12 +260,14 @@ This project supports multiple AI coding assistants through the **[agents.md](ht
 - ✅ **OpenAI Codex, Gemini CLI, Zed** - All support `AGENTS.md`
 
 **Using Aider:**
+
 ```bash
 aider               # Start Aider (auto-reads AGENTS.md for context)
 aider --help        # See all options
 ```
 
 **Context Files:**
+
 - `AGENTS.md` - Universal AI context (architecture, patterns, workflows)
 - `docs/DEVELOPMENT_HISTORY.md` - Historical development context (former `CLAUDE.md`)
 
@@ -272,6 +295,7 @@ modules/<name>/
 ```
 
 **Key principles:**
+
 - Test-Driven Development (TDD)
 - Simple orchestrators (no state management)
 - Use plugin defaults
