@@ -14,11 +14,11 @@
 [tools]
 # Core development tools (installed via mise)
 # neovim = "0.10.2"           # Using Homebrew neovim instead (0.11.5)
-node = "22.11.0"            # LTS - needed for LSP servers and Copilot
-python = "3.12.7"           # Latest stable - needed for Python LSP and DAP
-ruby = "3.3.6"              # Latest stable - needed for Ruby LSP
+node = "lts"                # LTS - needed for LSP servers and Copilot
+python = "latest"           # Latest stable - needed for Python LSP and DAP
+ruby = "latest"             # Latest stable - needed for Ruby LSP
 lua = "5.1.5"               # Lua 5.1 (compatible with LuaJIT/NeoVim)
-go = "1.23.3"               # Latest - needed for Go LSP (gopls) and tools
+go = "latest"               # Latest stable - needed for Go LSP (gopls) and tools
 rust = "latest"             # Latest stable - needed for Rust LSP and some NeoVim plugins
 
 [env]
