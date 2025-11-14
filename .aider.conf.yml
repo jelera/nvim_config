@@ -1,10 +1,11 @@
 # Aider AI Configuration
 # https://aider.chat/docs/config/aider_conf.html
 
-# Read AGENTS.md for project context
+# Read project context and guidelines
 read:
   - AGENTS.md
   - README.md
+  - PERFORMANCE.md
 
 # Auto-commit changes
 auto-commits: true

@@ -26,4 +26,10 @@ This NeoVim IDE configuration is:
 - Tests must have `#unit` or `#integration` tags
 - LSP servers in `modules/lsp/servers/<language>/`
 
+## Performance
+
+- **Always lazy-load plugins** - Use `event`, `cmd`, `keys`, or `ft`
+- **Target: <100ms startup** - Profile with `:Lazy profile`
+- See [`PERFORMANCE.md`](../PERFORMANCE.md) for optimization strategies
+
 **For detailed information, refer to [`AGENTS.md`](../AGENTS.md)**

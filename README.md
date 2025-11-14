@@ -278,6 +278,7 @@ See [`AGENTS.md`](AGENTS.md) for complete project context and development guidel
 - [AGENTS.md](AGENTS.md) - AI assistant context and development guidelines
 - [KEYMAPS.md](docs/KEYMAPS.md) - Complete keymap reference
 - [ARCHITECTURE.md](docs/ARCHITECTURE.md) - Design and module system
+- [PERFORMANCE.md](PERFORMANCE.md) - Performance optimization plan
 - [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) - Common issues
 - [TESTING.md](TESTING.md) - Testing guide
 - [DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md) - Development history
@@ -308,8 +309,10 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for details.
 
 - Startup: <100ms target
 - 786 tests run in <1 second
-- Lazy loading for all non-critical plugins
-- Profile with `:Lazy profile`
+- Lazy loading for all non-critical plugins (87% of plugins)
+- Profile with `:Lazy profile` or `nvim --startuptime startup.log`
+
+See [PERFORMANCE.md](PERFORMANCE.md) for detailed optimization plan and strategies.
 
 ## Project Status
 

@@ -27,7 +27,8 @@ treesitter.setup()
 treesitter.setup({
   highlight = { enable = true },
   indent = { enable = true },
-  ensure_installed = { 'lua', 'python' }, -- or 'all'
+  -- Parsers auto-install on-demand; add more to ensure_installed if needed
+  ensure_installed = { 'lua', 'python' },
 })
 ```
 
@@ -46,45 +47,12 @@ local default_config = {
 	-- Auto-install parsers when entering buffer
 	auto_install = true,
 
-	-- Install parsers for languages in your tech stack
-	-- Your stack: TS/JS, HTML, CSS, SCSS, Ruby, Python, Shell, Lua, Angular
+	-- Install only essential parsers at startup (performance optimization)
+	-- Other parsers will auto-install on-demand when files are opened
 	ensure_installed = {
-		-- Core languages
-		"typescript",
-		"tsx",
-		"javascript",
-		"html",
-		"css",
-		"scss",
-		"ruby",
-		"python",
-		"bash",
-		"lua",
-		"angular",
-
-		-- Config/data formats
-		"json",
-		"jsonc",
-		"yaml",
-		"toml",
-
-		-- Documentation
-		"markdown",
-		"markdown_inline",
-		"luadoc",
-		"vim",
-		"vimdoc",
-
-		-- Git files
-		"git_config",
-		"git_rebase",
-		"gitcommit",
-		"gitignore",
-		"gitattributes",
-
-		-- Utilities
-		"regex",
-		"comment",
+		"lua", -- For nvim config itself
+		"vim", -- For vim help files
+		"vimdoc", -- For vim documentation
 		"query", -- For treesitter query files
 	},
 

@@ -366,6 +366,7 @@ vim.api.nvim_create_autocmd('FileType', {
 - `README.md` - User guide and quick start
 - `docs/KEYMAPS.md` - Complete keymap reference
 - `docs/ARCHITECTURE.md` - Design and module system
+- `PERFORMANCE.md` - Performance optimization plan and strategies
 - `docs/TROUBLESHOOTING.md` - Common issues and solutions
 - `docs/DEVELOPMENT_HISTORY.md` - Historical development context (see CLAUDE.md)
 - `TESTING.md` - Testing guide and best practices
@@ -380,6 +381,22 @@ vim.api.nvim_create_autocmd('FileType', {
 - Follow **naming conventions** (snake_case for files, functions)
 - Tests must use **tags** (`#unit` or `#integration`)
 - **Never** break existing tests - maintain 100% pass rate
+
+### Performance Guidelines
+
+- **Always lazy-load plugins** - Use `event`, `cmd`, `keys`, or `ft` triggers
+- **Never use `lazy = false`** unless absolutely necessary (colorscheme, critical plugins)
+- **Prefer deferred loading** - Use `vim.schedule()` or `vim.defer_fn()` for non-critical setup
+- **Profile changes** - Use `:Lazy profile` or `nvim --startuptime` to measure impact
+- **Target: <100ms startup** - Any change adding >5ms should be optimized
+- **Common lazy-loading patterns:**
+  - UI components: `event = 'UIEnter'` or `event = 'VeryLazy'`
+  - File operations: `event = 'BufReadPost'` or `event = 'BufNewFile'`
+  - Insert mode: `event = 'InsertEnter'`
+  - Language-specific: `ft = { 'lua', 'javascript', ... }`
+  - Commands: `cmd = { 'CommandName' }`
+  - Keymaps: `keys = { '<leader>x', ... }`
+- **See PERFORMANCE.md** for optimization strategies and best practices
 
 ---
 

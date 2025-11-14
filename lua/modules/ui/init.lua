@@ -195,12 +195,12 @@ end
 function M.setup(config)
 	config = config or {}
 
+	-- Only setup eager-loaded components (colorscheme, icons)
+	-- Other components (statusline, indent, notifications) are lazy-loaded
+	-- and configure themselves when their events trigger
 	local results = {
 		colorscheme = setup_colorscheme(config.colorscheme),
 		icons = setup_icons(),
-		statusline = setup_statusline(config.statusline),
-		indent = setup_indent(),
-		notifications = setup_notifications(),
 	}
 
 	-- Report any failures
