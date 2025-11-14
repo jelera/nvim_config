@@ -18,6 +18,7 @@ node = "lts"                # LTS - needed for LSP servers and Copilot
 python = "latest"           # Latest stable - needed for Python LSP and DAP
 ruby = "latest"             # Latest stable - needed for Ruby LSP
 lua = "5.1.5"               # Lua 5.1 (compatible with LuaJIT/NeoVim)
+luajit = "2.1"              # LuaJIT - used by busted for running tests
 go = "latest"               # Latest stable - needed for Go LSP (gopls) and tools
 rust = "latest"             # Latest stable - needed for Rust LSP and some NeoVim plugins
 

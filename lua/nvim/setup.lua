@@ -26,9 +26,6 @@ Usage:
 
 local M = {}
 
--- Dependencies
-local event_bus = require("nvim.core.event_bus")
-
 -- lazy.nvim repository URL
 local LAZY_REPO = "https://github.com/folke/lazy.nvim.git"
 local LAZY_BRANCH = "stable"
@@ -154,12 +151,7 @@ function M.init(config)
 		return false
 	end
 
-	-- Emit setup complete event
-	event_bus.emit("setup:complete", {
-		lazy_installed = true,
-		lazy_path = M.get_lazy_path(),
-	})
-
+	-- Setup complete (event_bus.emit removed for performance)
 	return true
 end
 

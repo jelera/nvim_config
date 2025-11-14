@@ -109,6 +109,125 @@ function M.get_defaults()
 				desc = "Reload NeoVim configuration",
 			},
 		},
+
+		-- Profile startup time
+		ProfileStartup = {
+			callback = function()
+				local cache_dir = vim.fn.stdpath("cache")
+				local profile_file = cache_dir .. "/startup.log"
+
+				-- Run nvim with startuptime profiling
+				vim.notify("Profiling startup time...", vim.log.levels.INFO)
+				local cmd = string.format(
+					"nvim --headless --startuptime %s +qall && cat %s",
+					vim.fn.shellescape(profile_file),
+					vim.fn.shellescape(profile_file)
+				)
+
+				vim.fn.system(cmd)
+
+				-- Open the profile in a new buffer
+				vim.cmd("new")
+				vim.cmd("file StartupProfile")
+				vim.cmd("setlocal buftype=nofile bufhidden=wipe noswapfile")
+				vim.api.nvim_buf_set_lines(0, 0, -1, false, vim.split(vim.fn.readfile(profile_file), "\n"))
+
+				-- Extract and show summary
+				local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+				local total_time = "Unknown"
+				for _, line in ipairs(lines) do
+					if line:match("NVIM STARTED") then
+						total_time = line:match("^%s*([%d.]+)")
+						break
+					end
+				end
+
+				vim.notify(string.format("Startup time: %sms (see buffer for details)", total_time), vim.log.levels.INFO)
+			end,
+			opts = {
+				desc = "Profile NeoVim startup time and show results",
+			},
+		},
+
+		-- Benchmark startup (multiple runs)
+		BenchmarkStartup = {
+			callback = function(opts)
+				local runs = tonumber(opts.args) or 5
+				vim.notify(string.format("Running %d startup benchmarks...", runs), vim.log.levels.INFO)
+
+				local cache_dir = vim.fn.stdpath("cache")
+				local times = {}
+
+				for i = 1, runs do
+					local profile_file = cache_dir .. "/startup_bench_" .. i .. ".log"
+					local cmd = string.format("nvim --headless --startuptime %s +qall", vim.fn.shellescape(profile_file))
+					vim.fn.system(cmd)
+
+					-- Extract time from log
+					local log_content = vim.fn.readfile(profile_file)
+					for _, line in ipairs(log_content) do
+						if line:match("NVIM STARTED") then
+							local time = tonumber(line:match("^%s*([%d.]+)"))
+							if time then
+								table.insert(times, time)
+							end
+							break
+						end
+					end
+				end
+
+				-- Calculate statistics
+				if #times > 0 then
+					table.sort(times)
+					local sum = 0
+					for _, time in ipairs(times) do
+						sum = sum + time
+					end
+					local avg = sum / #times
+					local min = times[1]
+					local max = times[#times]
+
+					-- Show results
+					local results = {
+						string.format("Startup Benchmark Results (%d runs):", runs),
+						string.format("  Average: %.1fms", avg),
+						string.format("  Best:    %.1fms", min),
+						string.format("  Worst:   %.1fms", max),
+						"",
+						"All runs:",
+					}
+
+					for i, time in ipairs(times) do
+						table.insert(results, string.format("  Run %d: %.1fms", i, time))
+					end
+
+					-- Display in buffer
+					vim.cmd("new")
+					vim.cmd("file BenchmarkResults")
+					vim.cmd("setlocal buftype=nofile bufhidden=wipe noswapfile")
+					vim.api.nvim_buf_set_lines(0, 0, -1, false, results)
+
+					vim.notify(string.format("Benchmark complete: %.1fms avg (best: %.1fms)", avg, min), vim.log.levels.INFO)
+				else
+					vim.notify("Failed to collect benchmark data", vim.log.levels.ERROR)
+				end
+			end,
+			opts = {
+				nargs = "?",
+				desc = "Benchmark startup time (default: 5 runs, usage: :BenchmarkStartup [runs])",
+			},
+		},
+
+		-- Profile plugins with lazy.nvim
+		ProfilePlugins = {
+			callback = function()
+				-- Open lazy.nvim profile
+				vim.cmd("Lazy profile")
+			end,
+			opts = {
+				desc = "Open lazy.nvim plugin profiler",
+			},
+		},
 	}
 end
 

@@ -307,12 +307,19 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for details.
 
 ## Performance
 
-- Startup: <100ms target
+- **Startup: 62ms average** (37% faster than baseline, best run: 45ms)
 - 786 tests run in <1 second
-- Lazy loading for all non-critical plugins (87% of plugins)
-- Profile with `:Lazy profile` or `nvim --startuptime startup.log`
+- Lazy loading for 90%+ of plugins with smart event triggers
+- Profile with `:ProfileStartup`, `:BenchmarkStartup`, or `:ProfilePlugins`
 
-See [PERFORMANCE.md](PERFORMANCE.md) for detailed optimization plan and strategies.
+**Profiling Commands:**
+```vim
+:ProfileStartup           " Detailed startup analysis
+:BenchmarkStartup [runs]  " Run benchmarks (default: 5 runs)
+:ProfilePlugins           " Open lazy.nvim profiler
+```
+
+See [PERFORMANCE.md](PERFORMANCE.md) for complete optimization journey and strategies.
 
 ## Project Status
 

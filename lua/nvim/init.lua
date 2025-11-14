@@ -77,16 +77,30 @@ Core modules
 
 Provides direct access to core framework modules:
 - module_loader: Dynamic module loading
-- event_bus: Pub/sub event system
-- plugin_system: Plugin management
+- event_bus: Pub/sub event system (lazy-loaded for performance)
+- plugin_system: Plugin management (lazy-loaded, unused in favor of lazy.nvim)
 - config_schema: Configuration validation
 --]]
 M.core = {
 	module_loader = require("nvim.core.module_loader"),
-	event_bus = require("nvim.core.event_bus"),
-	plugin_system = require("nvim.core.plugin_system"),
 	config_schema = require("nvim.core.config_schema"),
 }
+
+-- Lazy-load event_bus and plugin_system only when accessed
+-- These are not used in production but available for tests and future features
+setmetatable(M.core, {
+	__index = function(t, k)
+		if k == "event_bus" then
+			local event_bus = require("nvim.core.event_bus")
+			rawset(t, k, event_bus)
+			return event_bus
+		elseif k == "plugin_system" then
+			local plugin_system = require("nvim.core.plugin_system")
+			rawset(t, k, plugin_system)
+			return plugin_system
+		end
+	end,
+})
 
 --[[
 Utility libraries
