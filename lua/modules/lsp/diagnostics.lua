@@ -21,15 +21,6 @@ local M = {}
 
 ---Setup LSP diagnostics configuration
 function M.setup()
-  -- Configure diagnostic display
-  vim.diagnostic.config({
-    virtual_text = true, -- Show diagnostics as virtual text
-    signs = true, -- Show signs in sign column
-    underline = true, -- Underline diagnostics
-    update_in_insert = false, -- Don't update diagnostics in insert mode
-    severity_sort = true, -- Sort by severity
-  })
-
   -- Define diagnostic signs with emojis
   local signs = {
     Error = '❌',
@@ -38,14 +29,21 @@ function M.setup()
     Info = 'ℹ️',
   }
 
-  for type, icon in pairs(signs) do
-    local hl = 'DiagnosticSign' .. type
-    vim.fn.sign_define(hl, {
-      text = icon,
-      texthl = hl,
-      numhl = hl,
-    })
-  end
+  -- Configure diagnostic display with new signs API (Neovim 0.10+)
+  vim.diagnostic.config({
+    virtual_text = false, -- Disable virtual text, show in lualine instead
+    signs = {
+      text = {
+        [vim.diagnostic.severity.ERROR] = signs.Error,
+        [vim.diagnostic.severity.WARN] = signs.Warn,
+        [vim.diagnostic.severity.HINT] = signs.Hint,
+        [vim.diagnostic.severity.INFO] = signs.Info,
+      },
+    },
+    underline = true, -- Underline diagnostics
+    update_in_insert = false, -- Don't update diagnostics in insert mode
+    severity_sort = true, -- Sort by severity
+  })
 end
 
 return M

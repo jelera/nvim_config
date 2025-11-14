@@ -28,15 +28,21 @@ M.default_config = {
     'pyright', -- Python
     'solargraph', -- Ruby
     'bashls', -- Bash
-    'sqlls', -- SQL
+    'postgres_lsp', -- PostgreSQL
     'marksman', -- Markdown
+    'dockerls', -- Docker
+    'html', -- HTML
+    'cssls', -- CSS/SCSS
+    'terraformls', -- Terraform
+    'gh_actions_ls', -- GitHub Actions
   },
 
-  -- Auto-install servers when opening supported files
-  automatic_installation = true,
+  -- Automatically enable installed LSP servers
+  -- This uses vim.lsp.enable() which requires Neovim 0.11+
+  automatic_enable = true,
 
   -- Format on save (can be toggled per-buffer)
-  format_on_save = false,
+  format_on_save = true,
 
   -- Mason UI settings
   mason_ui = {
@@ -87,11 +93,26 @@ function M.load_server_config(server_name)
     -- Bash
     bashls = 'bash',
 
-    -- SQL
-    sqlls = 'sql',
+    -- PostgreSQL
+    postgres_lsp = 'postgresql',
 
     -- Markdown
     marksman = 'markdown',
+
+    -- Docker
+    dockerls = 'docker',
+
+    -- HTML
+    html = 'html',
+
+    -- CSS/SCSS
+    cssls = 'css',
+
+    -- Terraform
+    terraformls = 'terraform',
+
+    -- GitHub Actions
+    gh_actions_ls = 'github',
 
     -- Go
     gopls = 'go',

@@ -9,7 +9,6 @@ Dependencies:
 - kylechui/nvim-surround - Surround text with brackets, quotes, tags
 - numToStr/Comment.nvim - Smart commenting
 - JoosepAlviste/nvim-ts-context-commentstring - Treesitter-aware comments
-- ahmedkhalf/project.nvim - Project management and root detection
 - folke/persistence.nvim - Session management
 
 Usage:
@@ -50,13 +49,6 @@ return {
     opts = {
       enable_autocmd = false,
     },
-  },
-
-  -- Project management
-  {
-    'ahmedkhalf/project.nvim',
-    event = 'VeryLazy',
-    config = false,
   },
 
   -- Session management

@@ -87,12 +87,54 @@ local function setup_statusline(config)
     return false
   end
 
+  -- Custom component to show diagnostic message on current line
+  local function current_line_diagnostic()
+    local bufnr = vim.api.nvim_get_current_buf()
+    local line = vim.api.nvim_win_get_cursor(0)[1] - 1
+    local diagnostics = vim.diagnostic.get(bufnr, { lnum = line })
+
+    if #diagnostics == 0 then
+      return ''
+    end
+
+    -- Get the highest severity diagnostic for this line
+    table.sort(diagnostics, function(a, b)
+      return a.severity < b.severity
+    end)
+
+    local diag = diagnostics[1]
+    local icons = {
+      [vim.diagnostic.severity.ERROR] = '❌',
+      [vim.diagnostic.severity.WARN] = '⚠️',
+      [vim.diagnostic.severity.HINT] = '💡',
+      [vim.diagnostic.severity.INFO] = 'ℹ️',
+    }
+
+    local icon = icons[diag.severity] or ''
+    local message = diag.message:gsub('\n', ' '):gsub('%s+', ' ')
+    return string.format('%s %s', icon, message)
+  end
+
   lualine.setup({
     options = {
       theme = config.theme or 'gruvbox',
       icons_enabled = true,
       component_separators = { left = '', right = '' },
       section_separators = { left = '', right = '' },
+    },
+    sections = {
+      lualine_a = { 'mode' },
+      lualine_b = { 'branch', 'diff', 'diagnostics' },
+      lualine_c = {
+        'filename',
+        {
+          current_line_diagnostic,
+          color = { fg = '#ff9e64' },
+        },
+      },
+      lualine_x = { 'encoding', 'fileformat', 'filetype' },
+      lualine_y = { 'progress' },
+      lualine_z = { 'location' },
     },
   })
 

@@ -22,6 +22,8 @@ local M = {}
 ---Default configuration for diffview
 local default_config = {
   enhanced_diff_hl = true,
+  -- Note: Mercurial (hg) support is not needed, only Git is used
+  -- The healthcheck warning about 'hg' can be safely ignored
   view = {
     default = {
       layout = 'diff2_horizontal',

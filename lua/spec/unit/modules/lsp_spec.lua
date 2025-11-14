@@ -34,6 +34,7 @@ describe('modules.lsp #unit', function()
     _G._test_mason_lspconfig_config = nil
     _G._test_lsp_servers_setup = {}
     _G._test_diagnostic_config = nil
+    _G._test_installed_servers = {}
 
     -- Mock vim.diagnostic
     vim.diagnostic = {
@@ -75,20 +76,28 @@ describe('modules.lsp #unit', function()
         setup_handlers = function(handlers)
           _G._test_mason_lspconfig_handlers = handlers
         end,
+        get_installed_servers = function()
+          -- Return empty list by default, tests can override this
+          return _G._test_installed_servers or {}
+        end,
       }
     end
 
-    -- Mock lspconfig
+    -- Mock lspconfig (needed for config loading)
     package.preload['lspconfig'] = function()
-      return setmetatable({}, {
-        __index = function(_, server_name)
-          return {
-            setup = function(config)
-              _G._test_lsp_servers_setup[server_name] = config
-            end,
-          }
-        end,
-      })
+      return {}
+    end
+
+    -- Initialize vim.lsp if it doesn't exist
+    vim.lsp = vim.lsp or {}
+
+    -- Mock vim.lsp.config and vim.lsp.enable for Neovim 0.11
+    vim.lsp.config = function(server_name, config)
+      _G._test_lsp_servers_setup[server_name] = config
+    end
+
+    vim.lsp.enable = function(server_name)
+      -- Track that enable was called
     end
 
     -- Mock cmp_nvim_lsp
@@ -169,7 +178,7 @@ describe('modules.lsp #unit', function()
 
     it('should enable automatic installation', function()
       lsp.setup()
-      assert.is_true(_G._test_mason_lspconfig_config.automatic_installation)
+      assert.is_true(_G._test_mason_lspconfig_config.automatic_enable)
     end)
   end)
 
@@ -190,10 +199,10 @@ describe('modules.lsp #unit', function()
 
     it('should allow disabling automatic_installation', function()
       lsp.setup({
-        automatic_installation = false,
+        automatic_enable = false,
       })
 
-      assert.is_false(_G._test_mason_lspconfig_config.automatic_installation)
+      assert.is_false(_G._test_mason_lspconfig_config.automatic_enable)
     end)
 
     it('should merge custom config with defaults', function()
@@ -291,10 +300,13 @@ describe('modules.lsp #unit', function()
 
   describe('LSP capabilities', function()
     it('should configure completion capabilities', function()
+      -- Set up some test servers
+      _G._test_installed_servers = { 'lua_ls', 'ts_ls' }
       lsp.setup()
 
-      -- Handler should be set for default server setup
-      assert.is_not_nil(_G._test_mason_lspconfig_handlers)
+      -- Servers should be configured
+      assert.is_not_nil(_G._test_lsp_servers_setup['lua_ls'])
+      assert.is_not_nil(_G._test_lsp_servers_setup['ts_ls'])
     end)
   end)
 end)

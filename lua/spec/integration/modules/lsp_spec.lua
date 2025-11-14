@@ -106,27 +106,35 @@ describe('modules.lsp #integration', function()
             handlers[1]('pyright')
           end
         end,
+        get_installed_servers = function()
+          -- Return test servers for integration tests
+          return { 'lua_ls', 'ts_ls', 'pyright' }
+        end,
       }
     end
 
-    -- Mock lspconfig
+    -- Mock lspconfig (needed for config loading)
     package.preload['lspconfig'] = function()
-      return setmetatable({}, {
-        __index = function(_, server_name)
-          return {
-            setup = function(config)
-              _G._test_lsp_servers_setup[server_name] = config
+      return {}
+    end
 
-              -- Simulate on_attach being called
-              if config.on_attach then
-                table.insert(_G._test_on_attach_called, server_name)
-                -- Call on_attach with mock client and buffer
-                config.on_attach({ name = server_name, supports_method = function() return true end }, 1)
-              end
-            end,
-          }
-        end,
-      })
+    -- Initialize vim.lsp if it doesn't exist
+    vim.lsp = vim.lsp or {}
+
+    -- Mock vim.lsp.config and vim.lsp.enable for Neovim 0.11
+    vim.lsp.config = function(server_name, config)
+      _G._test_lsp_servers_setup[server_name] = config
+
+      -- Simulate on_attach being called
+      if config.on_attach then
+        table.insert(_G._test_on_attach_called, server_name)
+        -- Call on_attach with mock client and buffer
+        config.on_attach({ name = server_name, supports_method = function() return true end }, 1)
+      end
+    end
+
+    vim.lsp.enable = function(server_name)
+      -- Track that enable was called
     end
 
     -- Mock cmp_nvim_lsp
@@ -181,10 +189,28 @@ describe('modules.lsp #integration', function()
             table.insert(setup_order, 'mason-lspconfig')
             _G._test_mason_lspconfig_config = config
           end,
-          setup_handlers = function()
-            table.insert(setup_order, 'handlers')
+          get_installed_servers = function()
+            table.insert(setup_order, 'get_servers')
+            return { 'lua_ls' }
           end,
         }
+      end
+
+      package.loaded['lspconfig'] = nil
+      package.preload['lspconfig'] = function()
+        return {}
+      end
+
+      -- Initialize vim.lsp if it doesn't exist
+      vim.lsp = vim.lsp or {}
+
+      -- Mock vim.lsp.config and vim.lsp.enable
+      vim.lsp.config = function(server_name, config)
+        table.insert(setup_order, 'vim_lsp_config_' .. server_name)
+      end
+
+      vim.lsp.enable = function(server_name)
+        table.insert(setup_order, 'vim_lsp_enable_' .. server_name)
       end
 
       vim.diagnostic = {
@@ -195,11 +221,13 @@ describe('modules.lsp #integration', function()
 
       lsp.setup()
 
-      -- Order should be: mason -> mason-lspconfig -> diagnostics -> handlers
+      -- Order should be: mason -> mason-lspconfig -> diagnostics -> get_servers -> vim_lsp_config_lua_ls -> vim_lsp_enable_lua_ls
       assert.equal('mason', setup_order[1])
       assert.equal('mason-lspconfig', setup_order[2])
       assert.equal('diagnostics', setup_order[3])
-      assert.equal('handlers', setup_order[4])
+      assert.equal('get_servers', setup_order[4])
+      assert.equal('vim_lsp_config_lua_ls', setup_order[5])
+      assert.equal('vim_lsp_enable_lua_ls', setup_order[6])
     end)
   end)
 
@@ -327,19 +355,23 @@ describe('modules.lsp #integration', function()
 
       package.loaded['lspconfig'] = nil
       package.preload['lspconfig'] = function()
-        return setmetatable({}, {
-          __index = function()
-            return {
-              setup = function(config)
-                if config.on_attach then
-                  local mock_client = { name = 'mock_server', supports_method = function() return true end }
-                  on_attach_args = { mock_client, 123 }
-                  config.on_attach(mock_client, 123)
-                end
-              end,
-            }
-          end,
-        })
+        return {}
+      end
+
+      -- Initialize vim.lsp if it doesn't exist
+      vim.lsp = vim.lsp or {}
+
+      -- Mock vim.lsp.config
+      vim.lsp.config = function(server_name, config)
+        if config.on_attach then
+          local mock_client = { name = 'mock_server', supports_method = function() return true end }
+          on_attach_args = { mock_client, 123 }
+          config.on_attach(mock_client, 123)
+        end
+      end
+
+      vim.lsp.enable = function(server_name)
+        -- Track that enable was called
       end
 
       lsp.setup()
@@ -360,16 +392,16 @@ describe('modules.lsp #integration', function()
 
     it('should respect automatic_installation setting', function()
       lsp.setup({
-        automatic_installation = false,
+        automatic_enable = false,
       })
 
-      assert.is_false(_G._test_mason_lspconfig_config.automatic_installation)
+      assert.is_false(_G._test_mason_lspconfig_config.automatic_enable)
     end)
 
     it('should merge user config with defaults', function()
       lsp.setup({
         ensure_installed = { 'custom_server' },
-        automatic_installation = false,
+        automatic_enable = false,
       })
 
       -- Should still have Mason configured

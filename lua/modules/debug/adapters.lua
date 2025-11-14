@@ -75,10 +75,13 @@ end
 ---Configure Python adapter
 ---@param dap table nvim-dap module
 local function setup_python(dap)
-  -- Use debugpy adapter (installed via Mason)
+  -- Use debugpy adapter (installed via Mason or system)
+  local mason_debugpy = vim.fn.stdpath('data') .. '/mason/packages/debugpy/venv/bin/python'
+  local python_cmd = vim.fn.executable(mason_debugpy) == 1 and mason_debugpy or 'python3'
+
   dap.adapters.python = {
     type = 'executable',
-    command = vim.fn.stdpath('data') .. '/mason/packages/debugpy/venv/bin/python',
+    command = python_cmd,
     args = { '-m', 'debugpy.adapter' },
   }
 
@@ -114,11 +117,35 @@ end
 ---Configure Ruby adapter
 ---@param dap table nvim-dap module
 local function setup_ruby(dap)
-  -- Use ruby-debug-ide adapter
+  -- Use rdbg (ruby/debug) - the modern Ruby debugger
+  -- Try to find rdbg from mise, then fall back to system
+  local function find_rdbg()
+    -- Try mise's rdbg
+    local mise_rdbg = vim.fn.system('mise which rdbg 2>/dev/null'):gsub('%s+$', '')
+    if vim.fn.executable(mise_rdbg) == 1 then
+      return mise_rdbg
+    end
+    -- Fall back to system rdbg
+    if vim.fn.executable('rdbg') == 1 then
+      return 'rdbg'
+    end
+    return nil
+  end
+
+  local rdbg_cmd = find_rdbg()
+  if not rdbg_cmd then
+    vim.notify('rdbg not found. Install with: gem install debug', vim.log.levels.WARN)
+    return
+  end
+
   dap.adapters.ruby = {
-    type = 'executable',
-    command = 'ruby-debug-ide',
-    args = { '--host', '127.0.0.1', '--port', '${port}' },
+    type = 'server',
+    host = '127.0.0.1',
+    port = '${port}',
+    executable = {
+      command = rdbg_cmd,
+      args = { '-O', '--host', '127.0.0.1', '--port', '${port}', '-c', '--' },
+    },
   }
 
   -- Ruby configurations
@@ -127,17 +154,14 @@ local function setup_ruby(dap)
       type = 'ruby',
       request = 'launch',
       name = 'Launch file',
-      program = '${file}',
-      programArgs = {},
-      useBundler = true,
+      command = rdbg_cmd,
+      script = '${file}',
     },
     {
       type = 'ruby',
       request = 'attach',
       name = 'Attach',
-      remoteHost = '127.0.0.1',
-      remotePort = '1234',
-      remoteWorkspaceRoot = '${workspaceFolder}',
+      localfs = true,
     },
   }
 end
@@ -190,23 +214,44 @@ local function install_adapters(adapters)
     javascript = 'js-debug-adapter',
     typescript = 'js-debug-adapter',
     python = 'debugpy',
-    ruby = 'ruby-debug-ide',
+    -- Ruby uses rdbg (installed via gem, not Mason)
     lua = 'local-lua-debugger-vscode',
   }
 
-  for _, adapter_name in ipairs(adapters) do
-    local package_name = adapter_map[adapter_name]
-    if package_name then
-      local package = mason_registry.get_package(package_name)
-      if not package:is_installed() then
+  -- Ensure Mason registry is refreshed and ready
+  mason_registry.refresh(function()
+    for _, adapter_name in ipairs(adapters) do
+      local package_name = adapter_map[adapter_name]
+      if package_name then
+        -- Use pcall to handle package not found errors gracefully
+        local ok, package = pcall(function()
+          return mason_registry.get_package(package_name)
+        end)
+        if ok and package then
+        if not package:is_installed() then
+          vim.notify(
+            string.format('Installing debug adapter: %s', package_name),
+            vim.log.levels.INFO
+          )
+          local install_ok, install_err = pcall(function()
+            package:install()
+          end)
+          if not install_ok then
+            vim.notify(
+              string.format('Failed to install %s: %s', package_name, install_err),
+              vim.log.levels.WARN
+            )
+          end
+        end
+      else
         vim.notify(
-          string.format('Installing debug adapter: %s', package_name),
-          vim.log.levels.INFO
+          string.format('Debug adapter package "%s" not found in Mason registry', package_name),
+          vim.log.levels.DEBUG
         )
-        package:install()
       end
     end
-  end
+    end
+  end)
 end
 
 ---Setup lazy-install for filetype-specific adapters
@@ -261,9 +306,11 @@ function M.setup(config)
     end
   end
 
-  -- Auto-install common adapters
+  -- Auto-install common adapters (deferred to ensure Mason is ready)
   if merged_config.auto_install and #merged_config.auto_install > 0 then
-    install_adapters(merged_config.auto_install)
+    vim.defer_fn(function()
+      install_adapters(merged_config.auto_install)
+    end, 500)
   end
 
   -- Setup lazy-install for less common adapters

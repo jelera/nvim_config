@@ -114,23 +114,32 @@ function M.setup(config)
   })
 
   -- Command-line completion
-  -- `/` and `?` for search
-  cmp.setup_cmdline({ '/', '?' }, {
-    mapping = cmp.mapping.preset.cmdline(),
-    sources = {
-      { name = 'buffer' },
-    },
-  })
+  -- Try both old and new nvim-cmp cmdline APIs for compatibility
+  local cmdline_setup_fn = cmp.setup_cmdline or (cmp.setup and cmp.setup.cmdline)
 
-  -- `:` for commands
-  cmp.setup_cmdline(':', {
-    mapping = cmp.mapping.preset.cmdline(),
-    sources = cmp.config.sources({
-      { name = 'path' },
-    }, {
-      { name = 'cmdline' },
-    }),
-  })
+  if cmdline_setup_fn then
+    -- `/` and `?` for search
+    local search_ok = pcall(cmdline_setup_fn, { '/', '?' }, {
+      mapping = cmp.mapping.preset.cmdline(),
+      sources = {
+        { name = 'buffer' },
+      },
+    })
+
+    -- `:` for commands
+    local cmd_ok = pcall(cmdline_setup_fn, ':', {
+      mapping = cmp.mapping.preset.cmdline(),
+      sources = cmp.config.sources({
+        { name = 'path' },
+      }, {
+        { name = 'cmdline' },
+      }),
+    })
+
+    if not (search_ok and cmd_ok) then
+      vim.notify('Command-line completion setup had issues', vim.log.levels.DEBUG)
+    end
+  end
 
   return true
 end

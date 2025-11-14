@@ -5,7 +5,7 @@ Core Options Module
 Manages all vim options (vim.opt, vim.g, vim.o) in a structured, testable way.
 
 Features:
-- Organized option categories (general, UI, editing, search, performance, files)
+- Organized option categories (general, UI, editing, search, performance, files, providers)
 - User configuration override support
 - Validation and error handling
 - Easy enable/disable
@@ -104,6 +104,14 @@ function M.get_defaults()
       swapfile = false,         -- Don't use swap files
       undofile = true,          -- Enable persistent undo
     },
+
+    -- Provider Settings (disable unused providers)
+    providers = {
+      loaded_perl_provider = 0,   -- Disable perl provider
+      loaded_node_provider = 1,   -- Enable node provider (for plugins)
+      loaded_python3_provider = 1, -- Enable python3 provider
+      loaded_ruby_provider = 1,   -- Enable ruby provider
+    },
   }
 end
 
@@ -119,9 +127,16 @@ function M.apply(opts)
     -- Iterate through each category
     for category, options in pairs(opts) do
       if type(options) == 'table' then
-        -- Apply each option in the category
-        for option_name, option_value in pairs(options) do
-          vim.opt[option_name] = option_value
+        -- Providers use vim.g (global variables)
+        if category == 'providers' then
+          for option_name, option_value in pairs(options) do
+            vim.g[option_name] = option_value
+          end
+        else
+          -- All other options use vim.opt
+          for option_name, option_value in pairs(options) do
+            vim.opt[option_name] = option_value
+          end
         end
       end
     end

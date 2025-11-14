@@ -91,12 +91,14 @@ return {
   },
 
   -- Lua: Busted adapter
-  {
-    'nvim-neotest/neotest-busted',
-    dependencies = {
-      'nvim-neotest/neotest',
-    },
-    ft = 'lua',
-    config = false,
-  },
+  -- Note: Commented out due to authentication issues
+  -- Uncomment if you have access to the repo
+  -- {
+  --   'nvim-neotest/neotest-busted',
+  --   dependencies = {
+  --     'nvim-neotest/neotest',
+  --   },
+  --   ft = 'lua',
+  --   config = false,
+  -- },
 }

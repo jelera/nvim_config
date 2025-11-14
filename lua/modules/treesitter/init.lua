@@ -46,9 +46,47 @@ local default_config = {
   -- Auto-install parsers when entering buffer
   auto_install = true,
 
-  -- Install all maintained parsers
-  -- This ensures parsers are available for all supported languages
-  ensure_installed = 'all',
+  -- Install parsers for languages in your tech stack
+  -- Your stack: TS/JS, HTML, CSS, SCSS, Ruby, Python, Shell, Lua, Angular
+  ensure_installed = {
+    -- Core languages
+    'typescript',
+    'tsx',
+    'javascript',
+    'html',
+    'css',
+    'scss',
+    'ruby',
+    'python',
+    'bash',
+    'lua',
+    'angular',
+
+    -- Config/data formats
+    'json',
+    'jsonc',
+    'yaml',
+    'toml',
+
+    -- Documentation
+    'markdown',
+    'markdown_inline',
+    'luadoc',
+    'vim',
+    'vimdoc',
+
+    -- Git files
+    'git_config',
+    'git_rebase',
+    'gitcommit',
+    'gitignore',
+    'gitattributes',
+
+    -- Utilities
+    'regex',
+    'comment',
+    'query',  -- For treesitter query files
+  },
 
   -- Syntax highlighting
   highlight = {

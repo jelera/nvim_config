@@ -13,7 +13,7 @@
 
 [tools]
 # Core development tools (installed via mise)
-neovim = "0.10.2"           # Latest stable NeoVim
+# neovim = "0.10.2"           # Using Homebrew neovim instead (0.11.5)
 node = "22.11.0"            # LTS - needed for LSP servers and Copilot
 python = "3.12.7"           # Latest stable - needed for Python LSP and DAP
 ruby = "3.3.6"              # Latest stable - needed for Ruby LSP

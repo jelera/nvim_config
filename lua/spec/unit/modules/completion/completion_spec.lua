@@ -87,11 +87,20 @@ describe('modules.completion.completion #unit', function()
         end,
       })
 
-      return {
-        setup = function(config)
+      -- Create setup as a callable table to support both setup() and setup.cmdline()
+      local setup_fn = setmetatable({
+        cmdline = function(mode, config)
+          table.insert(_G._test_cmdline_setup, { mode = mode, config = config })
+        end
+      }, {
+        __call = function(_, config)
           _G._test_cmp_setup_called = true
           _G._test_cmp_config = config
-        end,
+        end
+      })
+
+      local cmp_module = {
+        setup = setup_fn,
         setup_cmdline = function(mode, config)
           table.insert(_G._test_cmdline_setup, { mode = mode, config = config })
         end,
@@ -123,6 +132,8 @@ describe('modules.completion.completion #unit', function()
           Replace = 'replace',
         },
       }
+
+      return cmp_module
     end
 
     -- Mock completion sources

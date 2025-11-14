@@ -53,6 +53,13 @@ function M.setup(config)
     return false
   end
 
+  -- Load telescope actions
+  local actions_ok, actions = pcall(require, 'telescope.actions')
+  if not actions_ok then
+    vim.notify('Telescope actions not found.', vim.log.levels.WARN)
+    return false
+  end
+
   -- Load builtin pickers
   local builtin_ok, builtin = pcall(require, 'telescope.builtin')
   if not builtin_ok then
@@ -108,15 +115,33 @@ function M.setup(config)
       -- Mappings (vim-style navigation)
       mappings = {
         i = {
-          ['<C-j>'] = 'move_selection_next',
-          ['<C-k>'] = 'move_selection_previous',
-          ['<C-q>'] = 'send_to_qflist + open_qflist',
-          ['<C-a>'] = 'select_all',
-          ['<Esc>'] = 'close',
+          ['<C-j>'] = function(bufnr)
+            require('telescope.actions').move_selection_next(bufnr)
+          end,
+          ['<C-k>'] = function(bufnr)
+            require('telescope.actions').move_selection_previous(bufnr)
+          end,
+          ['<C-q>'] = function(bufnr)
+            local acts = require('telescope.actions')
+            acts.send_selected_to_qflist(bufnr)
+            acts.open_qflist(bufnr)
+          end,
+          ['<C-a>'] = function(bufnr)
+            require('telescope.actions').select_all(bufnr)
+          end,
+          ['<Esc>'] = function(bufnr)
+            require('telescope.actions').close(bufnr)
+          end,
         },
         n = {
-          ['q'] = 'close',
-          ['<C-q>'] = 'send_to_qflist + open_qflist',
+          ['q'] = function(bufnr)
+            require('telescope.actions').close(bufnr)
+          end,
+          ['<C-q>'] = function(bufnr)
+            local acts = require('telescope.actions')
+            acts.send_selected_to_qflist(bufnr)
+            acts.open_qflist(bufnr)
+          end,
         },
       },
     },
@@ -134,7 +159,9 @@ function M.setup(config)
         sort_mru = true,
         mappings = {
           i = {
-            ['<C-d>'] = 'delete_buffer',
+            ['<C-d>'] = function(bufnr)
+              require('telescope.actions').delete_buffer(bufnr)
+            end,
           },
         },
       },

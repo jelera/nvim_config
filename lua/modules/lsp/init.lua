@@ -62,7 +62,10 @@ function M.setup(config)
     return false
   end
 
-  local lspconfig_ok, lspconfig = pcall(require, 'lspconfig')
+  -- Load nvim-lspconfig to make configs available to vim.lsp.config
+  -- We don't need to use lspconfig directly, just ensure it's loaded
+  -- so that vim.lsp.config can find the server configurations
+  local lspconfig_ok = pcall(require, 'lspconfig')
   if not lspconfig_ok then
     vim.notify('nvim-lspconfig not found', vim.log.levels.WARN, { title = 'LSP Module' })
     return false
@@ -90,19 +93,28 @@ function M.setup(config)
 
   -- Setup mason-lspconfig
   local mason_lsp_setup_ok, mason_lsp_err = pcall(function()
-    mason_lspconfig.setup({
+    -- Build config with correct option names
+    local mason_lsp_config = {
       ensure_installed = merged_config.ensure_installed,
-      automatic_installation = merged_config.automatic_installation,
-    })
+    }
+
+    -- Add automatic_enable option if present
+    -- Note: automatic_enable requires Neovim 0.11+ (uses vim.lsp.enable())
+    -- We disable it by default for compatibility with Neovim 0.10.x
+    if merged_config.automatic_enable ~= nil then
+      mason_lsp_config.automatic_enable = merged_config.automatic_enable
+    end
+
+    mason_lspconfig.setup(mason_lsp_config)
   end)
 
   if not mason_lsp_setup_ok then
     vim.notify(
       'Failed to setup mason-lspconfig: ' .. tostring(mason_lsp_err),
-      vim.log.levels.ERROR,
+      vim.log.levels.WARN,
       { title = 'LSP Module' }
     )
-    return false
+    -- Don't return false - continue with manual server setup
   end
 
   -- Setup diagnostics
@@ -114,22 +126,33 @@ function M.setup(config)
   -- Create on_attach callback
   local on_attach = event_handlers.create_on_attach(merged_config)
 
-  -- Setup handlers for automatic server configuration
-  mason_lspconfig.setup_handlers({
-    -- Default handler for all servers
-    function(server_name)
-      -- Load per-language config if it exists
-      local server_config = lsp_config.load_server_config(server_name) or {}
+  -- With automatic_enable = true, mason-lspconfig will automatically enable servers
+  -- We need to manually configure each installed server with our settings
+  local installed_servers = mason_lspconfig.get_installed_servers()
+  for _, server_name in ipairs(installed_servers) do
+    -- Load per-language config if it exists
+    local server_config = lsp_config.load_server_config(server_name) or {}
 
-      -- Merge with default settings
-      local final_config = utils.deep_merge({
-        capabilities = capabilities,
-        on_attach = on_attach,
-      }, server_config)
+    -- Merge with default settings
+    local final_config = utils.deep_merge({
+      capabilities = capabilities,
+      on_attach = on_attach,
+    }, server_config)
 
-      lspconfig[server_name].setup(final_config)
-    end,
-  })
+    -- Setup the server using the new Neovim 0.11 vim.lsp.config API
+    local setup_ok, setup_err = pcall(function()
+      vim.lsp.config(server_name, final_config)
+      vim.lsp.enable(server_name)
+    end)
+
+    if not setup_ok then
+      vim.notify(
+        string.format('Failed to setup LSP server %s: %s', server_name, setup_err),
+        vim.log.levels.WARN,
+        { title = 'LSP Module' }
+      )
+    end
+  end
 
   return true
 end

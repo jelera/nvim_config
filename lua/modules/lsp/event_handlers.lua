@@ -28,14 +28,47 @@ function M.setup_format_on_save(client, bufnr, enabled)
     return
   end
 
-  if client.supports_method('textDocument/formatting') then
-    vim.api.nvim_create_autocmd('BufWritePre', {
-      buffer = bufnr,
-      callback = function()
+  -- Create autocmd group for this buffer
+  local augroup = vim.api.nvim_create_augroup('LspFormatOnSave_' .. bufnr, { clear = true })
+
+  vim.api.nvim_create_autocmd('BufWritePre', {
+    group = augroup,
+    buffer = bufnr,
+    callback = function()
+      -- Apply code actions (autofix) if supported
+      if client.supports_method('textDocument/codeAction') then
+        -- Request source.organizeImports and source.fixAll actions
+        local context = {
+          diagnostics = vim.diagnostic.get(bufnr),
+          only = { 'source.fixAll', 'source.organizeImports' },
+        }
+
+        local params = vim.lsp.util.make_range_params()
+        params.context = context
+
+        -- Apply code actions synchronously
+        local result = vim.lsp.buf_request_sync(bufnr, 'textDocument/codeAction', params, 1000)
+        if result then
+          for _, res in pairs(result) do
+            if res.result then
+              for _, action in pairs(res.result) do
+                if action.edit then
+                  vim.lsp.util.apply_workspace_edit(action.edit, client.offset_encoding)
+                elseif action.command then
+                  vim.lsp.buf.execute_command(action.command)
+                end
+              end
+            end
+          end
+        end
+      end
+
+      -- Format the buffer if formatting is supported
+      if client.supports_method('textDocument/formatting') then
         vim.lsp.buf.format({ bufnr = bufnr })
-      end,
-    })
-  end
+      end
+    end,
+  })
 end
 
 ---Create on_attach callback for LSP servers
