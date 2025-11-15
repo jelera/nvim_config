@@ -2,10 +2,12 @@
   "hooks": {
     "SessionStart": [
       {
+        "description": "Load project context when Claude Code starts or resumes",
         "matcher": "startup|resume",
         "hooks": [
           {
             "type": "prompt",
+            "description": "Read SESSION_STATUS.md to understand current project state and next tasks",
             "prompt": "Read SESSION_STATUS.md to understand the current project state, what was accomplished in the last session, and what to work on next. This file contains:\n- Completed work (72 tests passing, 2 modules complete)\n- Test structure and conventions\n- Key decisions made\n- Next steps\n- File structure\n- Test running commands\n\nAfter reading, briefly confirm you understand the current state and what to work on next."
           }
         ]
@@ -13,10 +15,12 @@
     ],
     "SessionEnd": [
       {
+        "description": "Update project status when session ends",
         "matcher": "clear|logout|other",
         "hooks": [
           {
             "type": "prompt",
+            "description": "Update SESSION_STATUS.md with session accomplishments and next steps",
             "prompt": "Before ending this session, please update SESSION_STATUS.md with:\n1. What was accomplished this session\n2. Current test results (pass/fail counts)\n3. Any new files created or modules completed\n4. Updated 'Next Steps' section\n5. Any important decisions or notes for next session\n\nKeep the format consistent with the existing structure."
           }
         ]
@@ -24,17 +28,61 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Edit|Write",
+        "description": "Lint and format check Lua files after edits",
+        "matcher": "Edit:*.lua|Write:*.lua",
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/scripts/lint-check.sh \"$CLAUDE_TOOL_INPUT\"",
-            "timeout": 30
+            "description": "Check Lua code for errors and warnings",
+            "command": "luacheck $CLAUDE_FILE_PATH"
           },
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/scripts/type-check.sh \"$CLAUDE_TOOL_INPUT\"",
-            "timeout": 60
+            "description": "Verify Lua code formatting matches stylua rules",
+            "command": "stylua --check $CLAUDE_FILE_PATH"
+          }
+        ]
+      },
+      {
+        "description": "Lint shell scripts after edits",
+        "matcher": "Edit:*.sh|Write:*.sh",
+        "hooks": [
+          {
+            "type": "command",
+            "description": "Check shell script for common issues and best practices",
+            "command": "shellcheck $CLAUDE_FILE_PATH"
+          }
+        ]
+      },
+      {
+        "description": "Lint and format check JSON files after edits",
+        "matcher": "Edit:*.json|Write:*.json",
+        "hooks": [
+          {
+            "type": "command",
+            "description": "Check JSON syntax and formatting with ESLint",
+            "command": "eslint $CLAUDE_FILE_PATH"
+          }
+        ]
+      },
+      {
+        "description": "Lint and format check Markdown files after edits (GitHub Flavored Markdown)",
+        "matcher": "Edit:*.md|Write:*.md",
+        "hooks": [
+          {
+            "type": "command",
+            "description": "Check Markdown style and syntax with markdownlint",
+            "command": "markdownlint $CLAUDE_FILE_PATH"
+          },
+          {
+            "type": "command",
+            "description": "Lint code blocks in Markdown with ESLint",
+            "command": "eslint $CLAUDE_FILE_PATH"
+          },
+          {
+            "type": "command",
+            "description": "Check Markdown formatting with prettier",
+            "command": "prettier --check $CLAUDE_FILE_PATH"
           }
         ]
       }

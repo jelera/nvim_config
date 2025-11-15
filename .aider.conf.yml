@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=
 # Aider AI Configuration
 # https://aider.chat/docs/config/aider_conf.html
 
@@ -23,16 +24,16 @@ commit-prompt: |
   Co-Authored-By: AI <noreply@aider.chat>
 
 # Linting
-lint-cmd: "./scripts/lint-check.sh"
+lint-cmd: './scripts/lint-check.sh'
 
 # Testing
-test-cmd: "./scripts/test.sh"
+test-cmd: './scripts/test.sh'
 
 # File patterns to watch
 watch-files:
-  - "lua/**/*.lua"
-  - "scripts/**/*.sh"
-  - "*.md"
+  - 'lua/**/*.lua'
+  - 'scripts/**/*.sh'
+  - '*.md'
 
 # Dark mode (if terminal supports it)
 dark-mode: true

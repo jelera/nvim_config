@@ -107,7 +107,10 @@ local function parse_gemfile()
 	end
 
 	-- Check for each gem
-	if content:find("gem [\"']standard[\"']") or content:find('gem "standard"') or content:find("gem 'standard'") then
+	local has_standard = content:find("gem [\"']standard[\"']")
+		or content:find('gem "standard"')
+		or content:find("gem 'standard'")
+	if has_standard then
 		gems.standard = true
 	end
 
@@ -123,7 +126,7 @@ local function parse_gemfile()
 end
 
 ---Detect Ruby project configuration
----@return table config { is_rails: boolean, use_standardrb: boolean, has_rubocop_rails: boolean, has_rubocop_rspec: boolean, lsp_server: string, formatter: string, servers: string[] }
+---@return table config Project config with is_rails, use_standardrb, has_rubocop_rails, lsp_server, etc.
 function M.detect()
 	local is_rails = is_rails_project()
 	local gems = parse_gemfile()

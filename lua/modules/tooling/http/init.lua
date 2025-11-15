@@ -39,7 +39,8 @@ function M.setup()
 		pattern = "http",
 		callback = function()
 			local bufnr = vim.api.nvim_get_current_buf()
-			vim.keymap.set("n", "<leader>hr", "<Plug>RestNvim", { buffer = bufnr, desc = "Run HTTP request" })
+			local hr_opts = { buffer = bufnr, desc = "Run HTTP request" }
+			vim.keymap.set("n", "<leader>hr", "<Plug>RestNvim", hr_opts)
 			vim.keymap.set(
 				"n",
 				"<leader>hp",

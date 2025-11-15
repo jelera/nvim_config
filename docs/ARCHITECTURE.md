@@ -10,7 +10,7 @@ This NeoVim configuration follows three core principles:
 
 ## Project Structure
 
-```
+```text
 nvimconfig/
 ├── init.lua              # Entry point
 ├── lua/
@@ -27,7 +27,7 @@ nvimconfig/
 
 Every module follows the same structure:
 
-```
+```text
 modules/<name>/
 ├── init.lua          # Orchestrator - calls submodules
 ├── <feature>.lua     # Feature implementation
@@ -77,7 +77,7 @@ return {
 
 ## Module Loading Order
 
-```
+```text
 1. Framework (nvim/)
 2. Core (options, keymaps, autocmds)
 3. UI (colorscheme, statusline)
@@ -121,7 +121,7 @@ end)
 
 ## Configuration Flow
 
-```
+```text
 User config → Module defaults → Plugin setup
 ```
 

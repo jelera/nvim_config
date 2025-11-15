@@ -32,11 +32,16 @@ function M.setup()
 
 	-- Fugitive keymaps
 	keymap("n", "<leader>gs", "<cmd>Git<cr>", vim.tbl_extend("force", opts, { desc = "Git status" }))
-	keymap("n", "<leader>gc", "<cmd>Git commit<cr>", vim.tbl_extend("force", opts, { desc = "Git commit" }))
-	keymap("n", "<leader>gp", "<cmd>Git push<cr>", vim.tbl_extend("force", opts, { desc = "Git push" }))
-	keymap("n", "<leader>gl", "<cmd>Git pull<cr>", vim.tbl_extend("force", opts, { desc = "Git pull" }))
-	keymap("n", "<leader>gb", "<cmd>Git blame<cr>", vim.tbl_extend("force", opts, { desc = "Git blame" }))
-	keymap("n", "<leader>gd", "<cmd>Git diff<cr>", vim.tbl_extend("force", opts, { desc = "Git diff" }))
+	local gc_opts = vim.tbl_extend("force", opts, { desc = "Git commit" })
+	keymap("n", "<leader>gc", "<cmd>Git commit<cr>", gc_opts)
+	local gp_opts = vim.tbl_extend("force", opts, { desc = "Git push" })
+	keymap("n", "<leader>gp", "<cmd>Git push<cr>", gp_opts)
+	local gl_opts = vim.tbl_extend("force", opts, { desc = "Git pull" })
+	keymap("n", "<leader>gl", "<cmd>Git pull<cr>", gl_opts)
+	local gb_opts = vim.tbl_extend("force", opts, { desc = "Git blame" })
+	keymap("n", "<leader>gb", "<cmd>Git blame<cr>", gb_opts)
+	local gd_opts = vim.tbl_extend("force", opts, { desc = "Git diff" })
+	keymap("n", "<leader>gd", "<cmd>Git diff<cr>", gd_opts)
 
 	-- Gitsigns keymaps (using gitsigns functions)
 	keymap("n", "]h", function()
@@ -108,10 +113,14 @@ function M.setup()
 	end, vim.tbl_extend("force", opts, { desc = "Toggle blame" }))
 
 	-- Diffview keymaps
-	keymap("n", "<leader>gdo", "<cmd>DiffviewOpen<cr>", vim.tbl_extend("force", opts, { desc = "Open diffview" }))
-	keymap("n", "<leader>gdc", "<cmd>DiffviewClose<cr>", vim.tbl_extend("force", opts, { desc = "Close diffview" }))
-	keymap("n", "<leader>gdt", "<cmd>DiffviewToggleFiles<cr>", vim.tbl_extend("force", opts, { desc = "Toggle files" }))
-	keymap("n", "<leader>gdh", "<cmd>DiffviewFileHistory<cr>", vim.tbl_extend("force", opts, { desc = "File history" }))
+	local gdo_opts = vim.tbl_extend("force", opts, { desc = "Open diffview" })
+	keymap("n", "<leader>gdo", "<cmd>DiffviewOpen<cr>", gdo_opts)
+	local gdc_opts = vim.tbl_extend("force", opts, { desc = "Close diffview" })
+	keymap("n", "<leader>gdc", "<cmd>DiffviewClose<cr>", gdc_opts)
+	local gdt_opts = vim.tbl_extend("force", opts, { desc = "Toggle files" })
+	keymap("n", "<leader>gdt", "<cmd>DiffviewToggleFiles<cr>", gdt_opts)
+	local gdh_opts = vim.tbl_extend("force", opts, { desc = "File history" })
+	keymap("n", "<leader>gdh", "<cmd>DiffviewFileHistory<cr>", gdh_opts)
 	keymap(
 		"n",
 		"<leader>gdf",

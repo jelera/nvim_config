@@ -85,19 +85,23 @@ cd ~/my-nvim-config
 
 **What it installs:**
 
-- **Development tools** (via mise): NeoVim, Node.js, Python, Ruby, Lua, Go, Rust
-- **System packages**: Git, luarocks, ripgrep, fd, lazygit, bat, delta, eza, fzf, gh, jq, tree, shellcheck, shfmt
-- **Linters & Formatters**:
-  - TypeScript/JavaScript: eslint, prettier
-  - Python: ruff, mypy, black
-  - Ruby: rubocop (+ performance, rspec extensions)
-  - Lua: stylua
-  - Markdown: markdownlint-cli, prettier
-  - JSON: prettier
-  - Shell: shellcheck, shfmt
-- **AI Tools**: aider-chat (AI pair programming)
-- **Nerd Fonts**: Hack, JetBrains Mono, Fira Code (installed by default)
-- **NeoVim config**: Creates symlink to `~/.config/nvim`
+**via mise** (.mise.toml):
+
+- **Language Runtimes**: Node.js, Python, Ruby, Lua, LuaJIT, Go, Rust
+- **Node.js packages**: neovim, tree-sitter-cli, eslint, typescript, prettier, markdownlint-cli, etc.
+- **Python packages** (pipx): pynvim, debugpy, ruff, mypy, black, aider-chat
+- **Ruby gems**: neovim, solargraph, debug, rubocop (+ extensions), standardrb
+- **Rust tools** (cargo): stylua, git-delta, eza
+
+**via system package manager** (brew/apt):
+
+- **System tools**: Git, luarocks, ripgrep, fd, lazygit, bat, fzf, gh, jq, tree, shellcheck, shfmt
+- **Lua packages** (luarocks): busted, luacheck (for testing)
+- **Nerd Fonts**: Hack, JetBrains Mono, Fira Code (optional, auto-installed)
+
+**Other:**
+
+- **NeoVim config**: Creates symlink from `~/.config/nvim` to installation directory
 
 **Supported platforms:**
 
@@ -227,25 +231,35 @@ See [TESTING.md](TESTING.md) for detailed testing guide.
 
 Automated checks run on every PR (only when relevant files change):
 
-**PR Checks** (`.github/workflows/lint-pr.yml`):
-
-- Triggers only when code files change (`.md`, `.sh`, `.ts`, `.js`, `.json`, `.lua`)
-- Lints only changed files (Markdown, Shell, TS/JS, Lua)
-- Checks formatting on changed files (JSON, TS/JS, Shell, Lua)
-- Fast feedback on incremental changes
-
-**Full Lua Checks** (`.github/workflows/lint-and-type-check.yml`):
-
-- Triggers only when Lua files or config change (`.lua`, `.luacheckrc`, `.stylua.toml`)
-- Full Lua linting with luacheck
-- Full Lua format checking with stylua
-- Runs on push to main and PRs
-
 **Tests** (`.github/workflows/test.yml`):
 
-- Runs full test suite (786 tests)
+- Uses inline mise configuration (minimal) - only installs Lua/LuaJIT and stylua
+- Runs full test suite (786 tests) with busted
 - Ubuntu-based CI environment
 - Runs on all PRs and pushes to main
+- Fast: Avoids installing Node, Python, Ruby, Go, Rust (saves ~2-3 minutes per run)
+
+**Lint and Format Lua** (`.github/workflows/lint-lua.yml`):
+
+- Triggers only when Lua files change (`.lua`, `.luacheckrc`, `.stylua.toml`)
+- Lints all Lua code with luacheck
+- Checks formatting with stylua --check
+- Uses minimal mise profile (Lua + stylua only)
+- Fast feedback on code quality
+
+**Lint Shell Scripts** (`.github/workflows/lint-shell.yml`):
+
+- Triggers only when shell scripts change (`**.sh`)
+- Lints with shellcheck (severity: warning)
+- Checks all `.sh` files in the repository
+- Quick validation of shell script quality
+
+**Lint JSON Files** (`.github/workflows/lint-json.yml`):
+
+- Triggers only when JSON files change (`**.json`, `.eslintrc.json`)
+- Lints with ESLint + eslint-plugin-jsonc
+- Validates JSON syntax, indentation, and formatting
+- Uses mise to install Node.js and ESLint tools
 
 ## AI Assistant Support
 
@@ -287,7 +301,7 @@ See [`AGENTS.md`](AGENTS.md) for complete project context and development guidel
 
 Modular design with each feature as a self-contained module:
 
-```
+```text
 modules/<name>/
 ├── init.lua          # Orchestrator
 ├── <feature>.lua     # Implementation
@@ -313,6 +327,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for details.
 - Profile with `:ProfileStartup`, `:BenchmarkStartup`, or `:ProfilePlugins`
 
 **Profiling Commands:**
+
 ```vim
 :ProfileStartup           " Detailed startup analysis
 :BenchmarkStartup [runs]  " Run benchmarks (default: 5 runs)

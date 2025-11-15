@@ -51,7 +51,8 @@ local function load_adapter(adapter_name, dap)
 	local adapter_module = "modules.debug.adapters." .. adapter_name
 	local ok, adapter = pcall(require, adapter_module)
 	if not ok then
-		vim.notify(string.format("Failed to load debug adapter for %s", adapter_name), vim.log.levels.WARN)
+		local message = string.format("Failed to load debug adapter for %s", adapter_name)
+		vim.notify(message, vim.log.levels.WARN)
 		return false
 	end
 

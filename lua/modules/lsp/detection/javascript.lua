@@ -72,7 +72,7 @@ local function is_angular_project()
 end
 
 ---Parse package.json dependencies
----@return table config { has_standard: boolean, has_eslint: boolean, has_prettier: boolean, has_eslint_config_prettier: boolean }
+---@return table config Configuration with has_standard, has_eslint, has_prettier, has_eslint_config_prettier
 local function parse_package_json()
 	local config = {
 		has_standard = false,
@@ -114,7 +114,7 @@ local function parse_package_json()
 end
 
 ---Detect JavaScript/TypeScript project configuration
----@return table config { is_angular: boolean, use_standard: boolean, use_eslint: boolean, use_prettier: boolean, has_eslint_config_prettier: boolean, needs_prettier_config: boolean, servers: string[] }
+---@return table config Project config with is_angular, use_standard, use_eslint, use_prettier, etc.
 function M.detect()
 	local is_angular = is_angular_project()
 	local pkg_config = parse_package_json()

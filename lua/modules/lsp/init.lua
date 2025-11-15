@@ -83,7 +83,8 @@ function M.setup(config)
 	end)
 
 	if not mason_setup_ok then
-		vim.notify("Failed to setup Mason: " .. tostring(mason_err), vim.log.levels.ERROR, { title = "LSP Module" })
+		local message = "Failed to setup Mason: " .. tostring(mason_err)
+		vim.notify(message, vim.log.levels.ERROR, { title = "LSP Module" })
 		return false
 	end
 

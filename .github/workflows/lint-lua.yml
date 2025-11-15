@@ -1,0 +1,57 @@
+name: Lint and Format Lua
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    paths:
+      - '**.lua'
+      - '.luacheckrc'
+      - '.stylua.toml'
+      - '.github/workflows/lint-lua.yml'
+
+jobs:
+  lint-lua:
+    name: Lint and Format Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libreadline-dev
+
+      - name: Setup mise (Lua tools)
+        uses: jdx/mise-action@v2
+        with:
+          install: true
+          cache: true
+          experimental: true
+          mise_toml: |
+            [tools]
+            lua = "5.1.5"
+            "cargo:stylua" = "latest"
+
+      - name: Install luacheck
+        run: |
+          eval "$(luarocks path)"
+          luarocks install --local luacheck
+
+      - name: Run luacheck (linter)
+        run: |
+          eval "$(mise activate bash)"
+          eval "$(luarocks path)"
+          luacheck lua/
+
+      - name: Run stylua (format check)
+        run: |
+          eval "$(mise activate bash)"
+          stylua --check lua/
+
+      - name: Lint summary
+        if: always()
+        run: echo "Lua linting and format checking completed"

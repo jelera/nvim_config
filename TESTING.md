@@ -11,7 +11,7 @@ This project follows **Test-Driven Development (TDD)** with a clear separation b
 
 ## Directory Structure
 
-```
+```text
 lua/spec/
 ├── unit/                          # Fast unit tests
 │   └── nvim/core/
@@ -387,7 +387,7 @@ exec busted "$@"
 
 ### Module Not Found
 
-```
+```text
 Error: module 'nvim.core.module_name' not found
 ```
 

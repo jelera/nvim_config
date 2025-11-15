@@ -1,0 +1,45 @@
+# Lefthook configuration - minimal, fast pre-commit checks
+# Philosophy: Less friction for quick commits, comprehensive checks in CI
+# To skip: git commit --no-verify
+
+pre-commit:
+  parallel: true
+  commands:
+    # Lua formatting
+    stylua:
+      glob: '*.lua'
+      run: stylua --check {staged_files}
+      stage_fixed: true
+
+    # JSON & YAML formatting (auto-fix)
+    prettier:
+      glob: '*.{json,jsonc,yml,yaml}'
+      run: prettier --write {staged_files}
+      stage_fixed: true
+
+    # Markdown linting
+    markdownlint:
+      glob: '*.md'
+      run: markdownlint {staged_files}
+
+    # Shell script linting
+    shellcheck:
+      glob: '*.sh'
+      run: shellcheck {staged_files}
+
+    # YAML/JSON schema validation
+    schema-github-workflows:
+      glob: '.github/workflows/*.{yml,yaml}'
+      run: check-jsonschema --builtin-schema github-workflows {staged_files}
+
+    schema-eslint:
+      glob: '.eslintrc.json'
+      run: check-jsonschema --schemafile https://json.schemastore.org/eslintrc.json {staged_files}
+
+    schema-prettier:
+      glob: '.prettierrc.json'
+      run: check-jsonschema --schemafile https://json.schemastore.org/prettierrc.json {staged_files}
+
+    schema-markdownlint:
+      glob: '.markdownlint.json'
+      run: check-jsonschema --schemafile https://json.schemastore.org/markdownlint.json {staged_files}

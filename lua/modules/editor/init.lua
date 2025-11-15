@@ -9,12 +9,14 @@ Features:
 - Surround: Surround text with brackets, quotes, tags
 - Comment: Smart commenting
 - Session: Session persistence across restarts
+- Folding: Treesitter-based fold text with icons
 
 Submodules:
 - autopairs.lua - nvim-autopairs configuration
 - surround.lua - nvim-surround configuration
 - comment.lua - Comment.nvim configuration
 - session.lua - persistence.nvim configuration
+- folding.lua - Custom fold text configuration
 - keymaps.lua - Editor key mappings
 
 Dependencies:
@@ -30,7 +32,8 @@ editor.setup({
   autopairs = {},
   surround = {},
   comment = {},
-  session = {}
+  session = {},
+  folding = {}
 })
 ```
 
@@ -46,6 +49,7 @@ local M = {}
 ---@param config.surround table|nil Surround configuration overrides
 ---@param config.comment table|nil Comment configuration overrides
 ---@param config.session table|nil Session configuration overrides
+---@param config.folding table|nil Folding configuration overrides
 ---@return boolean success Whether setup succeeded
 function M.setup(config)
 	config = config or {}
@@ -76,6 +80,13 @@ function M.setup(config)
 	local session_ok = session.setup(config.session or {})
 	if not session_ok then
 		vim.notify("Failed to setup session.", vim.log.levels.WARN)
+	end
+
+	-- Setup folding
+	local folding = require("modules.editor.folding")
+	local folding_ok = folding.setup(config.folding or {})
+	if not folding_ok then
+		vim.notify("Failed to setup folding.", vim.log.levels.WARN)
 	end
 
 	-- Setup keymaps (after all features are initialized)

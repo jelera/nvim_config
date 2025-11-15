@@ -1,8 +1,10 @@
 # mise configuration for NeoVim IDE project
 # https://mise.jdx.dev/
 #
-# This file defines all tool versions needed for development
+# Full development profile with all languages, linters, and formatters
 # Run: mise install
+#
+# For CI: GitHub Actions uses inline mise_toml with minimal profile (Lua + stylua only)
 #
 # Supported platforms:
 # - macOS + Homebrew
@@ -12,8 +14,9 @@
 # - Ubuntu 22.04 LTS + apt
 
 [tools]
-# Core development tools (installed via mise)
-# neovim = "0.10.2"           # Using Homebrew neovim instead (0.11.5)
+# ============================================================================
+# Core Language Runtimes
+# ============================================================================
 node = "lts"                # LTS - needed for LSP servers and Copilot
 python = "latest"           # Latest stable - needed for Python LSP and DAP
 ruby = "latest"             # Latest stable - needed for Ruby LSP
@@ -21,6 +24,60 @@ lua = "5.1.5"               # Lua 5.1 (compatible with LuaJIT/NeoVim)
 luajit = "2.1"              # LuaJIT - used by busted for running tests
 go = "latest"               # Latest stable - needed for Go LSP (gopls) and tools
 rust = "latest"             # Latest stable - needed for Rust LSP and some NeoVim plugins
+
+# ============================================================================
+# Node.js Packages (via npm)
+# ============================================================================
+"npm:neovim" = "latest"                           # NeoVim Node.js provider
+"npm:tree-sitter-cli" = "latest"                  # TreeSitter CLI
+"npm:typescript" = "latest"                       # TypeScript compiler
+"npm:eslint" = "latest"                           # JavaScript/TypeScript linter
+"npm:@typescript-eslint/parser" = "latest"        # TypeScript parser for ESLint
+"npm:@typescript-eslint/eslint-plugin" = "latest" # TypeScript rules for ESLint
+"npm:prettier" = "latest"                         # Code formatter
+"npm:markdownlint-cli" = "latest"                 # Markdown linter
+"npm:eslint-config-prettier" = "latest"           # Disable conflicting ESLint rules
+"npm:eslint-plugin-prettier" = "latest"           # Run Prettier as ESLint rule
+"npm:eslint-plugin-jsonc" = "latest"              # JSON linter for ESLint
+"npm:eslint-plugin-markdown" = "latest"           # Markdown linter for ESLint (code blocks)
+"npm:@olrtg/emmet-language-server" = "latest"     # Emmet LSP
+"npm:ts-node" = "latest"                          # TypeScript REPL
+
+# ============================================================================
+# Python Packages (via pipx for isolation)
+# ============================================================================
+uv = "latest"                                     # Fast Python package manager (pipx replacement)
+"pipx:pynvim" = "latest"                          # NeoVim Python provider
+"pipx:debugpy" = "latest"                         # Python debugger for DAP
+"pipx:ruff" = "latest"                            # Fast Python linter and formatter
+"pipx:mypy" = "latest"                            # Python type checker
+"pipx:black" = "latest"                           # Python formatter
+"pipx:aider-chat" = "latest"                      # AI pair programming tool
+"pipx:check-jsonschema" = "latest"                # JSON/YAML schema validator
+
+# ============================================================================
+# Ruby Gems
+# ============================================================================
+"gem:neovim" = "latest"                           # NeoVim Ruby provider
+"gem:solargraph" = "latest"                       # Ruby LSP
+"gem:debug" = "latest"                            # Ruby debugger (rdbg)
+"gem:rubocop" = "latest"                          # Ruby linter and formatter
+"gem:rubocop-performance" = "latest"              # Performance cops
+"gem:rubocop-rspec" = "latest"                    # RSpec cops
+"gem:rubocop-rails" = "latest"                    # Rails cops
+"gem:standardrb" = "latest"                       # Ruby Standard Style
+
+# ============================================================================
+# Rust/Cargo Tools
+# ============================================================================
+"cargo:stylua" = "latest"                         # Lua formatter
+"cargo:git-delta" = "latest"                      # Better git diff viewer
+"cargo:eza" = "latest"                            # Better ls
+
+# ============================================================================
+# Development Tools
+# ============================================================================
+lefthook = "latest"                               # Git hooks manager
 
 [env]
 # Environment variables for the project

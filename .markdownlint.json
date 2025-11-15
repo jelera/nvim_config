@@ -15,10 +15,26 @@
   "MD026": { "punctuation": ".,;:!" },
   "MD029": { "style": "ordered" },
   "MD033": {
-    "allowed_elements": ["details", "summary", "br", "img", "a", "sub", "sup", "kbd"]
+    "allowed_elements": [
+      "details",
+      "summary",
+      "br",
+      "img",
+      "a",
+      "sub",
+      "sup",
+      "kbd",
+      "div",
+      "span",
+      "table",
+      "tr",
+      "td",
+      "th"
+    ]
   },
   "MD034": false,
   "MD041": false,
+  "MD028": false,
   "no-hard-tabs": true,
   "whitespace": true,
   "commands-show-output": false,

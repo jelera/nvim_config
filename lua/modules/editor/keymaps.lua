@@ -92,8 +92,10 @@ function M.setup()
 	)
 
 	-- Documentation writing and formatting
-	keymap("n", "<leader>h1", "yypVr=o", vim.tbl_extend("force", opts, { desc = "Editor: Create H1 header" }))
-	keymap("n", "<leader>h2", "yypVr-o", vim.tbl_extend("force", opts, { desc = "Editor: Create H2 header" }))
+	local h1_opts = vim.tbl_extend("force", opts, { desc = "Editor: Create H1 header" })
+	keymap("n", "<leader>h1", "yypVr=o", h1_opts)
+	local h2_opts = vim.tbl_extend("force", opts, { desc = "Editor: Create H2 header" })
+	keymap("n", "<leader>h2", "yypVr-o", h2_opts)
 
 	-- ============================================================================
 	-- Copy, Cut, Paste Keymaps
@@ -106,7 +108,8 @@ function M.setup()
 	keymap("v", "<C-C>", '"+y', vim.tbl_extend("force", opts, { desc = "Editor: Copy to clipboard" }))
 
 	-- Smart paste from system clipboard and indent automatically
-	keymap("n", "<leader>v", "\"+P=']", vim.tbl_extend("force", opts, { desc = "Editor: Paste and indent" }))
+	local paste_opts = vim.tbl_extend("force", opts, { desc = "Editor: Paste and indent" })
+	keymap("n", "<leader>v", "\"+P=']", paste_opts)
 
 	-- ============================================================================
 	-- Spell Checking Keymaps

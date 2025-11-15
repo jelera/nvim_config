@@ -118,7 +118,8 @@ function M.emit(event_name, data)
 
 		if not success then
 			-- Log error but continue with other callbacks
-			vim.notify(string.format('Error in event callback for "%s": %s', event_name, err), vim.log.levels.ERROR)
+			local message = string.format('Error in event callback for "%s": %s', event_name, err)
+			vim.notify(message, vim.log.levels.ERROR)
 		end
 
 		-- Mark for removal if it's a one-time subscription

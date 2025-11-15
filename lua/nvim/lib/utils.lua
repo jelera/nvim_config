@@ -61,7 +61,11 @@ function M.deep_merge(source, target)
 	local result = M.deep_copy(source)
 
 	for k, v in pairs(target) do
-		if type(v) == "table" and type(result[k]) == "table" and not M.is_array(v) and not M.is_array(result[k]) then
+		local is_table_merge = type(v) == "table"
+			and type(result[k]) == "table"
+			and not M.is_array(v)
+			and not M.is_array(result[k])
+		if is_table_merge then
 			-- Recursively merge nested tables (but not arrays)
 			result[k] = M.deep_merge(result[k], v)
 		else

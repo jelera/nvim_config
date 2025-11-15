@@ -40,21 +40,17 @@ return {
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 		config = function()
 			-- Auto-configure when plugin loads
-			local ok, module = pcall(require, "modules.ui")
-			if ok then
-				-- Call internal setup function for statusline only
-				pcall(function()
-					local lualine = require("lualine")
-					lualine.setup({
-						options = {
-							theme = "gruvbox",
-							icons_enabled = true,
-							component_separators = { left = "", right = "" },
-							section_separators = { left = "", right = "" },
-						},
-					})
-				end)
-			end
+			pcall(function()
+				local lualine = require("lualine")
+				lualine.setup({
+					options = {
+						theme = "gruvbox",
+						icons_enabled = true,
+						component_separators = { left = "", right = "" },
+						section_separators = { left = "", right = "" },
+					},
+				})
+			end)
 		end,
 	},
 

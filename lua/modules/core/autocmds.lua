@@ -152,7 +152,8 @@ function M.create_augroup(name, opts)
 	end)
 
 	if not success then
-		vim.notify("Failed to create augroup: " .. name .. " - " .. tostring(result), vim.log.levels.ERROR)
+		local message = "Failed to create augroup: " .. name .. " - " .. tostring(result)
+		vim.notify(message, vim.log.levels.ERROR)
 		return nil
 	end
 

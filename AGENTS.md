@@ -35,7 +35,7 @@ A **production-ready, test-driven NeoVim IDE configuration** built from scratch 
 
 ### Directory Structure
 
-```
+```text
 nvimconfig/
 ├── AGENTS.md                    # This file - AI context
 ├── init.lua                     # Entry point
@@ -90,7 +90,7 @@ return M
 
 LSP servers are organized by language in `modules/lsp/servers/<language>/`:
 
-```
+```text
 modules/lsp/servers/
 ├── lua/
 │   └── lua_ls.lua              # Lua language server config

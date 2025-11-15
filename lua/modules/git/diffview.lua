@@ -92,7 +92,12 @@ local default_config = {
 			{ "n", "<up>", '<cmd>lua require("diffview").prev_entry()<cr>', { desc = "Previous entry" } },
 			{ "n", "<cr>", '<cmd>lua require("diffview").select_entry()<cr>', { desc = "Open diff" } },
 			{ "n", "o", '<cmd>lua require("diffview").select_entry()<cr>', { desc = "Open diff" } },
-			{ "n", "<2-LeftMouse>", '<cmd>lua require("diffview").select_entry()<cr>', { desc = "Open diff" } },
+			{
+				"n",
+				"<2-LeftMouse>",
+				'<cmd>lua require("diffview").select_entry()<cr>',
+				{ desc = "Open diff" },
+			},
 			{ "n", "R", '<cmd>lua require("diffview").refresh_files()<cr>', { desc = "Refresh" } },
 			{ "n", "<tab>", "<cmd>DiffviewToggleFiles<cr>", { desc = "Toggle panel" } },
 			{ "n", "gf", "<cmd>DiffviewFocusFiles<cr>", { desc = "Focus files" } },

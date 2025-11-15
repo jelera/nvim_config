@@ -15,7 +15,8 @@ return {
 	-- It requires @angular/language-service to be installed in the project
 	root_dir = function(fname)
 		local util = require("lspconfig.util")
-		return util.root_pattern("angular.json", ".angular", "nx.json")(fname) or util.find_git_ancestor(fname)
+		local root_pattern = util.root_pattern("angular.json", ".angular", "nx.json")
+		return root_pattern(fname) or util.find_git_ancestor(fname)
 	end,
 
 	settings = {

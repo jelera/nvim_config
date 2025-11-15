@@ -1,15 +1,20 @@
 name: Tests
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_run:
+    workflows:
+      - 'Lint and Format Lua'
+      - 'Lint Shell Scripts'
+      - 'Validate Schemas'
+    types:
+      - completed
+    branches: [main]
 
 jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Checkout code
@@ -20,20 +25,33 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential libreadline-dev libncurses5-dev
 
-      - name: Setup mise
+      - name: Setup mise (minimal CI profile)
         uses: jdx/mise-action@v2
         with:
           install: true
           cache: true
           experimental: true
+          mise_toml: |
+            [tools]
+            lua = "5.1.5"
+            luajit = "2.1"
 
-      - name: Install busted
+      - name: Install Lua packages
         run: |
           eval "$(luarocks path)"
           luarocks install --local busted
+          luarocks install --local luacheck
+
+      - name: Verify mise tools
+        run: |
+          mise exec -- lua -v
+          mise exec -- luajit -v
 
       - name: Run tests
-        run: ./scripts/test.sh
+        run: |
+          eval "$(mise activate bash)"
+          eval "$(luarocks path)"
+          busted --verbose
 
       - name: Test summary
         if: always()

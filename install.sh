@@ -529,8 +529,9 @@ install_lua_packages() {
 }
 
 # Install Node.js global packages
+# NOTE: Most npm packages are now managed by mise (see .mise.toml)
 install_node_packages() {
-	print_header "Installing Node.js global packages"
+	print_header "Verifying Node.js packages (managed by mise)"
 
 	if ! command_exists npm; then
 		print_warning "npm not found (node should be installed by mise)"
@@ -538,166 +539,55 @@ install_node_packages() {
 		return 1
 	fi
 
-	local node_packages=(
-		"neovim"                           # NeoVim Node.js provider (required)
-		"tree-sitter-cli"                  # TreeSitter CLI (required for parsers)
-		"eslint"                           # JavaScript/TypeScript linter
-		"typescript"                       # TypeScript compiler
-		"@typescript-eslint/parser"        # TypeScript parser for ESLint
-		"@typescript-eslint/eslint-plugin" # TypeScript rules for ESLint
-		"eslint-config-standard"           # Standard.js config for ESLint (optional)
-		"markdownlint-cli"                 # Markdown linter
-		"prettier"                         # Code formatter (JS/TS/JSON/Markdown/YAML)
-		"eslint-config-prettier"           # Disable ESLint rules that conflict with Prettier
-		"eslint-plugin-prettier"           # Run Prettier as an ESLint rule
-		"@olrtg/emmet-language-server"     # Emmet abbreviations LSP
-		"ts-node"                          # TypeScript REPL for iron.nvim
-	)
-
-	for package in "${node_packages[@]}"; do
-		print_info "Installing $package..."
-		if npm install -g "$package"; then
-			print_success "$package installed"
-		else
-			print_warning "Failed to install $package"
-		fi
-	done
-
-	print_info "Node.js version: $(node --version)"
-	print_info "npm version: $(npm --version)"
+	print_info "Node.js packages are managed by mise via .mise.toml"
+	print_info "Packages include: neovim, tree-sitter-cli, eslint, typescript, prettier, etc."
+	print_success "Node.js version: $(node --version)"
+	print_success "npm version: $(npm --version)"
 }
 
 # Install Python packages
+# NOTE: Python packages are now managed by mise via pipx (see .mise.toml)
 install_python_packages() {
-	print_header "Installing Python packages"
+	print_header "Verifying Python packages (managed by mise)"
 
 	if ! command_exists python3; then
 		print_warning "python3 not found (should be installed by mise)"
 		return 1
 	fi
 
-	local pip_cmd="python3 -m pip"
-
-	# Ensure pip is installed
-	if ! python3 -m pip --version &>/dev/null; then
-		print_info "Installing pip..."
-		python3 -m ensurepip --default-pip || python3 -m ensurepip --user
-	fi
-
-	local python_packages=(
-		"pynvim"     # NeoVim Python provider (required)
-		"debugpy"    # Python debugger for DAP (optional but recommended)
-		"ruff"       # Fast Python linter and formatter (required for lint-check.sh)
-		"mypy"       # Python type checker (required for type-check.sh)
-		"black"      # Python formatter (for auto-fixing, works with ruff)
-		"gitlint"    # Git commit message linter (for nvim-lint)
-		"aider-chat" # AI pair programming tool (optional but recommended)
-	)
-
-	for package in "${python_packages[@]}"; do
-		print_info "Installing $package..."
-		if $pip_cmd install --user "$package"; then
-			print_success "$package installed"
-		else
-			print_warning "Failed to install $package"
-		fi
-	done
-
-	print_info "Python version: $(python3 --version)"
+	print_info "Python packages are managed by mise via pipx in .mise.toml"
+	print_info "Packages include: pynvim, debugpy, ruff, mypy, black, aider-chat"
+	print_success "Python version: $(python3 --version)"
 }
 
 # Install Ruby gems
+# NOTE: Ruby gems are now managed by mise (see .mise.toml)
 install_ruby_gems() {
-	print_header "Installing Ruby gems"
+	print_header "Verifying Ruby gems (managed by mise)"
 
 	if ! command_exists gem; then
 		print_warning "gem not found (ruby should be installed by mise)"
 		return 1
 	fi
 
-	local ruby_gems=(
-		"neovim"              # NeoVim Ruby provider (required)
-		"solargraph"          # Ruby LSP for Rails projects
-		"debug"               # Ruby debugger (rdbg) for DAP integration
-		"rubocop"             # Ruby linter and formatter
-		"rubocop-performance" # Performance cops for RuboCop
-		"rubocop-rspec"       # RSpec cops for RuboCop
-		"rubocop-rails"       # Rails cops for RuboCop
-		"standardrb"          # Ruby Standard Style (alternative to Rubocop)
-	)
-
-	for gem_name in "${ruby_gems[@]}"; do
-		print_info "Installing $gem_name..."
-		if gem install --user-install "$gem_name"; then
-			print_success "$gem_name installed"
-		else
-			print_warning "Failed to install $gem_name"
-		fi
-	done
-
-	print_info "Ruby version: $(ruby --version)"
+	print_info "Ruby gems are managed by mise via .mise.toml"
+	print_info "Gems include: neovim, solargraph, debug, rubocop, rubocop-*, standardrb"
+	print_success "Ruby version: $(ruby --version)"
 }
 
 # Install Rust-based tools via cargo
+# NOTE: Cargo tools are now managed by mise (see .mise.toml)
 install_cargo_tools() {
-	print_header "Installing Rust-based development tools"
+	print_header "Verifying Rust tools (managed by mise)"
 
 	if ! command_exists cargo; then
 		print_warning "cargo not found (rust should be installed by mise)"
 		return 1
 	fi
 
-	# Required cargo tools
-	local required_tools=(
-		"stylua" # Lua formatter (required for auto-fix.sh)
-	)
-
-	# Optional cargo tools
-	local optional_tools=(
-		"git-delta" # Better git diff viewer (installs as 'delta')
-		"eza"       # Better ls (formerly exa)
-	)
-
-	# Install required tools
-	for tool in "${required_tools[@]}"; do
-		local bin_name="$tool"
-		if [[ "$tool" == "git-delta" ]]; then
-			bin_name="delta"
-		fi
-
-		if command_exists "$bin_name"; then
-			print_success "$tool already installed"
-		else
-			print_info "Installing $tool..."
-			if cargo install "$tool"; then
-				print_success "$tool installed"
-			else
-				print_error "Failed to install $tool (required)"
-				return 1
-			fi
-		fi
-	done
-
-	# Install optional tools
-	for tool in "${optional_tools[@]}"; do
-		local bin_name="$tool"
-		if [[ "$tool" == "git-delta" ]]; then
-			bin_name="delta"
-		fi
-
-		if command_exists "$bin_name"; then
-			print_success "$tool already installed"
-		else
-			print_info "Installing $tool..."
-			if cargo install "$tool"; then
-				print_success "$tool installed"
-			else
-				print_warning "Failed to install $tool (optional)"
-			fi
-		fi
-	done
-
-	print_info "Cargo version: $(cargo --version)"
+	print_info "Cargo tools are managed by mise via .mise.toml"
+	print_info "Tools include: stylua, git-delta, eza"
+	print_success "Cargo version: $(cargo --version)"
 }
 
 #------------------------------------------------------------------------------

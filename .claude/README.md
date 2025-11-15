@@ -1,17 +1,32 @@
 # Claude Code Configuration
 
-> **Project Context:** See [`AGENTS.md`](../AGENTS.md) at repository root for complete architecture, patterns, and development guidelines.
+> **Project Context:** See [`AGENTS.md`](../AGENTS.md) at repository root for
+> complete architecture, patterns, and development guidelines.
 
 ## Hooks Configuration
 
 This directory contains Claude Code hooks that automatically run code quality checks on file edits/writes.
 
-### PostToolUse: Edit|Write
+### PostToolUse Hooks
 
-Configured checks:
+**Lua Files** (`*.lua`):
 
-1. **Lint Check** (`scripts/lint-check.sh`) - Blocks on linting errors
-2. **Type Check** (`scripts/type-check.sh`) - Blocks on type errors
+- **luacheck** - Lints Lua code for errors and warnings
+- **stylua --check** - Checks Lua code formatting
+
+**Shell Scripts** (`*.sh`):
+
+- **shellcheck** - Lints shell scripts for common issues and best practices
+
+**JSON Files** (`*.json`):
+
+- **eslint** (with eslint-plugin-jsonc) - Validates JSON syntax and formatting
+
+**Markdown Files** (`*.md`):
+
+- **markdownlint** - Checks GitHub Flavored Markdown style and syntax
+- **eslint** (with eslint-plugin-markdown) - Lints code blocks within Markdown
+- **prettier** - Verifies Markdown formatting consistency
 
 ## Supported Languages
 
@@ -27,20 +42,33 @@ Configured checks:
 
 ## Auto-Fixing
 
-To automatically fix issues (not run by hooks):
+To automatically fix formatting issues:
+
+**Lua:**
 
 ```bash
-# Fix specific file
-./scripts/auto-fix.sh path/to/file.lua
+stylua lua/                    # Format all Lua files
+stylua path/to/file.lua        # Format specific file
+```
 
-# Fix all staged files
-./scripts/auto-fix.sh
+**Shell:**
 
-# Fix all files in project
-./scripts/auto-fix.sh --all
+```bash
+shfmt -w install.sh            # Format shell script (if shfmt installed)
+```
 
-# Dry run (check what would be fixed)
-./scripts/auto-fix.sh --check
+**Markdown:**
+
+```bash
+prettier --write docs/          # Format all markdown in docs/
+prettier --write README.md      # Format specific file
+markdownlint --fix README.md   # Auto-fix some markdownlint issues
+```
+
+**JSON:**
+
+```bash
+prettier --write .eslintrc.json  # Format JSON files
 ```
 
 ## Disabling Hooks Temporarily
@@ -52,11 +80,11 @@ If you need to bypass the hooks for a specific operation, you can:
 
 ## Integration with Other Systems
 
-These same scripts are used in:
+The same tools are used in:
 
-- **Git pre-commit hooks**: `scripts/pre-commit-hook.sh`
-- **GitHub Actions**: `.github/workflows/lint-and-type-check.yml`
-- **Manual development**: Run scripts directly
+- **Claude Code hooks**: Automatic validation on file edits (this config)
+- **GitHub Actions**: `.github/workflows/lint-lua.yml` and `.github/workflows/lint-shell.yml`
+- **Manual development**: Run `luacheck`, `stylua`, `shellcheck` directly
 
 This ensures consistent code quality across all workflows.
 
@@ -65,8 +93,10 @@ This ensures consistent code quality across all workflows.
 ### Hook not running
 
 1. Verify `.claude/settings.json` exists and is valid JSON
-2. Check scripts are executable: `chmod +x scripts/*.sh`
-3. Ensure tools are installed: `./install.sh`
+2. Ensure tools are installed: `mise install` or check individual tools:
+   - `luacheck --version`
+   - `stylua --version`
+   - `shellcheck --version`
 
 ### False positives
 
@@ -76,10 +106,17 @@ This ensures consistent code quality across all workflows.
 
 ### Tool not found
 
-Run the installation script to install all required tools:
+Run the installation to install all required tools:
 
 ```bash
-./install.sh
+mise install                   # Install all dev tools
+./install.sh                   # Install system packages
 ```
 
-Or install specific tools manually (see `scripts/README.md`).
+Or install specific tools:
+
+```bash
+luarocks install luacheck      # Lua linter
+mise install cargo:stylua      # Lua formatter
+brew install shellcheck        # Shell script linter (macOS)
+```
