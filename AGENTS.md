@@ -7,7 +7,7 @@
 A **production-ready, test-driven NeoVim IDE configuration** built from scratch with:
 
 - **Pure Lua** configuration (no VimScript)
-- **Test-Driven Development** with 786 passing tests
+- **Test-Driven Development** with 811 passing tests
 - **Modular architecture** with clean separation of concerns
 - **Comprehensive tooling** for 7+ programming languages
 - **Full IDE features**: LSP, DAP, testing, AI integration
@@ -36,19 +36,26 @@ A **production-ready, test-driven NeoVim IDE configuration** built from scratch 
 ### Directory Structure
 
 ```text
-nvimconfig/
+nvim_config/
 ├── AGENTS.md                    # This file - AI context
 ├── init.lua                     # Entry point
 ├── lua/
 │   ├── nvim/                    # Core framework
-│   │   ├── bootstrap.lua        # Plugin manager setup
-│   │   ├── module_loader.lua    # Dynamic module loading
-│   │   └── utils.lua            # Shared utilities
+│   │   ├── core/                # Core systems
+│   │   │   ├── module_loader.lua    # Dynamic module loading
+│   │   │   ├── config_schema.lua    # Configuration validation
+│   │   │   ├── event_bus.lua        # Event system
+│   │   │   └── plugin_system.lua    # Plugin management
+│   │   ├── lib/                 # Shared libraries
+│   │   │   ├── utils.lua            # Utility functions
+│   │   │   └── validator.lua        # Input validation
+│   │   ├── init.lua             # Framework initialization
+│   │   └── setup.lua            # Plugin manager setup (lazy.nvim)
 │   ├── modules/                 # Feature modules
 │   │   ├── core/                # Vim settings (options, keymaps, autocmds)
 │   │   ├── ui/                  # Visual (colorscheme, statusline, icons)
 │   │   ├── treesitter/          # Syntax highlighting
-│   │   ├── lsp/                 # Language servers
+│   │   ├── lsp/                 # Language servers (15+ servers)
 │   │   ├── completion/          # Auto-completion
 │   │   ├── navigation/          # File navigation (Telescope, Tree)
 │   │   ├── git/                 # Git integration
@@ -57,7 +64,11 @@ nvimconfig/
 │   │   ├── ai/                  # AI integration
 │   │   └── editor/              # Editor enhancements
 │   └── spec/                    # Test suite (busted)
-├── scripts/                     # Development scripts
+│       ├── unit/                # Unit tests (fast, isolated)
+│       ├── integration/         # Integration tests
+│       └── spec_helper.lua      # Test utilities and mocks
+├── .busted                      # Busted test configuration
+├── spec_helper.lua              # Lua path setup for tests
 └── docs/                        # Documentation
 ```
 
@@ -92,13 +103,21 @@ LSP servers are organized by language in `modules/lsp/servers/<language>/`:
 
 ```text
 modules/lsp/servers/
-├── lua/
-│   └── lua_ls.lua              # Lua language server config
-├── javascript/
-│   └── ts_ls.lua               # TypeScript/JavaScript server
-├── python/
-│   └── pyright.lua             # Python server
-└── ...
+├── angular/        # Angular language server
+├── bash/           # Bash language server
+├── copilot/        # GitHub Copilot LSP
+├── emmet/          # Emmet for HTML/CSS
+├── go/             # Go language server
+├── javascript/     # TypeScript/JavaScript (ts_ls)
+├── json/           # JSON language server
+├── lua/            # Lua language server (lua_ls)
+├── markdown/       # Markdown language server
+├── postgresql/     # PostgreSQL language server
+├── python/         # Python language server (pyright)
+├── ruby/           # Ruby language server (solargraph)
+├── rust/           # Rust language server (rust_analyzer)
+├── toml/           # TOML language server
+└── yaml/           # YAML language server
 ```
 
 Each server file exports:
@@ -115,36 +134,46 @@ return {
 ### Essential Commands
 
 ```bash
-# Testing
-./scripts/test.sh                    # Run all tests (786 tests)
-./scripts/test.sh --tags=unit        # Unit tests only
-./scripts/test.sh --tags=integration # Integration tests only
+# Testing (using busted directly - no wrapper scripts)
+mise exec -- bash -c 'eval "$(luarocks path)" && busted'  # Run all 811 tests
+busted --tags=unit                   # Unit tests only
+busted --tags=integration            # Integration tests only
+busted lua/spec/unit/<file>_spec.lua # Run specific test file
+busted --coverage                    # Run with coverage
 
-# Linting & Formatting
-./scripts/lint-check.sh              # Lint staged files
-./scripts/auto-fix.sh                # Fix formatting issues
-./scripts/auto-fix.sh --check        # Check formatting (dry run)
-./scripts/type-check.sh              # Type checking
+# Linting
+luacheck lua/                        # Lint Lua code
+stylua --check lua/                  # Check Lua formatting
+stylua lua/                          # Fix Lua formatting
 
-# Pre-commit Hooks
-./scripts/install-hooks.sh           # Install git hooks
+# Installation
+./install.sh                         # Full installation
+./install.sh -y                      # Auto-confirm all prompts
+./install.sh --help                  # Show all options
 ```
 
 ### Test-Driven Development (TDD)
 
 **Always write tests first:**
 
-1. Create `*_spec.lua` in `spec/unit/` or `spec/integration/`
+1. Create `*_spec.lua` in `lua/spec/unit/` or `lua/spec/integration/`
 2. Use tags: `#unit` or `#integration`
-3. Mock vim API via `spec_helper.lua`
-4. Run tests with `./scripts/test.sh`
+3. Mock vim API via `spec.spec_helper`
+4. Run tests with `busted` or via mise
 
 **Test structure:**
 
 ```lua
 describe('modules.example #unit', function()
+  local spec_helper = require('spec.spec_helper')
+
   before_each(function()
+    spec_helper.setup()  -- Sets up vim mocks
     package.loaded['modules.example'] = nil
+  end)
+
+  after_each(function()
+    spec_helper.teardown()  -- Cleans up
   end)
 
   it('should do something', function()
@@ -154,34 +183,43 @@ describe('modules.example #unit', function()
 end)
 ```
 
-### Pre-commit Checks
+### Pre-commit Hooks
 
-Installed hooks run automatically on `git commit`:
+Uses **lefthook** for git hooks (`.git/hooks/pre-commit`). Configuration in
+`lefthook.yml` runs quality checks on staged files before commits:
 
-1. **Lint checks** - luacheck, eslint, ruff, rubocop, markdownlint, shellcheck
-2. **Type checks** - TypeScript, Python
-3. **Format checks** - stylua, prettier, shfmt
+- Lua code with luacheck
+- Lua formatting with stylua
+- Shell scripts with shellcheck
 
 **Bypass (not recommended):** `git commit --no-verify`
 
+**Setup:** Hooks are installed automatically by lefthook during development
+
 ### CI/CD Workflows
 
-**PR Checks** (`.github/workflows/lint-pr.yml`):
+**Lint Lua** (`.github/workflows/lint-lua.yml`):
 
-- Runs only when relevant files change (`.md`, `.sh`, `.ts`, `.js`, `.json`, `.lua`)
-- Lints only changed files
-- Checks formatting on changed files
-- Fast feedback loop
+- Triggers when: Lua files, `.luacheckrc`, `.stylua.toml`, or workflow file changes
+- Runs: `luacheck lua/` and `stylua --check lua/`
+- Uses: Minimal mise config (Lua + stylua only)
 
-**Full Lua Checks** (`.github/workflows/lint-and-type-check.yml`):
+**Lint Shell** (`.github/workflows/lint-shell.yml`):
 
-- Runs only when Lua files or configs change
-- Full luacheck linting
-- Full stylua format checking
+- Triggers when: Shell scripts (`*.sh`) change
+- Runs: `shellcheck` with severity=warning
+- Quick validation of shell script quality
+
+**Validate Schemas** (`.github/workflows/validate-schemas.yml`):
+
+- Validates JSON and YAML configuration schemas
+- Ensures config files are well-formed
 
 **Tests** (`.github/workflows/test.yml`):
 
-- Runs all 786 tests
+- Triggers: After Lint Lua, Lint Shell, and Validate Schemas workflows complete successfully
+- Runs: All 811 tests with busted
+- Uses: Minimal mise config (Lua 5.1.5 + LuaJIT 2.1)
 - Ubuntu-based environment
 
 ## Code Conventions
@@ -191,11 +229,11 @@ Installed hooks run automatically on `git commit`:
 **Always use** `utils.merge_config()` for deep merging:
 
 ```lua
-local utils = require('nvim.utils')
+local utils = require('nvim.lib.utils')
 local merged = utils.merge_config(default_config, user_config)
 ```
 
-**Never** manually merge tables with `vim.tbl_deep_extend()`.
+**Note:** `utils` is located at `nvim.lib.utils`, not directly in `nvim.utils`.
 
 ### Module Loading
 
@@ -290,7 +328,7 @@ return {
 13. ✅ Documentation & Polish
 14. ✅ CI/CD & Distribution
 
-**Total:** 786 tests, 100% pass rate
+**Total:** 811 tests, 100% pass rate
 
 **Current Focus:** Maintenance and bug fixes
 
@@ -333,43 +371,52 @@ vim.api.nvim_create_autocmd('FileType', {
 ### Tests Failing
 
 1. Check busted is installed: `luarocks list | grep busted`
-2. Run specific test: `./scripts/test.sh lua/spec/unit/<file>_spec.lua`
-3. Check test tags: Tests should have `#unit` or `#integration`
+2. Check Lua path setup: `spec_helper.lua` should exist at project root
+3. Run specific test: `busted lua/spec/unit/<file>_spec.lua`
+4. Check test tags: Tests should have `#unit` or `#integration`
+5. Verify mise environment: `mise exec -- lua -v`
 
 ### LSP Not Attaching
 
 1. Check Mason: `:Mason` in NeoVim
 2. Verify server installed: `:LspInfo`
 3. Check server config in `modules/lsp/servers/<language>/`
+4. View LSP logs: `:LspLog`
 
 ### Linting Errors
 
-1. Run lint manually: `./scripts/lint-check.sh`
-2. Auto-fix: `./scripts/auto-fix.sh`
-3. Check tool installed: `which luacheck`, `which eslint`, etc.
+1. Run lint manually: `luacheck lua/`
+2. Check formatting: `stylua --check lua/`
+3. Auto-fix formatting: `stylua lua/`
+4. Check tool installed: `which luacheck`, `which stylua`, etc.
 
 ## Key Files Reference
 
 - `init.lua` - Entry point, bootstraps framework
-- `lua/nvim/bootstrap.lua` - Plugin manager setup
+- `lua/nvim/setup.lua` - Plugin manager setup (lazy.nvim)
+- `lua/nvim/init.lua` - Framework initialization
+- `lua/nvim/core/module_loader.lua` - Dynamic module loading
+- `lua/nvim/lib/utils.lua` - Utility functions
 - `lua/modules/*/init.lua` - Module orchestrators
-- `lua/modules/lsp/servers/` - LSP server configs
-- `scripts/test.sh` - Test runner
-- `scripts/lint-check.sh` - Linting tool
-- `scripts/auto-fix.sh` - Auto-formatter
-- `scripts/install-hooks.sh` - Git hook installer
+- `lua/modules/lsp/servers/` - LSP server configs (15+ languages)
+- `lua/spec/spec_helper.lua` - Test utilities and vim mocks
+- `spec_helper.lua` - Lua path setup for tests (project root)
+- `.busted` - Busted test runner configuration
 - `.luacheckrc` - Lua linter configuration
 - `.stylua.toml` - Lua formatter configuration
+- `.mise.toml` - Development environment configuration
+- `lefthook.yml` - Git hooks configuration (pre-commit)
+- `install.sh` - Installation script
 
 ## Documentation
 
-- `README.md` - User guide and quick start
+- `README.md` - User guide, installation, and quick start
+- `AGENTS.md` - This file - Universal AI assistant context
+- `TESTING.md` - Testing guide and best practices
+- `VIMRC_MIGRATION.md` - Migration guide from traditional vimrc
 - `docs/KEYMAPS.md` - Complete keymap reference
 - `docs/ARCHITECTURE.md` - Design and module system
-- `PERFORMANCE.md` - Performance optimization plan and strategies
 - `docs/TROUBLESHOOTING.md` - Common issues and solutions
-- `docs/DEVELOPMENT_HISTORY.md` - Historical development context (see CLAUDE.md)
-- `TESTING.md` - Testing guide and best practices
 
 ## Notes for AI Assistants
 
@@ -387,8 +434,8 @@ vim.api.nvim_create_autocmd('FileType', {
 - **Always lazy-load plugins** - Use `event`, `cmd`, `keys`, or `ft` triggers
 - **Never use `lazy = false`** unless absolutely necessary (colorscheme, critical plugins)
 - **Prefer deferred loading** - Use `vim.schedule()` or `vim.defer_fn()` for non-critical setup
-- **Profile changes** - Use `:Lazy profile` or `nvim --startuptime` to measure impact
-- **Target: <100ms startup** - Any change adding >5ms should be optimized
+- **Profile changes** - Use `:Lazy profile` in NeoVim to measure plugin load times
+- **Target: <100ms startup** - Current average: 62ms (best: 45ms)
 - **Common lazy-loading patterns:**
   - UI components: `event = 'UIEnter'` or `event = 'VeryLazy'`
   - File operations: `event = 'BufReadPost'` or `event = 'BufNewFile'`
@@ -396,7 +443,6 @@ vim.api.nvim_create_autocmd('FileType', {
   - Language-specific: `ft = { 'lua', 'javascript', ... }`
   - Commands: `cmd = { 'CommandName' }`
   - Keymaps: `keys = { '<leader>x', ... }`
-- **See PERFORMANCE.md** for optimization strategies and best practices
 
 ---
 

@@ -1,4 +1,3 @@
-# yaml-language-server: $schema=
 # Aider AI Configuration
 # https://aider.chat/docs/config/aider_conf.html
 
@@ -6,7 +5,6 @@
 read:
   - AGENTS.md
   - README.md
-  - PERFORMANCE.md
 
 # Auto-commit changes
 auto-commits: true
@@ -23,20 +21,36 @@ commit-prompt: |
 
   Co-Authored-By: AI <noreply@aider.chat>
 
-# Linting
-lint-cmd: './scripts/lint-check.sh'
+# Auto-lint files after changes
+auto-lint: true
 
-# Testing
-test-cmd: './scripts/test.sh'
+# Auto-test after changes (disabled by default for speed)
+auto-test: false
 
-# File patterns to watch
-watch-files:
-  - 'lua/**/*.lua'
-  - 'scripts/**/*.sh'
-  - '*.md'
+# Linting - Check syntax, style, and formatting for all file types
+lint-cmd:
+  # Lua files
+  - 'luacheck lua/'
+  - 'stylua --check lua/'
+  # Shell scripts
+  - 'shellcheck *.sh'
+  # Markdown files
+  - 'markdownlint *.md'
+  - 'prettier --check *.md'
+  # JSON files (if any)
+  - 'eslint **/*.json'
+  # YAML files
+  - 'prettier --check **/*.{yml,yaml}'
+
+# Testing - Run busted test suite
+test-cmd:
+  - 'busted --verbose'
+
+# Watch files for AI coding comments
+watch-files: false
 
 # Dark mode (if terminal supports it)
 dark-mode: true
 
 # Use map tokens for better context
-map-tokens: 2048
+map-tokens: '2048'

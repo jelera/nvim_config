@@ -2,7 +2,7 @@
 Sidekick.nvim Configuration
 ============================
 
-Configures sidekick.nvim for AI assistance.
+Configures sidekick.nvim for AI assistance and editor enhancements.
 
 Features:
 - Copilot NES: Next Edit Suggestions for multi-line refactorings
@@ -23,6 +23,7 @@ local default_config = {
 	-- NES (Next Edit Suggestions) configuration
 	nes = {
 		enabled = true,
+		provider = "copilot_lsp", -- Use Copilot LSP for AI suggestions
 	},
 	-- AI Terminal configuration
 	terminal = {

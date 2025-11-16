@@ -1,0 +1,53 @@
+name: Tests (Local)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libreadline-dev libncurses5-dev
+
+      - name: Setup mise (minimal CI profile)
+        uses: jdx/mise-action@v2
+        with:
+          install: true
+          cache: true
+          experimental: true
+          mise_toml: |
+            [tools]
+            lua = "5.1.5"
+            luajit = "2.1"
+
+      - name: Install Lua packages
+        run: |
+          eval "$(luarocks path)"
+          luarocks install --local busted
+          luarocks install --local luacheck
+
+      - name: Verify mise tools
+        run: |
+          mise exec -- lua -v
+          mise exec -- luajit -v
+
+      - name: Run tests
+        run: |
+          eval "$(mise activate bash)"
+          eval "$(luarocks path)"
+          busted --verbose
+
+      - name: Test summary
+        if: always()
+        run: echo "Tests completed"

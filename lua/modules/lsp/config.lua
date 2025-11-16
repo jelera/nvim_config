@@ -67,8 +67,10 @@ M.default_config = {
 		"cssls", -- CSS/SCSS
 		"emmet_ls", -- Emmet abbreviations
 
-		-- YAML
-		"yamlls",
+		-- Configuration Files
+		"jsonls", -- JSON with SchemaStore validation
+		"yamlls", -- YAML with SchemaStore validation
+		"taplo", -- TOML language server
 
 		-- Infrastructure/Cloud
 		"terraformls",
@@ -161,8 +163,10 @@ function M.load_server_config(server_name)
 		-- Vim Script
 		vimls = "vim",
 
-		-- YAML
+		-- Configuration Files
+		jsonls = "json",
 		yamlls = "yaml",
+		taplo = "toml",
 
 		-- Docker Compose
 		docker_compose_language_service = "docker",
@@ -175,6 +179,9 @@ function M.load_server_config(server_name)
 
 		-- Emmet
 		emmet_ls = "emmet",
+
+		-- GitHub Copilot
+		copilot = "copilot",
 	}
 
 	local language = server_to_language[server_name]

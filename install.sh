@@ -86,11 +86,11 @@ color_echo() {
 }
 
 print_header() {
-	color_echo "\n${BOLD}${CYAN}🔧 $*${NC}\n"
+	color_echo "\n\n${BOLD}${CYAN}🔧 $*${NC}\n"
 }
 
 print_info() {
-	color_echo "${BLUE}ℹ️${NC}  $*"
+	color_echo "\n${BLUE}ℹ️${NC}  $*"
 }
 
 print_success() {
@@ -256,29 +256,28 @@ install_homebrew_packages() {
 
 	# Required packages
 	local required_packages=(
-		"git"      # Git (if not already installed)
-		"luarocks" # Lua package manager
+		"git"    # Git (if not already installed)
+		"neovim" # NeoVim editor
 	)
 
 	# Optional but recommended packages
 	local optional_packages=(
-		"ripgrep"    # Fast grep (for Telescope)
-		"fd"         # Fast find (for Telescope)
-		"lazygit"    # Git TUI
-		"bat"        # Better cat with syntax highlighting
-		"delta"      # Better git diff viewer
-		"eza"        # Better ls (formerly exa)
-		"fzf"        # Fuzzy finder (general use)
-		"gh"         # GitHub CLI
-		"jq"         # JSON processor (for rest.nvim HTTP client)
-		"tidy-html5" # HTML formatter (for rest.nvim)
-		"tree"       # Directory tree viewer
-		"shellcheck" # Shell script linter
-		"shfmt"      # Shell script formatter
-		"actionlint" # GitHub Actions workflow linter (for nvim-lint)
-		"codespell"  # Spell checker (for nvim-lint)
-		"gitlint"    # Git commit message linter (for nvim-lint)
-		"checkmake"  # Makefile linter (for nvim-lint)
+		"ripgrep"     # Fast grep (for Telescope)
+		"fd"          # Fast find (for Telescope)
+		"lazygit"     # Git TUI
+		"bat"         # Better cat with syntax highlighting
+		"fzf"         # Fuzzy finder (general use)
+		"gh"          # GitHub CLI
+		"jq"          # JSON processor (for rest.nvim HTTP client)
+		"tidy-html5"  # HTML formatter (for rest.nvim)
+		"tree"        # Directory tree viewer
+		"shellcheck"  # Shell script linter
+		"shfmt"       # Shell script formatter
+		"actionlint"  # GitHub Actions workflow linter (for nvim-lint)
+		"codespell"   # Spell checker (for nvim-lint)
+		"gitlint"     # Git commit message linter (for nvim-lint)
+		"checkmake"   # Makefile linter (for nvim-lint)
+		"claude-code" # Anthropic Claude Code CLI (AI pair programming)
 	)
 
 	# Install required packages
@@ -320,15 +319,6 @@ add_apt_repositories() {
 	# Note: We don't use ubuntu_version here, but keeping detect_os call
 	# in case we need version-specific logic in the future
 	detect_os >/dev/null
-
-	# Neovim stable PPA (official)
-	if ! grep -q "neovim-ppa/stable" /etc/apt/sources.list.d/* 2>/dev/null; then
-		print_info "Adding Neovim stable PPA..."
-		sudo add-apt-repository -y ppa:neovim-ppa/stable
-		print_success "Neovim PPA added"
-	else
-		print_success "Neovim PPA already configured"
-	fi
 
 	# Git stable PPA (official)
 	if ! grep -q "git-core/ppa" /etc/apt/sources.list.d/* 2>/dev/null; then
@@ -375,11 +365,8 @@ install_apt_packages() {
 	# shellcheck disable=SC2068
 	sudo apt-get install -y ${essential_packages[@]}
 
-	# Required packages
-	local required_packages=(
-		"neovim"   # NeoVim (from PPA)
-		"luarocks" # Lua package manager
-	)
+	# Note: NeoVim is installed via Homebrew (see install_homebrew_packages)
+	# Use --use-homebrew flag to install NeoVim on Ubuntu
 
 	# Optional but recommended packages
 	local optional_packages=(
@@ -395,22 +382,6 @@ install_apt_packages() {
 		"shfmt"      # Shell script formatter
 		"codespell"  # Spell checker (for nvim-lint)
 	)
-
-	# Install required packages
-	print_info "Installing required packages..."
-	for package in "${required_packages[@]}"; do
-		if dpkg -l | grep -q "^ii  $package "; then
-			print_success "$package is already installed"
-		else
-			print_info "Installing $package..."
-			if sudo apt-get install -y "$package"; then
-				print_success "$package installed"
-			else
-				print_error "Failed to install $package (required)"
-				return 1
-			fi
-		fi
-	done
 
 	# Install optional packages
 	print_info "Installing optional packages..."
@@ -472,6 +443,11 @@ install_system_packages() {
 		check_homebrew
 		install_homebrew_packages
 	elif [[ "$PKG_MANAGER" == "apt" ]]; then
+		print_warning "NeoVim must be installed via Homebrew (not available via apt in this script)"
+		print_warning "To install NeoVim, either:"
+		print_warning "  1. Run: brew install neovim (if Homebrew is installed)"
+		print_warning "  2. Or re-run this script with: ./install.sh --use-homebrew"
+		echo ""
 		add_apt_repositories
 		install_apt_packages
 	else
@@ -485,11 +461,12 @@ install_system_packages() {
 #------------------------------------------------------------------------------
 
 # Install Lua packages via luarocks
+# Note: luarocks is installed by mise as part of the lua installation
 install_lua_packages() {
 	print_header "Installing Lua development tools"
 
 	if ! command_exists luarocks; then
-		print_error "luarocks not found (should have been installed earlier)"
+		print_error "luarocks not found (should have been installed by mise with lua)"
 		return 1
 	fi
 
@@ -545,6 +522,39 @@ install_node_packages() {
 	print_success "npm version: $(npm --version)"
 }
 
+# Install global npm AI coding tools
+install_ai_tools() {
+	print_header "Installing AI coding assistants (global npm)"
+
+	if ! command_exists npm; then
+		print_warning "npm not found - skipping AI tools installation"
+		return 1
+	fi
+
+	local ai_packages=(
+		"@github/copilot"                # GitHub Copilot CLI
+		"@github/copilot-language-server" # GitHub Copilot LSP (for sidekick.nvim)
+		"@openai/codex"                  # OpenAI Codex CLI
+	)
+
+	print_info "Installing global npm AI tools..."
+	for package in "${ai_packages[@]}"; do
+		if npm list -g "$package" &>/dev/null; then
+			print_success "$package is already installed"
+		else
+			print_info "Installing $package..."
+			if npm install -g "$package"; then
+				print_success "$package installed"
+			else
+				print_warning "Failed to install $package (optional)"
+			fi
+		fi
+	done
+
+	# Note about aider
+	print_info "Note: aider-chat is managed by mise (pipx:aider-chat in .mise.toml)"
+}
+
 # Install Python packages
 # NOTE: Python packages are now managed by mise via pipx (see .mise.toml)
 install_python_packages() {
@@ -586,7 +596,7 @@ install_cargo_tools() {
 	fi
 
 	print_info "Cargo tools are managed by mise via .mise.toml"
-	print_info "Tools include: stylua, git-delta, eza"
+	print_info "Tools include: stylua (Lua formatter), git-delta (better git diff), eza (better ls)"
 	print_success "Cargo version: $(cargo --version)"
 }
 
@@ -608,9 +618,10 @@ install_nerd_fonts() {
 		print_info "Installing Nerd Fonts via Homebrew..."
 
 		local fonts=(
-			"font-hack-nerd-font"           # Hack (popular monospace)
-			"font-jetbrains-mono-nerd-font" # JetBrains Mono (popular for coding)
-			"font-fira-code-nerd-font"      # Fira Code (ligatures)
+			"font-hack-nerd-font"              # Hack (popular monospace)
+			"font-jetbrains-mono-nerd-font"    # JetBrains Mono (popular for coding)
+			"font-fira-code-nerd-font"         # Fira Code (ligatures)
+			"font-caskaydia-cove-nerd-font"    # CaskaydiaCove (Cascadia Code with Nerd Font icons)
 		)
 
 		for font in "${fonts[@]}"; do
@@ -627,7 +638,11 @@ install_nerd_fonts() {
 		done
 
 		print_success "Nerd Fonts installed!"
-		print_info "To use: Set your terminal font to 'Hack Nerd Font', 'JetBrainsMono Nerd Font', or 'FiraCode Nerd Font'"
+		print_info "To use: Set your terminal font to one of:"
+		print_info "  • Hack Nerd Font"
+		print_info "  • JetBrainsMono Nerd Font"
+		print_info "  • FiraCode Nerd Font"
+		print_info "  • CaskaydiaCove Nerd Font"
 
 	elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
 		# Linux: Download and install manually
@@ -644,11 +659,19 @@ install_nerd_fonts() {
 			"https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/Hack.zip"
 			"https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/JetBrainsMono.zip"
 			"https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/FiraCode.zip"
+			"https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/CascadiaCode.zip"
 		)
 
 		for url in "${font_urls[@]}"; do
 			local font_name
 			font_name=$(basename "$url" .zip)
+
+			# Check if font directory already exists
+			if [[ -d "$fonts_dir/$font_name" ]] && [[ -n "$(ls -A "$fonts_dir/$font_name" 2>/dev/null)" ]]; then
+				print_success "$font_name is already installed"
+				continue
+			fi
+
 			print_info "Downloading $font_name..."
 
 			if curl -L -o "$temp_dir/$font_name.zip" "$url"; then
@@ -672,13 +695,80 @@ install_nerd_fonts() {
 		rm -rf "$temp_dir"
 
 		print_success "Nerd Fonts installed!"
-		print_info "To use: Set your terminal font to 'Hack Nerd Font', 'JetBrainsMono Nerd Font', or 'FiraCode Nerd Font'"
+		print_info "To use: Set your terminal font to one of:"
+		print_info "  • Hack Nerd Font"
+		print_info "  • JetBrainsMono Nerd Font"
+		print_info "  • FiraCode Nerd Font"
+		print_info "  • CaskaydiaCove Nerd Font (Cascadia Code)"
 	fi
 }
 
 #------------------------------------------------------------------------------
 # Configuration Setup
 #------------------------------------------------------------------------------
+
+# Clear NeoVim cache and data directories
+clear_nvim_cache() {
+	print_header "Clearing NeoVim cache and data"
+
+	local nvim_data_dir="${XDG_DATA_HOME:-$HOME/.local/share}/nvim"
+	local nvim_state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/nvim"
+	local nvim_cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/nvim"
+
+	local dirs_cleared=0
+
+	# Clear data directory (plugins, mason, etc.)
+	if [[ -d "$nvim_data_dir" ]]; then
+		local size
+		size=$(du -sh "$nvim_data_dir" 2>/dev/null | cut -f1)
+		print_info "Removing data directory: $nvim_data_dir ($size)"
+		if rm -rf "$nvim_data_dir"; then
+			print_success "Data directory cleared"
+			((dirs_cleared++))
+		else
+			print_warning "Failed to remove data directory"
+		fi
+	else
+		print_info "Data directory not found (already clean)"
+	fi
+
+	# Clear state directory (logs, sessions, shada, swap, undo)
+	if [[ -d "$nvim_state_dir" ]]; then
+		local size
+		size=$(du -sh "$nvim_state_dir" 2>/dev/null | cut -f1)
+		print_info "Removing state directory: $nvim_state_dir ($size)"
+		if rm -rf "$nvim_state_dir"; then
+			print_success "State directory cleared"
+			((dirs_cleared++))
+		else
+			print_warning "Failed to remove state directory"
+		fi
+	else
+		print_info "State directory not found (already clean)"
+	fi
+
+	# Clear cache directory (compiled lua, logs, etc.)
+	if [[ -d "$nvim_cache_dir" ]]; then
+		local size
+		size=$(du -sh "$nvim_cache_dir" 2>/dev/null | cut -f1)
+		print_info "Removing cache directory: $nvim_cache_dir ($size)"
+		if rm -rf "$nvim_cache_dir"; then
+			print_success "Cache directory cleared"
+			((dirs_cleared++))
+		else
+			print_warning "Failed to remove cache directory"
+		fi
+	else
+		print_info "Cache directory not found (already clean)"
+	fi
+
+	if [[ $dirs_cleared -eq 0 ]]; then
+		print_success "NeoVim cache already clean (no directories found)"
+	else
+		print_success "Cleared $dirs_cleared NeoVim director$([[ $dirs_cleared -eq 1 ]] && echo 'y' || echo 'ies')"
+		print_info "Plugins and LSP servers will be reinstalled on first NeoVim launch"
+	fi
+}
 
 # Setup NeoVim configuration
 setup_nvim_config() {
@@ -687,31 +777,84 @@ setup_nvim_config() {
 	local auto_yes="${1:-false}"
 	local nvim_config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
 
+	# Resolve absolute paths for comparison
+	local script_dir_abs
+	script_dir_abs=$(cd "$SCRIPT_DIR" && pwd)
+	local nvim_config_abs
+	nvim_config_abs=$(cd "$(dirname "$nvim_config_dir")" && pwd)/$(basename "$nvim_config_dir")
+
+	# Check if we're already in the target location (e.g., from one-liner clone)
+	if [[ "$script_dir_abs" == "$nvim_config_abs" ]]; then
+		print_success "NeoVim config is already in the correct location: $nvim_config_dir"
+		print_info "No symlink needed - repository cloned directly to config directory"
+
+		# Check if a recent backup exists (from one-liner)
+		for backup in "${nvim_config_dir}.backup."*; do
+			if [[ -d "$backup" ]]; then
+				# Check if backup is less than 5 minutes old
+				local backup_time
+				backup_time=$(stat -f %m "$backup" 2>/dev/null || stat -c %Y "$backup" 2>/dev/null)
+				local current_time
+				current_time=$(date +%s)
+				local age=$((current_time - backup_time))
+
+				if [[ $age -lt 300 ]]; then  # 5 minutes = 300 seconds
+					print_info "Recent backup found: $backup"
+					break
+				fi
+			fi
+		done
+
+		return 0
+	fi
+
 	# Backup existing config if it exists and is not a symlink
 	if [[ -d "$nvim_config_dir" ]] && [[ ! -L "$nvim_config_dir" ]]; then
-		local backup_dir
-		backup_dir="${nvim_config_dir}.backup.$(date +%Y%m%d_%H%M%S)"
+		# Check if a recent backup already exists (within last 5 minutes)
+		local recent_backup=""
+		for backup in "${nvim_config_dir}.backup."*; do
+			if [[ -d "$backup" ]]; then
+				local backup_time
+				backup_time=$(stat -f %m "$backup" 2>/dev/null || stat -c %Y "$backup" 2>/dev/null)
+				local current_time
+				current_time=$(date +%s)
+				local age=$((current_time - backup_time))
 
-		print_warning "Existing NeoVim config found at: $nvim_config_dir"
-		print_info "This will be backed up to: $backup_dir"
-		echo ""
+				if [[ $age -lt 300 ]]; then  # 5 minutes
+					recent_backup="$backup"
+					break
+				fi
+			fi
+		done
 
-		if [[ "$auto_yes" == "true" ]]; then
-			print_info "Auto-confirming backup (--yes flag)"
-			REPLY="y"
+		if [[ -n "$recent_backup" ]]; then
+			print_info "Recent backup already exists: $recent_backup"
+			print_info "Skipping duplicate backup"
 		else
-			read -p "Continue with backup and installation? [Y/n] " -n 1 -r
+			local backup_dir
+			backup_dir="${nvim_config_dir}.backup.$(date +%Y%m%d_%H%M%S)"
+
+			print_warning "Existing NeoVim config found at: $nvim_config_dir"
+			print_info "This will be backed up to: $backup_dir"
 			echo ""
-		fi
 
-		if [[ $REPLY =~ ^[Nn]$ ]]; then
-			print_info "Installation cancelled by user"
-			exit 0
-		fi
+			if [[ "$auto_yes" == "true" ]]; then
+				print_info "Auto-confirming backup (--yes flag)"
+				REPLY="y"
+			else
+				read -p "Continue with backup and installation? [Y/n] " -n 1 -r
+				echo ""
+			fi
 
-		print_info "Backing up existing config..."
-		mv "$nvim_config_dir" "$backup_dir"
-		print_success "Backup created at: $backup_dir"
+			if [[ $REPLY =~ ^[Nn]$ ]]; then
+				print_info "Installation cancelled by user"
+				exit 0
+			fi
+
+			print_info "Backing up existing config..."
+			mv "$nvim_config_dir" "$backup_dir"
+			print_success "Backup created at: $backup_dir"
+		fi
 	fi
 
 	# Remove broken symlink if it exists
@@ -762,6 +905,7 @@ verify_installation() {
 		"python3:Python:python3 --version"
 		"ruby:Ruby:ruby --version"
 		"lua:Lua:lua -v"
+		"luarocks:LuaRocks:luarocks --version | head -1"
 		"go:Go:go version"
 		"cargo:Rust:cargo --version"
 	)
@@ -784,7 +928,6 @@ verify_installation() {
 
 	local system_tools=(
 		"git:Git:git --version"
-		"luarocks:LuaRocks:luarocks --version | head -1"
 	)
 
 	for tool_spec in "${system_tools[@]}"; do
@@ -799,7 +942,7 @@ verify_installation() {
 		fi
 	done
 
-	# Check optional tools
+	# Check optional tools (from system packages and mise/cargo)
 	echo ""
 	color_echo "${BOLD}🎨 Optional Tools:${NC}"
 
@@ -818,6 +961,8 @@ verify_installation() {
 		"codespell:codespell"
 		"gitlint:gitlint"
 		"checkmake:checkmake"
+		"claude-code:Claude Code CLI"
+		"aider:Aider AI"
 	)
 
 	for tool_spec in "${optional_tools[@]}"; do
@@ -932,51 +1077,62 @@ ${BOLD}Options:${NC}
   --use-homebrew      Force use of Homebrew (Linux only)
   --use-apt           Force use of apt (Ubuntu only)
   --skip-optional     Skip installation of optional tools
+  --skip-cache-clear  Don't clear NeoVim cache (cache cleared by default)
   --verify-only       Only verify installation, don't install anything
   --no-config         Don't setup NeoVim config symlink
 
 ${BOLD}Supported Platforms:${NC}
-  ✓ macOS + Homebrew
-  ✓ Ubuntu 24.04 LTS (Noble Numbat) + Homebrew
-  ✓ Ubuntu 24.04 LTS (Noble Numbat) + apt
-  ✓ Ubuntu 22.04 LTS (Jammy Jellyfish) + Homebrew
-  ✓ Ubuntu 22.04 LTS (Jammy Jellyfish) + apt
+  ✓ macOS + Homebrew (recommended)
+  ✓ Ubuntu 24.04 LTS (Noble Numbat) + Homebrew (required for NeoVim)
+  ✓ Ubuntu 24.04 LTS (Noble Numbat) + apt (other packages only)
+  ✓ Ubuntu 22.04 LTS (Jammy Jellyfish) + Homebrew (required for NeoVim)
+  ✓ Ubuntu 22.04 LTS (Jammy Jellyfish) + apt (other packages only)
 
 ${BOLD}Description:${NC}
   This script installs all dependencies for the NeoVim IDE configuration:
 
   ${CYAN}1.${NC} Checks for mise (tool version manager)
-  ${CYAN}2.${NC} Installs development tools via mise (neovim, node, python, ruby, lua, go, rust)
-  ${CYAN}3.${NC} Installs system packages (git, luarocks, ripgrep, fd, lazygit, bat, delta, etc.)
-  ${CYAN}4.${NC} Installs Lua packages (busted, luacheck, luacov)
-  ${CYAN}5.${NC} Installs language-specific packages (npm, pip, gem, cargo tools)
-  ${CYAN}6.${NC} Installs linters for nvim-lint (actionlint, codespell, gitlint, checkmake)
-  ${CYAN}7.${NC} Installs Nerd Fonts (optional, with user prompt)
-  ${CYAN}8.${NC} Sets up NeoVim configuration symlink
-  ${CYAN}9.${NC} Verifies installation
+  ${CYAN}2.${NC} Installs NeoVim via Homebrew
+  ${CYAN}3.${NC} Installs development tools via mise (node, python, ruby, lua, go, rust)
+  ${CYAN}4.${NC} Installs system packages (git, ripgrep, fd, lazygit, bat, etc.)
+  ${CYAN}5.${NC} Installs Lua packages (busted, luacheck, luacov)
+  ${CYAN}6.${NC} Installs language-specific packages (npm, pip, gem, cargo tools)
+  ${CYAN}7.${NC} Installs AI coding assistants (claude-code, copilot, codex, aider)
+  ${CYAN}8.${NC} Installs linters for nvim-lint (actionlint, codespell, gitlint, checkmake)
+  ${CYAN}9.${NC} Installs Nerd Fonts (optional, with user prompt)
+  ${CYAN}10.${NC} Clears NeoVim cache, state, and data directories (ensures clean slate)
+  ${CYAN}11.${NC} Sets up NeoVim configuration symlink
+  ${CYAN}12.${NC} Verifies installation
 
 ${BOLD}Requirements:${NC}
   • mise (https://mise.jdx.dev/) - ${YELLOW}Required${NC}
-  • Homebrew (macOS) or apt (Ubuntu) - ${YELLOW}Required${NC}
+  • Homebrew (https://brew.sh/) - ${YELLOW}Required for NeoVim${NC}
+  • apt (Ubuntu only) - ${YELLOW}Optional for other packages${NC}
   • Internet connection - ${YELLOW}Required${NC}
 
 ${BOLD}Examples:${NC}
   ${CYAN}# Full installation (auto-detect package manager)${NC}
   ./install.sh
 
-  ${CYAN}# Use Homebrew on Ubuntu${NC}
+  ${CYAN}# Use Homebrew on Ubuntu (recommended for NeoVim)${NC}
   ./install.sh --use-homebrew
 
-  ${CYAN}# Use apt on Ubuntu${NC}
+  ${CYAN}# Use apt on Ubuntu (NeoVim requires Homebrew separately)${NC}
   ./install.sh --use-apt
 
   ${CYAN}# Skip optional tools${NC}
   ./install.sh --skip-optional
 
+  ${CYAN}# Keep existing NeoVim cache (don't clear)${NC}
+  ./install.sh --skip-cache-clear
+
   ${CYAN}# Just verify what's installed${NC}
   ./install.sh --verify-only
 
 ${BOLD}After Installation:${NC}
+  ${YELLOW}Note: NeoVim cache was cleared for a clean installation.${NC}
+  ${YELLOW}Plugins and LSP servers will be downloaded on first launch.${NC}
+
   1. Restart your shell or run: ${CYAN}eval "\$(mise activate bash)"${NC}
   2. Start NeoVim: ${CYAN}nvim${NC}
   3. Wait for plugins to auto-install (via lazy.nvim)
@@ -999,6 +1155,7 @@ main() {
 	local verify_only=false
 	local no_config=false
 	local auto_yes=false
+	local skip_cache_clear=false
 
 	# Parse command-line arguments
 	while [[ $# -gt 0 ]]; do
@@ -1025,6 +1182,10 @@ main() {
 			;;
 		--no-config)
 			no_config=true
+			shift
+			;;
+		--skip-cache-clear)
+			skip_cache_clear=true
 			shift
 			;;
 		--yes | -y)
@@ -1077,11 +1238,25 @@ main() {
 	install_ruby_gems
 	install_cargo_tools
 
+	# Step 6.5: Install AI coding assistants
+	if ! $skip_optional; then
+		install_ai_tools
+	else
+		print_info "Skipping AI tools installation (--skip-optional flag)"
+	fi
+
 	# Step 7: Install Nerd Fonts (optional, with prompt)
 	if ! $skip_optional; then
 		install_nerd_fonts
 	else
 		print_info "Skipping Nerd Fonts installation (--skip-optional flag)"
+	fi
+
+	# Step 7.5: Clear NeoVim cache (default behavior)
+	if ! $skip_cache_clear; then
+		clear_nvim_cache
+	else
+		print_info "Skipping NeoVim cache clearing (--skip-cache-clear flag)"
 	fi
 
 	# Step 8: Setup NeoVim configuration
@@ -1108,6 +1283,12 @@ main() {
 		fi
 
 		color_echo "${BOLD}📝 Next Steps:${NC}"
+		if ! $skip_cache_clear; then
+			echo ""
+			color_echo "  ${YELLOW}Note: NeoVim cache was cleared for a clean installation.${NC}"
+			color_echo "  ${YELLOW}Plugins and LSP servers will be downloaded on first launch.${NC}"
+		fi
+		echo ""
 		color_echo "  ${CYAN}1.${NC} Restart your shell or activate mise:"
 		color_echo "     ${YELLOW}eval \"\$(mise activate bash)\"${NC}  # for bash"
 		color_echo "     ${YELLOW}eval \"\$(mise activate zsh)\"${NC}   # for zsh"

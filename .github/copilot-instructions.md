@@ -1,12 +1,13 @@
 # GitHub Copilot Instructions
 
-> **Note:** For complete project context, architecture, and development guidelines, see [`AGENTS.md`](../AGENTS.md) at the repository root.
+> **Note:** For complete project context, architecture, and development
+> guidelines, see [`AGENTS.md`](../AGENTS.md) at the repository root.
 
 ## Quick Reference
 
 This NeoVim IDE configuration is:
 
-- ✅ **Production-ready** with 786 passing tests
+- ✅ **Production-ready** with 811 passing tests
 - ✅ **Test-Driven Development** (TDD) - always write tests first
 - ✅ **Modular architecture** - keep files under ~130 lines
 - ✅ **Strict conventions** - see AGENTS.md for details
@@ -30,6 +31,5 @@ This NeoVim IDE configuration is:
 
 - **Always lazy-load plugins** - Use `event`, `cmd`, `keys`, or `ft`
 - **Target: <100ms startup** - Profile with `:Lazy profile`
-- See [`PERFORMANCE.md`](../PERFORMANCE.md) for optimization strategies
 
 **For detailed information, refer to [`AGENTS.md`](../AGENTS.md)**

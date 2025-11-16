@@ -45,14 +45,20 @@ local M = {}
 local function setup_colorscheme(config)
 	config = config or {}
 
-	-- Set background
-	vim.o.background = config.background or "dark"
+	-- Set background if specified
+	if config.background then
+		vim.o.background = config.background
+	end
 
-	-- Apply gruvbox
-	local ok = pcall(vim.cmd, "colorscheme gruvbox")
-	if not ok then
-		vim.notify("gruvbox colorscheme not found", vim.log.levels.WARN)
-		return false
+	-- Colorscheme is already applied by the plugin config on load
+	-- Just verify it's loaded correctly
+	if vim.g.colors_name ~= "gruvbox" then
+		-- Try to apply if not already loaded
+		local ok = pcall(vim.cmd, "colorscheme gruvbox")
+		if not ok then
+			vim.notify("gruvbox colorscheme not found", vim.log.levels.WARN)
+			return false
+		end
 	end
 
 	return true

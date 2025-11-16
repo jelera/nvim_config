@@ -86,26 +86,28 @@ describe("modules.treesitter #unit", function()
 			assert.is_not_nil(_G._test_treesitter_config.textobjects)
 		end)
 
-		it("should configure parsers to install", function()
+		it("should configure essential parsers for startup", function()
 			treesitter.setup()
 			assert.is_table(_G._test_treesitter_config.ensure_installed)
-			-- Should include core languages
+			-- Should include essential parsers (performance optimization)
+			-- Other parsers auto-install on-demand when files are opened
 			local parsers = _G._test_treesitter_config.ensure_installed
-			local has_lua, has_python, has_javascript = false, false, false
+			local has_lua, has_vim, has_vimdoc, has_query = false, false, false, false
 			for _, parser in ipairs(parsers) do
 				if parser == "lua" then
 					has_lua = true
-				end
-				if parser == "python" then
-					has_python = true
-				end
-				if parser == "javascript" then
-					has_javascript = true
+				elseif parser == "vim" then
+					has_vim = true
+				elseif parser == "vimdoc" then
+					has_vimdoc = true
+				elseif parser == "query" then
+					has_query = true
 				end
 			end
 			assert.is_true(has_lua)
-			assert.is_true(has_python)
-			assert.is_true(has_javascript)
+			assert.is_true(has_vim)
+			assert.is_true(has_vimdoc)
+			assert.is_true(has_query)
 		end)
 
 		it("should set auto_install to true", function()

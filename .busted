@@ -5,6 +5,9 @@ return {
     ROOT = { 'lua/spec/unit', 'lua/spec/integration' },
     pattern = '_spec%.lua$',  -- Files ending with _spec.lua
 
+    -- Helper file to set up Lua module path
+    helper = 'lua/spec/busted_helper.lua',
+
     -- Execution settings
     shuffle = true,           -- Randomize test order to catch test interdependencies
     seed = os.time(),         -- Use timestamp as seed for reproducible shuffles
@@ -25,6 +28,7 @@ return {
   unit = {
     ROOT = { 'lua/spec/unit' },
     pattern = '_spec%.lua$',
+    helper = 'lua/spec/busted_helper.lua',
     shuffle = true,
     seed = os.time(),
     verbose = true,
@@ -37,6 +41,7 @@ return {
   integration = {
     ROOT = { 'lua/spec/integration' },
     pattern = '_spec%.lua$',
+    helper = 'lua/spec/busted_helper.lua',
     shuffle = true,
     seed = os.time(),
     verbose = true,

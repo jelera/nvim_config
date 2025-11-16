@@ -310,14 +310,8 @@ describe("setup #unit", function()
 			setup.setup_lazy = original_setup_lazy
 		end)
 
-		it("should emit setup:complete event", function()
-			local event_bus = require("nvim.core.event_bus")
-			local event_emitted = false
-
-			event_bus.on("setup:complete", function()
-				event_emitted = true
-			end)
-
+		it("should complete initialization without emitting events (performance)", function()
+			-- Event emission was removed for performance optimization
 			-- Mock all dependencies
 			package.loaded["lazy"] = {
 				setup = function() end,
@@ -333,9 +327,10 @@ describe("setup #unit", function()
 				return true
 			end
 
-			setup.init()
+			local result = setup.init()
 
-			assert.is_true(event_emitted)
+			-- Should complete successfully
+			assert.is_true(result)
 
 			setup.is_lazy_installed = original_is_lazy_installed
 			setup.setup_lazy = original_setup_lazy

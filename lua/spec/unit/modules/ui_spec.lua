@@ -116,18 +116,17 @@ describe("modules.ui #unit", function()
 			assert.equal("gruvbox", _G._test_colorscheme)
 		end)
 
-		it("should set dark background", function()
+		it("should configure devicons (eager-loaded)", function()
 			ui.setup()
-			assert.equal("dark", _G._test_background)
+			assert.is_not_nil(_G._test_plugins_configured.devicons)
 		end)
 
-		it("should configure all plugins", function()
+		it("should not configure lazy-loaded plugins during setup", function()
 			ui.setup()
-
-			assert.is_not_nil(_G._test_plugins_configured.devicons)
-			assert.is_not_nil(_G._test_plugins_configured.lualine)
-			assert.is_not_nil(_G._test_plugins_configured.ibl)
-			assert.is_not_nil(_G._test_plugins_configured.notify)
+			-- Lualine, ibl, notify are lazy-loaded and configured on-demand
+			assert.is_nil(_G._test_plugins_configured.lualine)
+			assert.is_nil(_G._test_plugins_configured.ibl)
+			assert.is_nil(_G._test_plugins_configured.notify)
 		end)
 	end)
 
@@ -137,14 +136,14 @@ describe("modules.ui #unit", function()
 			assert.is_true(result)
 		end)
 
-		it("should apply light background", function()
+		it("should apply light background when specified", function()
 			ui.setup({ colorscheme = { background = "light" } })
 			assert.equal("light", _G._test_background)
 		end)
 
-		it("should use custom statusline theme", function()
-			ui.setup({ statusline = { theme = "tokyonight" } })
-			assert.equal("tokyonight", _G._test_plugins_configured.lualine.options.theme)
+		it("should apply dark background when specified", function()
+			ui.setup({ colorscheme = { background = "dark" } })
+			assert.equal("dark", _G._test_background)
 		end)
 	end)
 
@@ -158,9 +157,9 @@ describe("modules.ui #unit", function()
 			assert.is_false(result)
 		end)
 
-		it("should return false when any plugin missing", function()
-			package.loaded["lualine"] = nil
-			package.preload["lualine"] = function()
+		it("should return false when devicons missing", function()
+			package.loaded["nvim-web-devicons"] = nil
+			package.preload["nvim-web-devicons"] = function()
 				error("not found")
 			end
 

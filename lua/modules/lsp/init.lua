@@ -215,6 +215,21 @@ function M.setup(config)
 		end)
 	end
 
+	-- Configure copilot manually (installed via npm, not mason)
+	-- Always enable copilot for all projects (AI assistance)
+	if vim.fn.executable("copilot-language-server") == 1 then
+		local copilot_config = lsp_config.load_server_config("copilot") or {}
+		local final_copilot_config = utils.deep_merge({
+			capabilities = capabilities,
+			on_attach = on_attach,
+		}, copilot_config)
+
+		pcall(function()
+			vim.lsp.config("copilot", final_copilot_config)
+			vim.lsp.enable("copilot")
+		end)
+	end
+
 	return true
 end
 

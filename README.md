@@ -4,7 +4,7 @@ Modern, IDE-like NeoVim configuration built with TDD and modular architecture.
 
 ## Features
 
-✅ **12 Complete Modules** | **786 Tests Passing** | **100% Success Rate**
+✅ **12 Complete Modules** | **811 Tests Passing** | **100% Success Rate**
 
 - **Core**: Vim options, keymaps, autocmds, commands
 - **UI**: Colorscheme, statusline, icons, indent guides, notifications
@@ -24,47 +24,25 @@ Modern, IDE-like NeoVim configuration built with TDD and modular architecture.
 
 **Fully automated (recommended):**
 
-Using curl:
-
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jelera/nvim_config/main/quick-start.sh | bash -s -- -y
-```
-
-Using wget:
-
-```bash
-wget -qO- https://raw.githubusercontent.com/jelera/nvim_config/main/quick-start.sh | bash -s -- -y
+mv ~/.config/nvim ~/.config/nvim.backup.$(date +%Y%m%d_%H%M%S) 2>/dev/null || true; gh repo clone jelera/nvim_config ~/.config/nvim && cd ~/.config/nvim && ./install.sh -y
 ```
 
 **Interactive (with confirmation prompts):**
 
-Using curl:
-
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jelera/nvim_config/main/quick-start.sh | bash
+mv ~/.config/nvim ~/.config/nvim.backup.$(date +%Y%m%d_%H%M%S) 2>/dev/null || true; gh repo clone jelera/nvim_config ~/.config/nvim && cd ~/.config/nvim && ./install.sh
 ```
 
-Using wget:
+The one-liner automatically:
 
-```bash
-wget -qO- https://raw.githubusercontent.com/jelera/nvim_config/main/quick-start.sh | bash
-```
-
-The quick-start script safely handles existing configurations by:
-
-- Checking for existing `~/.config/nvim` before cloning
-- Prompting for confirmation if config exists
-- Creating automatic timestamped backups
-- Running the full installation
+- Backs up existing `~/.config/nvim` to `~/.config/nvim.backup.TIMESTAMP`
+- Clones this repo directly to `~/.config/nvim`
+- Runs the full installation script
+- Installs all dependencies and tools via mise
+- Clears NeoVim cache for a clean slate
 
 The `-y` flag auto-confirms all prompts for a completely hands-off installation.
-
-**Alternative: Using GitHub CLI (gh):**
-
-```bash
-# Clone to temporary location, then run installer
-gh repo clone jelera/nvim_config /tmp/nvim_config && cd /tmp/nvim_config && ./install.sh
-```
 
 ### Manual Installation
 
@@ -234,7 +212,7 @@ Automated checks run on every PR (only when relevant files change):
 **Tests** (`.github/workflows/test.yml`):
 
 - Uses inline mise configuration (minimal) - only installs Lua/LuaJIT and stylua
-- Runs full test suite (786 tests) with busted
+- Runs full test suite (811 tests) with busted
 - Ubuntu-based CI environment
 - Runs on all PRs and pushes to main
 - Fast: Avoids installing Node, Python, Ruby, Go, Rust (saves ~2-3 minutes per run)
@@ -322,7 +300,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for details.
 ## Performance
 
 - **Startup: 62ms average** (37% faster than baseline, best run: 45ms)
-- 786 tests run in <1 second
+- 811 tests run in <1 second
 - Lazy loading for 90%+ of plugins with smart event triggers
 - Profile with `:ProfileStartup`, `:BenchmarkStartup`, or `:ProfilePlugins`
 

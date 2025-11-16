@@ -27,6 +27,18 @@ return {
 			"<leader>aq",
 			"<leader>ai",
 		},
-		config = false,
+		config = function()
+			-- Configure sidekick to use copilot LSP
+			require("sidekick").setup({
+				nes = {
+					enabled = true,
+					provider = "copilot_lsp", -- Use Copilot LSP for AI suggestions
+				},
+				terminal = {
+					enabled = true,
+					default_tool = "claude",
+				},
+			})
+		end,
 	},
 }

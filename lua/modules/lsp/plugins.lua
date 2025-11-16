@@ -34,6 +34,12 @@ return {
 		config = false,
 	},
 
+	-- SchemaStore - JSON/YAML schema catalog integration
+	{
+		"b0o/schemastore.nvim",
+		lazy = true, -- Only load when required by LSP servers
+	},
+
 	-- Bridge between Mason and nvim-lspconfig
 	{
 		"williamboman/mason-lspconfig.nvim",
@@ -41,6 +47,7 @@ return {
 			"williamboman/mason.nvim",
 			"neovim/nvim-lspconfig",
 			"hrsh7th/cmp-nvim-lsp",
+			"b0o/schemastore.nvim", -- Schema validation for JSON/YAML
 		},
 		event = { "BufReadPre", "BufNewFile" }, -- Load with lspconfig
 		config = function()
