@@ -73,11 +73,12 @@ Pre-commit hooks run (in parallel):
 
 ### CI Pipeline (GitHub Actions)
 
-Four workflows run sequentially:
+A single CI workflow runs all checks in parallel, then tests:
 
-1. **Lint Lua** → 2. **Lint Shell** → 3. **Validate Schemas** → 4. **Run Tests**
+1. **Lint Lua**, **Lint Shell**, **Validate Schemas** (run in parallel)
+2. **Run Tests** (only runs if all linting/validation passes)
 
-Tests only run after all three lint workflows pass. If tests fail, check the CI output and fix issues locally before pushing.
+If tests fail, check the CI output and fix issues locally before pushing.
 
 ## Architecture Patterns
 
