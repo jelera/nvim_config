@@ -2,13 +2,17 @@
 Diffview Configuration
 ======================
 
-Configures diffview.nvim for advanced diff visualization.
+Configures diffview.nvim for advanced diff visualization and merge conflict resolution.
 
 Features:
 - Side-by-side or unified diff views
 - File history browser
-- Merge conflict resolution UI
+- 3-way merge conflict resolution UI with keymaps:
+  - <leader>go - Choose OURS (left pane)
+  - <leader>gt - Choose THEIRS (right pane)
+  - <leader>gb - Choose BASE (middle pane)
 - Customizable layouts
+- Auto-disable diagnostics in merge mode
 
 Dependencies:
 - sindrets/diffview.nvim
@@ -84,6 +88,11 @@ local default_config = {
 			{ "n", "<tab>", "<cmd>DiffviewToggleFiles<cr>", { desc = "Toggle file panel" } },
 			{ "n", "gf", "<cmd>DiffviewFocusFiles<cr>", { desc = "Focus file panel" } },
 			{ "n", "<leader>e", "<cmd>DiffviewToggleFiles<cr>", { desc = "Toggle file panel" } },
+			-- Conflict resolution keymaps in merge view
+			-- These are specific to 3-way merge layouts
+			{ "n", "<leader>go", "<cmd>diffget //2<cr>", { desc = "Choose OURS (left)" } },
+			{ "n", "<leader>gt", "<cmd>diffget //3<cr>", { desc = "Choose THEIRS (right)" } },
+			{ "n", "<leader>gb", "<cmd>diffget //1<cr>", { desc = "Choose BASE (middle)" } },
 		},
 		file_panel = {
 			{ "n", "j", '<cmd>lua require("diffview").next_entry()<cr>', { desc = "Next entry" } },

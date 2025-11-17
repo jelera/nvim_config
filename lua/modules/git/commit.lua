@@ -43,6 +43,9 @@ function M.setup()
 			-- Disable line numbers
 			vim.opt_local.number = false
 
+			-- Disable undo files for commit messages (prevents E824 errors)
+			vim.opt_local.undofile = false
+
 			-- Enable spell checking for commit messages
 			vim.opt_local.spell = true
 

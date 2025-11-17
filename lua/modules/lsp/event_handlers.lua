@@ -18,6 +18,7 @@ local on_attach = event_handlers.create_on_attach(config)
 local M = {}
 
 local keymaps = require("modules.lsp.keymaps")
+local utils = require("nvim.lib.utils")
 
 ---Setup format on save for buffer
 ---@param client table LSP client
@@ -76,6 +77,14 @@ end
 ---@return function on_attach callback
 function M.create_on_attach(config)
 	return function(client, bufnr)
+		-- Skip LSP attachment for special buffers
+		-- (git commit, neotest output, plugin UIs, etc.)
+		if not utils.should_attach_lsp(bufnr) then
+			-- Detach the LSP client from this buffer
+			vim.lsp.buf_detach_client(bufnr, client.id)
+			return
+		end
+
 		-- Setup keymaps
 		keymaps.setup(bufnr)
 

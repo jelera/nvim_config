@@ -5,7 +5,9 @@ Git Keymaps
 Defines all git-related key mappings.
 
 Keymaps:
-- <leader>gs - Git status
+- <leader>gs - Git status (Fugitive)
+- <leader>gg - Neogit status
+- <leader>gn - Neogit
 - <leader>gc - Git commit
 - <leader>gp - Git push
 - <leader>gl - Git pull
@@ -15,8 +17,21 @@ Keymaps:
 - <leader>gH - Reset hunk
 - <leader>gS - Stage hunk
 - <leader>gR - Reset buffer
+- <leader>gB - Toggle blame
 - ]h - Next hunk
 - [h - Previous hunk
+
+Diffview keymaps:
+- <leader>gdo - Open diffview
+- <leader>gdc - Close diffview
+- <leader>gdt - Toggle diffview files
+- <leader>gdh - File history
+- <leader>gdf - Current file history
+
+Conflict resolution keymaps:
+- <leader>gm - Open 3-way merge view
+- ]x - Next conflict
+- [x - Previous conflict
 
 API:
 - setup() - Setup git keymaps
@@ -127,6 +142,30 @@ function M.setup()
 		"<cmd>DiffviewFileHistory %<cr>",
 		vim.tbl_extend("force", opts, { desc = "Current file history" })
 	)
+
+	-- Conflict resolution keymaps
+	-- 3-way merge view (opens current file in merge mode)
+	keymap("n", "<leader>gm", function()
+		-- Get current file
+		local file = vim.fn.expand("%:p")
+		if file == "" then
+			vim.notify("No file open", vim.log.levels.WARN)
+			return
+		end
+		-- Open diffview in merge mode
+		vim.cmd("DiffviewOpen")
+	end, vim.tbl_extend("force", opts, { desc = "3-way merge view" }))
+
+	-- Navigate between conflicts
+	keymap("n", "]x", function()
+		-- Search for next conflict marker
+		vim.fn.search("^<<<<<<< ", "W")
+	end, vim.tbl_extend("force", opts, { desc = "Next conflict" }))
+
+	keymap("n", "[x", function()
+		-- Search for previous conflict marker
+		vim.fn.search("^<<<<<<< ", "bW")
+	end, vim.tbl_extend("force", opts, { desc = "Previous conflict" }))
 
 	return true
 end

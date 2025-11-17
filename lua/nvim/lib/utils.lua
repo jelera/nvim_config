@@ -11,6 +11,9 @@ Functions:
 - is_empty: Check if a table is empty
 - table_keys: Get all keys from a table
 - table_size: Get the number of entries in a table
+- merge_config: Merge user configuration with defaults
+- is_git_conflict_state: Check if git is in rebase/merge/cherry-pick state
+- should_attach_lsp: Check if LSP should attach to a buffer
 
 Usage:
   local utils = require('nvim.lib.utils')
@@ -20,6 +23,14 @@ Usage:
 
   if utils.is_array(value) then
     print('It is an array!')
+  end
+
+  if utils.is_git_conflict_state() then
+    print('Git conflict in progress!')
+  end
+
+  if utils.should_attach_lsp(bufnr) then
+    -- Attach LSP to this buffer
   end
 --]]
 
@@ -172,6 +183,123 @@ function M.merge_config(defaults, user_config)
 
 	local merged = M.deep_copy(defaults)
 	return M.deep_merge(merged, user_config)
+end
+
+--[[
+Check if git is currently in a rebase or merge state
+
+Detects whether the current working directory is in the middle of:
+- git rebase (interactive or non-interactive)
+- git merge
+- git cherry-pick
+
+This is useful for disabling LSP servers that might fail when
+parsing files with conflict markers.
+
+@return boolean: true if in rebase/merge/cherry-pick state
+--]]
+function M.is_git_conflict_state()
+	-- Check if vim.fn API is available (for test compatibility)
+	if not vim.fn or not vim.fn.isdirectory or not vim.fn.filereadable then
+		return false
+	end
+
+	-- Check for rebase in progress
+	-- luacheck: ignore
+	if vim.fn.isdirectory(".git/rebase-merge") == 1 or vim.fn.isdirectory(".git/rebase-apply") == 1 then
+		return true
+	end
+
+	-- Check for merge in progress
+	if vim.fn.filereadable(".git/MERGE_HEAD") == 1 then
+		return true
+	end
+
+	-- Check for cherry-pick in progress
+	if vim.fn.filereadable(".git/CHERRY_PICK_HEAD") == 1 then
+		return true
+	end
+
+	return false
+end
+
+--[[
+Check if a buffer should have LSP attached
+
+LSP should only attach to normal file buffers, not:
+- Special buffer types (terminal, quickfix, help, etc.)
+- Git-related buffers (commit messages, rebase, fugitive)
+- Plugin UI buffers (telescope, nvim-tree, lazy, mason, etc.)
+- Test output buffers (neotest)
+
+@param bufnr number: Buffer number to check
+@return boolean: true if LSP should attach, false otherwise
+--]]
+function M.should_attach_lsp(bufnr)
+	-- Get buffer properties
+	local buftype = vim.api.nvim_buf_get_option(bufnr, "buftype")
+	local filetype = vim.api.nvim_buf_get_option(bufnr, "filetype")
+	local bufname = vim.api.nvim_buf_get_name(bufnr)
+
+	-- Skip non-file buffers (terminal, quickfix, help, etc.)
+	-- Empty buftype = normal file buffer
+	if buftype ~= "" then
+		return false
+	end
+
+	-- Skip git-related filetypes
+	local git_filetypes = {
+		"gitcommit",
+		"gitrebase",
+		"gitconfig",
+		"git", -- fugitive buffers
+		"fugitive",
+		"fugitiveblame",
+	}
+	for _, ft in ipairs(git_filetypes) do
+		if filetype == ft then
+			return false
+		end
+	end
+
+	-- Skip test output and plugin UI filetypes
+	local special_filetypes = {
+		"neotest-output",
+		"neotest-output-panel",
+		"neotest-summary",
+		"TelescopePrompt",
+		"TelescopeResults",
+		"NvimTree",
+		"neo-tree",
+		"lazy",
+		"mason",
+		"lspinfo",
+		"null-ls-info",
+		"help",
+		"man",
+		"qf", -- quickfix
+	}
+	for _, ft in ipairs(special_filetypes) do
+		if filetype == ft then
+			return false
+		end
+	end
+
+	-- Skip buffers with special name patterns
+	-- These catch plugin buffers that might not have special filetypes
+	local skip_patterns = {
+		"^fugitive://", -- Fugitive buffers
+		"^term://", -- Terminal buffers
+		"^%[.*%]$", -- Buffers with names like [No Name], [Command Line]
+		"%.git/", -- Files inside .git directory
+	}
+	for _, pattern in ipairs(skip_patterns) do
+		if bufname:match(pattern) then
+			return false
+		end
+	end
+
+	return true
 end
 
 return M

@@ -147,6 +147,26 @@ end
 ---@param config.format_on_save boolean|nil Format on save (default: false)
 ---@return boolean success Whether setup succeeded
 function M.setup(config)
+	-- Skip LSP setup if in the middle of a git rebase/merge/cherry-pick
+	-- Language servers will fail when trying to parse files with conflict markers
+	-- Instead, trigger conflict resolution mode with git-aware tools
+	if utils.is_git_conflict_state() then
+		-- Trigger GitConflictDetected event to lazy-load conflict resolution tools
+		vim.api.nvim_exec_autocmds("User", { pattern = "GitConflictDetected" })
+
+		vim.notify(
+			"LSP disabled (git conflict state detected)\n\n"
+				.. "Conflict resolution tools loading:\n"
+				.. "• <leader>gg - Open Neogit status\n"
+				.. "• <leader>gm - Open 3-way merge view\n"
+				.. "• ]x / [x - Navigate conflicts\n\n"
+				.. "Resolve conflicts and reopen files to re-enable LSP.",
+			vim.log.levels.WARN,
+			{ title = "LSP Module" }
+		)
+		return false
+	end
+
 	-- Merge config with defaults using shared utility
 	local merged_config = utils.merge_config(lsp_config.default_config, config)
 

@@ -2,18 +2,21 @@
 Git Module
 ==========
 
-Orchestrates git integration including gitsigns, fugitive, and diffview.
+Orchestrates git integration including gitsigns, fugitive, diffview, and neogit.
 
 Features:
 - Gitsigns: Visual git indicators and hunk operations
 - Fugitive: Git commands and operations
 - Diffview: Advanced diff visualization
+- Neogit: Magit-inspired git interface
+- Conflict Resolution: Auto-detect and handle merge conflicts
 - Git keymaps: Comprehensive git key bindings
 
 Submodules:
 - signs.lua - Gitsigns configuration
 - fugitive.lua - Fugitive setup
 - diffview.lua - Diffview configuration
+- conflict.lua - Conflict resolution with neogit
 - commit.lua - Git commit message formatting
 - keymaps.lua - Git key mappings
 
@@ -21,6 +24,7 @@ Dependencies:
 - lewis6991/gitsigns.nvim
 - tpope/vim-fugitive
 - sindrets/diffview.nvim
+- NeogitOrg/neogit
 
 Usage:
 ```lua
@@ -30,7 +34,10 @@ git.setup({
     current_line_blame = true
   },
   fugitive = {},
-  diffview = {}
+  diffview = {},
+  conflict = {
+    neogit = {}
+  }
 })
 ```
 
@@ -45,6 +52,7 @@ local M = {}
 ---@param config.signs table|nil Gitsigns configuration overrides
 ---@param config.fugitive table|nil Fugitive configuration overrides
 ---@param config.diffview table|nil Diffview configuration overrides
+---@param config.conflict table|nil Conflict resolution configuration overrides
 ---@return boolean success Whether setup succeeded
 function M.setup(config)
 	config = config or {}
@@ -73,6 +81,13 @@ function M.setup(config)
 	local diffview_ok = diffview.setup(config.diffview or {})
 	if not diffview_ok then
 		vim.notify("Failed to setup diffview. Diff views disabled.", vim.log.levels.WARN)
+	end
+
+	-- Setup conflict resolution (neogit + enhanced diffview)
+	local conflict = require("modules.git.conflict")
+	local conflict_ok = conflict.setup(config.conflict or {})
+	if not conflict_ok then
+		vim.notify("Failed to setup conflict resolution tools.", vim.log.levels.WARN)
 	end
 
 	-- Setup git commit message formatting
